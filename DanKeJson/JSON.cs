@@ -33,6 +33,7 @@ Mail : danke1024@foxmail.com
 Github : https://github.com/DanKE123abc
   */
 
+using System.Reflection;
 using System.Text;
 
 namespace DanKeJson
@@ -61,6 +62,115 @@ namespace DanKeJson
             }
 
             return null;
+        }
+        
+        /// <summary>
+        /// Serializing Json(String) to Class
+        /// About Json : https://json.org
+        /// </summary>
+        /// <param name="text">the JsonText</param>
+        /// <typeparam name="T">Class</typeparam>
+        /// <returns>T Class</returns>
+        public static T ToData<T>(string text) where T : class, new()
+        {
+            int index = 0;
+            JsonData json = ProcessJson(text, ref index);
+            if (index == text.Length)
+            {
+                T dataclass = new T();
+                System.Type type = typeof(T);
+                foreach (PropertyInfo propertyInfo in type.GetProperties())
+                {
+                    if (propertyInfo.CanWrite)
+                    {
+                        System.Type propertyType = propertyInfo.PropertyType;
+                        if (propertyType == typeof(string))
+                        {
+                            propertyInfo.SetValue(dataclass,json[propertyInfo.Name].json[1..^1]);
+                        }
+                        else if (propertyType == typeof(bool))
+                        {
+                            bool.TryParse(json[propertyInfo.Name].json, out bool value);
+                            propertyInfo.SetValue(dataclass, value);
+                        }
+                        else if (propertyType == typeof(int))
+                        {
+                            int.TryParse(json[propertyInfo.Name].json, out int value);
+                            propertyInfo.SetValue(dataclass, value);
+                        }
+                        else if (propertyType == typeof(long))
+                        {
+                            long.TryParse(json[propertyInfo.Name].json, out long value);
+                            propertyInfo.SetValue(dataclass, value);
+                        }
+                        else if (propertyType == typeof(float))
+                        {
+                            float.TryParse(json[propertyInfo.Name].json, out float value);
+                            propertyInfo.SetValue(dataclass, value);
+                        }
+                        else if (propertyType == typeof(double))
+                        {
+                            double.TryParse(json[propertyInfo.Name].json, out double value);
+                            propertyInfo.SetValue(dataclass, value);
+                        }
+                        else if (propertyType == typeof(sbyte))
+                        {
+                            sbyte.TryParse(json[propertyInfo.Name].json, out sbyte value);
+                            propertyInfo.SetValue(dataclass, value);
+                        }
+                        else if (propertyType == typeof(short))
+                        {
+                            short.TryParse(json[propertyInfo.Name].json, out short value);
+                            propertyInfo.SetValue(dataclass, value);
+                        }
+                        else if (propertyType == typeof(uint))
+                        {
+                            uint.TryParse(json[propertyInfo.Name].json, out uint value);
+                            propertyInfo.SetValue(dataclass, value);
+                        }
+                        else if (propertyType == typeof(ulong))
+                        {
+                            ulong.TryParse(json[propertyInfo.Name].json, out ulong value);
+                            propertyInfo.SetValue(dataclass, value);
+                        }
+                        else if (propertyType == typeof(ushort))
+                        {
+                            ushort.TryParse(json[propertyInfo.Name].json, out ushort value);
+                            propertyInfo.SetValue(dataclass, value);
+                        }
+                        else if (propertyType.IsGenericType && propertyType.GetGenericTypeDefinition() == typeof(List<>))
+                        {
+                            Type listType = propertyType.GetGenericArguments()[0];
+                            if (listType == typeof(string))
+                            {
+                                List<string> list = new List<string>();
+                                foreach (var item in json[propertyInfo.Name].array)
+                                {
+                                    list.Add(item);
+                                }
+                                propertyInfo.SetValue(dataclass, list);
+                            }
+                            else
+                            {
+                                Type genericListType = typeof(List<>).MakeGenericType(listType);
+                                dynamic list = Activator.CreateInstance(genericListType);
+                                foreach (var item in json[propertyInfo.Name].array)
+                                {
+                                    list.Add(item);
+                                }
+                                propertyInfo.SetValue(dataclass, list);
+                            }
+                        }
+                        else
+                        {
+                            propertyInfo.SetValue(dataclass, null);
+                        }
+                    }
+                }
+                return dataclass;
+            }
+
+            return default(T);
         }
 
         /// <summary>

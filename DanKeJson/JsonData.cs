@@ -37,6 +37,7 @@ namespace DanKeJson
 {
     #pragma warning disable CS8618
     #pragma warning disable CS8603
+    #pragma warning disable CS8600
     
     /// <summary>
     /// DanKeJson : JsonData
