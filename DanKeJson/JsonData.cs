@@ -54,19 +54,20 @@ namespace DanKeJson
 
         public Type type { get; set; }
         public string json { get; set; }
+        
         public Dictionary<string, JsonData> map;
         public List<JsonData> array;
 
         public JsonData(Type type)
         {
             this.type = type;
-            if (type == Type.Array)
-            {
-                array = new List<JsonData>();
-            }
-            else if (type == Type.Object)
+            if (type == Type.Object)
             {
                 map = new Dictionary<string, JsonData>();
+            }
+            else if (type == Type.Array)
+            {
+                array = new List<JsonData>();
             }
 
         }
@@ -317,10 +318,11 @@ namespace DanKeJson
 
         public void Add(JsonData jsonData)
         {
-            if (jsonData != null && array != null)
+            if (jsonData == null || array == null)
             {
-                array.Add(jsonData);
+                return;
             }
+            array.Add(jsonData);
         }
 
         public JsonData this[int index]
@@ -368,11 +370,10 @@ namespace DanKeJson
                     return null;
                 }
 
-                if (map.ContainsKey(key))
+                if (map.TryGetValue(key, out JsonData json))
                 {
-                    return map[key];
+                    return json;
                 }
-
                 return null;
             }
             set
