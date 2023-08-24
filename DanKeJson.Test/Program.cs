@@ -1,15 +1,14 @@
 ﻿using DanKeJson;
 
-string json = "{ \"Name\" : \"Ming\",   " +
-              " \"Age\" : 16,   " +
-              " \"Height\" : 1.7,   " +
-              " \"HasFriends\" : true,    " +
-              " \"Friends\" : [\"Hong\",\"Long\",\"Cong\"],  " +
-              " \"Test\" :  { \"message\" : \"Hello\" }    " +
+string json = "{ \"Name\" : \"Ming\"," +
+              " \"Age\" : 16," +
+              " \"Height\" : 1.7," +
+              " \"HasFriends\" : true," +
+              " \"Friends\" : [\"Hong\",\"Long\",\"Cong\"]" +
               "}";
 Console.WriteLine(json);
 Person test = JSON.ToData<Person>(json);
-Console.WriteLine(test.Test.message);
+Console.WriteLine(test.Friends[2]);
 
 
 public class Person
@@ -19,11 +18,5 @@ public class Person
     public float Height { get; set; }
     public bool HasFriends { get; set; }
     public List <string> Friends { get; set; }
-    public Test Test { get; set; }
-}
-
-public class Test
-{
-    public string message { get; set; }
 }
 

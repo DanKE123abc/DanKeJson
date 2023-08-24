@@ -33,6 +33,9 @@ Mail : danke1024@foxmail.com
 Github : https://github.com/DanKE123abc
   */
 
+using System;
+using System.Collections.Generic;
+
 namespace DanKeJson
 {
     #pragma warning disable CS8618

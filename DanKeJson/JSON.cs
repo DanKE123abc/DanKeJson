@@ -33,8 +33,12 @@ Mail : danke1024@foxmail.com
 Github : https://github.com/DanKE123abc
   */
 
+using System;
+using System.Collections;
+using System.Collections.Generic;
 using System.Reflection;
 using System.Text;
+using System.Linq;
 
 namespace DanKeJson
 {
@@ -150,15 +154,20 @@ namespace DanKeJson
                                 }
                                 propertyInfo.SetValue(dataclass, list);
                             }
-                            else
+                            else if (propertyType.IsGenericType && propertyType.GetGenericTypeDefinition() == typeof(List<>))
                             {
-                                Type genericListType = typeof(List<>).MakeGenericType(listType);
-                                dynamic list = Activator.CreateInstance(genericListType);
+                                listType = propertyType.GetGenericArguments()[0];
+                                List<object> list = new List<object>();
+
                                 foreach (var item in json[propertyInfo.Name].array)
                                 {
                                     list.Add(item);
                                 }
-                                propertyInfo.SetValue(dataclass, list);
+
+                                // 转换为泛型列表类型
+                                IList convertedList = list.Cast<object>().ToList();
+
+                                propertyInfo.SetValue(dataclass, convertedList);
                             }
                         }
                         else
