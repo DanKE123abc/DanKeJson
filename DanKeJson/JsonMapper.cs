@@ -60,7 +60,11 @@ namespace DanKeJson
             switch (json.type)
             {
                 case JsonData.Type.Number:
+                    builder.Append(json.json);
+                    break;
                 case JsonData.Type.String:
+                    builder.Append(json.json);
+                    break;
                 case JsonData.Type.Boolean:
                     builder.Append(json.json);
                     break;

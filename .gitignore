@@ -1,4 +1,7 @@
 
 /.idea/
+/.vs/
 /DanKeJson/bin/
 /DanKeJson/obj/
+/DanKeJson.Test/bin/
+/DanKeJson.Test/obj/
