@@ -166,7 +166,121 @@ namespace DanKeJson
                         }
                         else if (propertyType.IsGenericType && propertyType.GetGenericTypeDefinition() == typeof(List<>))
                         {
-                            //todo
+                            Type listType = propertyType.GetGenericArguments()[0];
+                            if (listType == typeof(string))
+                            {
+                                List<string> list = new List<string>();
+                                foreach (var item in json[propertyInfo.Name].array)
+                                {
+                                    list.Add(item);
+                                }
+                                propertyInfo.SetValue(dataclass, list);
+                            }
+                            else if (listType == typeof(bool))
+                            {
+                                List<bool> list = new List<bool>();
+                                foreach (var item in json[propertyInfo.Name].array)
+                                {
+                                    list.Add(item);
+                                }
+                                propertyInfo.SetValue(dataclass, list);
+                            }
+                            else if (listType == typeof(int))
+                            {
+                                List<int> list = new List<int>();
+                                foreach (var item in json[propertyInfo.Name].array)
+                                {
+                                    list.Add(item);
+                                }
+                                propertyInfo.SetValue(dataclass, list);
+                            }
+                            else if (listType == typeof(long))
+                            {
+                                List<long> list = new List<long>();
+                                foreach (var item in json[propertyInfo.Name].array)
+                                {
+                                    list.Add(item);
+                                }
+                                propertyInfo.SetValue(dataclass, list);
+                            }
+                            else if (listType == typeof(float))
+                            {
+                                List<float> list = new List<float>();
+                                foreach (var item in json[propertyInfo.Name].array)
+                                {
+                                    list.Add(item);
+                                }
+                                propertyInfo.SetValue(dataclass, list);
+                            }
+                            else if (listType == typeof(double))
+                            {
+                                List<double> list = new List<double>();
+                                foreach (var item in json[propertyInfo.Name].array)
+                                {
+                                    list.Add(item);
+                                }
+                                propertyInfo.SetValue(dataclass, list);
+                            }
+                            else if (listType == typeof(sbyte))
+                            {
+                                List<sbyte> list = new List<sbyte>();
+                                foreach (var item in json[propertyInfo.Name].array)
+                                {
+                                    list.Add(item);
+                                }
+                                propertyInfo.SetValue(dataclass, list);
+                            }
+                            else if (listType == typeof(short))
+                            {
+                                List<short> list = new List<short>();
+                                foreach (var item in json[propertyInfo.Name].array)
+                                {
+                                    list.Add(item);
+                                }
+                                propertyInfo.SetValue(dataclass, list);
+                            }
+                            else if (listType == typeof(uint))
+                            {
+                                List<uint> list = new List<uint>();
+                                foreach (var item in json[propertyInfo.Name].array)
+                                {
+                                    list.Add(item);
+                                }
+                                propertyInfo.SetValue(dataclass, list);
+                            }
+                            else if (listType == typeof(ulong))
+                            {
+                                List<ulong> list = new List<ulong>();
+                                foreach (var item in json[propertyInfo.Name].array)
+                                {
+                                    list.Add(item);
+                                }
+                                propertyInfo.SetValue(dataclass, list);
+                            }
+                            else if (listType == typeof(ushort))
+                            {
+                                List<ushort> list = new List<ushort>();
+                                foreach (var item in json[propertyInfo.Name].array)
+                                {
+                                    list.Add(item);
+                                }
+                                propertyInfo.SetValue(dataclass, list);
+                            }
+                            else if (propertyType.IsGenericType && propertyType.GetGenericTypeDefinition() == typeof(List<>))
+                            {
+                                listType = propertyType.GetGenericArguments()[0];
+                                List<object> list = new List<object>();
+
+                                foreach (var item in json[propertyInfo.Name].array)
+                                {
+                                    list.Add(item);
+                                }
+
+                                // 转换为泛型列表类型
+                                IList convertedList = list.Cast<object>().ToList();
+
+                                propertyInfo.SetValue(dataclass, convertedList);
+                            }
                         }
                         else
                         {
