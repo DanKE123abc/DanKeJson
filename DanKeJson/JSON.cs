@@ -42,14 +42,15 @@ using System.Linq;
 
 namespace DanKeJson
 {
-    #pragma warning disable CS8603
-    #pragma warning disable CS8600
-   
+#pragma warning disable CS8603
+#pragma warning disable CS8600
+
     /// <summary>
     /// DanKeJson : Serialization and Deialization
     /// </summary>
     public static class JSON
     {
+        
         /// <summary>
         /// Serializing Json(String) to JsonData
         /// About Json : https://json.org
@@ -58,6 +59,7 @@ namespace DanKeJson
         /// <returns>JsonData</returns>
         public static JsonData ToData(string text)
         {
+            text = CommentParser.RemoveComments(text);
             int index = 0;
             JsonData json = ProcessJson(text, ref index);
             if (index == text.Length)
@@ -69,6 +71,25 @@ namespace DanKeJson
         }
         
         /// <summary>
+        /// Deserializing JsonData to Json(String)
+        /// About Json : https://json.org
+        /// </summary>
+        /// <param name="json">the JsonData</param>
+        /// <returns>Json(String)</returns>
+        public static string ToJson(JsonData json)
+        {
+            if (json == null)
+            {
+                return null;
+            }
+
+            StringBuilder stringBuilder = new StringBuilder();
+            ProcessData(json, stringBuilder);
+            return stringBuilder.ToString();
+        }
+
+        /// <summary>
+        /// Beta!
         /// Serializing Json(String) to Class
         /// About Json : https://json.org
         /// </summary>
@@ -77,6 +98,7 @@ namespace DanKeJson
         /// <returns>T Class</returns>
         public static T ToData<T>(string text) where T : class, new()
         {
+            text = CommentParser.RemoveComments(text);
             int index = 0;
             JsonData json = ProcessJson(text, ref index);
             if (index == text.Length)
@@ -90,7 +112,7 @@ namespace DanKeJson
                         System.Type propertyType = propertyInfo.PropertyType;
                         if (propertyType == typeof(string))
                         {
-                            propertyInfo.SetValue(dataclass,json[propertyInfo.Name].json[1..^1]);
+                            propertyInfo.SetValue(dataclass, json[propertyInfo.Name].json[1..^1]);
                         }
                         else if (propertyType == typeof(bool))
                         {
@@ -144,38 +166,15 @@ namespace DanKeJson
                         }
                         else if (propertyType.IsGenericType && propertyType.GetGenericTypeDefinition() == typeof(List<>))
                         {
-                            Type listType = propertyType.GetGenericArguments()[0];
-                            if (listType == typeof(string))
-                            {
-                                List<string> list = new List<string>();
-                                foreach (var item in json[propertyInfo.Name].array)
-                                {
-                                    list.Add(item);
-                                }
-                                propertyInfo.SetValue(dataclass, list);
-                            }
-                            else if (propertyType.IsGenericType && propertyType.GetGenericTypeDefinition() == typeof(List<>))
-                            {
-                                listType = propertyType.GetGenericArguments()[0];
-                                List<object> list = new List<object>();
-
-                                foreach (var item in json[propertyInfo.Name].array)
-                                {
-                                    list.Add(item);
-                                }
-
-                                // 转换为泛型列表类型
-                                IList convertedList = list.Cast<object>().ToList();
-
-                                propertyInfo.SetValue(dataclass, convertedList);
-                            }
+                            //todo
                         }
                         else
                         {
-                            propertyInfo.SetValue(dataclass, null);
+                            //todo
                         }
                     }
                 }
+
                 return dataclass;
             }
 
@@ -183,24 +182,87 @@ namespace DanKeJson
         }
 
         /// <summary>
-        /// Deserializing JsonData to Json(String)
+        /// Beta!
+        /// Deserializing Object to Json(String)
+        /// About Json : https://json.org
         /// </summary>
-        /// <param name="json">the JsonData</param>
-        /// <returns>Json(String)</returns>
-        public static string ToJson(JsonData json)
+        /// <param name="jsonObject">Csharp Object</param>
+        /// <returns></returns>
+        public static string ToJson(object jsonObject)
         {
-            if (json == null)
+            if (jsonObject == null)
             {
                 return null;
             }
 
+            JsonData json = new JsonData(JsonData.Type.Object);
             StringBuilder stringBuilder = new StringBuilder();
+            System.Type type = jsonObject.GetType();
+            foreach (PropertyInfo propertyInfo in type.GetProperties())
+            {
+                if (propertyInfo.CanWrite)
+                {
+                    System.Type propertyType = propertyInfo.PropertyType;
+                    if (propertyType == typeof(string))
+                    {
+                        json[propertyInfo.Name] = (string)propertyInfo.GetValue(jsonObject)!;
+                    }
+                    else if (propertyType == typeof(bool))
+                    {
+                        json[propertyInfo.Name] = (bool)propertyInfo.GetValue(jsonObject)!;
+                    }
+                    else if (propertyType == typeof(int))
+                    {
+                        json[propertyInfo.Name] = (int)propertyInfo.GetValue(jsonObject)!;
+                    }
+                    else if (propertyType == typeof(long))
+                    {
+                        json[propertyInfo.Name] = (long)propertyInfo.GetValue(jsonObject)!;
+                    }
+                    else if (propertyType == typeof(float))
+                    {
+                        json[propertyInfo.Name] = (float)propertyInfo.GetValue(jsonObject)!;
+                    }
+                    else if (propertyType == typeof(double))
+                    {
+                        json[propertyInfo.Name] = (double)propertyInfo.GetValue(jsonObject)!;
+                    }
+                    else if (propertyType == typeof(sbyte))
+                    {
+                        json[propertyInfo.Name] = (sbyte)propertyInfo.GetValue(jsonObject)!;
+                    }
+                    else if (propertyType == typeof(short))
+                    {
+                        json[propertyInfo.Name] = (short)propertyInfo.GetValue(jsonObject)!;
+                    }
+                    else if (propertyType == typeof(uint))
+                    {
+                        json[propertyInfo.Name] = (uint)propertyInfo.GetValue(jsonObject)!;
+                    }
+                    else if (propertyType == typeof(ulong))
+                    {
+                        json[propertyInfo.Name] = (ulong)propertyInfo.GetValue(jsonObject)!;
+                    }
+                    else if (propertyType == typeof(ushort))
+                    {
+                        json[propertyInfo.Name] = (ushort)propertyInfo.GetValue(jsonObject)!;
+                    }
+                    else if (propertyType.IsGenericType && propertyType.GetGenericTypeDefinition() == typeof(List<>))
+                    {
+                        //todo
+                    }
+                    else
+                    {
+                        //todo
+                    }
+                    
+                }
+            }
 
-            ProcessData(json,stringBuilder);
-            
+            ProcessData(json, stringBuilder);
             return stringBuilder.ToString();
         }
-        
+
         private static void ProcessData(JsonData json, StringBuilder builder)
         {
             if (json == null || builder == null)
@@ -224,7 +286,7 @@ namespace DanKeJson
                     foreach (var key in json.map.Keys)
                     {
                         builder.Append("\"" + key + "\":");
-                        ProcessData(json[key],builder);
+                        ProcessData(json[key], builder);
                         builder.Append(',');
                     }
 
@@ -238,12 +300,13 @@ namespace DanKeJson
                         ProcessData(item, builder);
                         builder.Append(',');
                     }
+
                     builder.Remove(builder.Length - 1, 1);
                     builder.Append(']');
                     break;
             }
         }
-        
+
         private static JsonData ProcessJson(string json, ref int index)
         {
             if (index < 0 || index >= json.Length)
@@ -331,15 +394,17 @@ namespace DanKeJson
                 return null;
             }
 
-            if (index + 3 < json.Length && json[index] == 't' && json[index + 1] == 'r' && json[index + 2] == 'u' && json[index + 3] == 'e')
+            if (index + 3 < json.Length && json[index] == 't' && json[index + 1] == 'r' && json[index + 2] == 'u' &&
+                json[index + 3] == 'e')
             {
                 index += 4;
                 return new JsonData(JsonData.Type.Boolean) { json = "true" };
             }
-            else if (index + 4 < json.Length && json[index] == 'f' && json[index + 1] == 'a' && json[index + 2] == 'l' && json[index + 3] == 's' && json[index + 4] == 'e')
+            else if (index + 4 < json.Length && json[index] == 'f' && json[index + 1] == 'a' &&
+                     json[index + 2] == 'l' && json[index + 3] == 's' && json[index + 4] == 'e')
             {
                 index += 5;
-                return new JsonData(JsonData.Type.Boolean) { json = "false"};
+                return new JsonData(JsonData.Type.Boolean) { json = "false" };
             }
 
             return null;
@@ -531,7 +596,6 @@ namespace DanKeJson
             arr.json = json[start..index];
             return arr;
         }
-        
+
     }
 }
-
