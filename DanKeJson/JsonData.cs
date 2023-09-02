@@ -1,3 +1,5 @@
+#region Header
+
 /*
 * MIT License
 
@@ -13,6 +15,9 @@ Address : Guangzhou City , Guangdong Provice , China
 Mail : danke1024@foxmail.com
 Github : https://github.com/DanKE123abc
   */
+
+#endregion
+
 
 using System;
 using System.Collections.Generic;
