@@ -283,6 +283,18 @@ namespace DanKeJson
 
                                     propertyInfo.SetValue(dataclass, list);
                                 }
+                                else if (listType.IsClass)
+                                {
+                                    List<object> list = new List<object>();
+                                    foreach (var item in json[propertyInfo.Name].array)
+                                    {
+                                        MethodInfo fromJsonMethod = typeof(JSON).GetMethod("FromJson", BindingFlags.Static | BindingFlags.NonPublic);
+                                        MethodInfo genericFromJsonMethod = fromJsonMethod.MakeGenericMethod(listType);
+                                        object[] parameters = new object[] { json[propertyInfo.Name] };
+                                        list.Add(genericFromJsonMethod.Invoke(null, parameters));
+                                    }
+                                    propertyInfo.SetValue(dataclass, list);
+                                }
                                 else if (propertyType.IsGenericType &&
                                          propertyType.GetGenericTypeDefinition() == typeof(List<>))
                                 {
@@ -295,10 +307,6 @@ namespace DanKeJson
 
                                     IList convertedList = list.Cast<object>().ToList();
                                     propertyInfo.SetValue(dataclass, convertedList);
-                                }
-                                else
-                                {
-                                    //todo
                                 }
                             }
                             else if (propertyType.IsClass)
@@ -476,6 +484,18 @@ namespace DanKeJson
                                         json[propertyInfo.Name].Add(item);
                                     }
                                 }
+                                else if (listType.IsClass)
+                                {
+                                    List<object> propertyList = (List<object>)jsonObject.GetType()
+                                        .GetProperty(propertyInfo.Name).GetValue(jsonObject, null);
+                                    json[propertyInfo.Name] = new JsonData(JsonData.Type.Array);
+                                    foreach (var item in propertyList)
+                                    {
+
+                                        json[propertyInfo.Name].Add(FromObject(item));
+
+                                    }
+                                }
                                 else if (propertyType.IsGenericType &&
                                          propertyType.GetGenericTypeDefinition() == typeof(List<>))
                                 {
@@ -488,10 +508,6 @@ namespace DanKeJson
                                         json[propertyInfo.Name].Add(item.ToString());
 
                                     }
-                                }
-                                else
-                                {
-                                    //todo
                                 }
                             }
                             else if (propertyType.IsClass)
