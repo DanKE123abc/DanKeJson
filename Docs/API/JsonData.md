@@ -27,6 +27,7 @@
 | :------------- | :---------- | :------------------ |
 | HasKey(string) | bool        | 获取Object是否有Key |
 | Add(JsonData)  | void        | 往Array里添加Value  |
+| Add(object)    | void        | 往Array里添加Value  |
 | Equals(object) | bool        |                     |
 | ToString()     | string      |                     |
 | GetType()      | System.Type |                     |

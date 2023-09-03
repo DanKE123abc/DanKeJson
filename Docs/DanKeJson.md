@@ -2,9 +2,11 @@
 
 
 
-## What is JSON?
-
 JSON (J ava S cript O bject N otation) is a simple, yet powerful notation to specify data. It defines simple scalar types such as boolean, number (integers and reals) and string, and a couple of data structures: arrays (lists) and objects (dictionaries). For more information on the JSON format, visit [JSON.org](http://www.json.org/).
+
+
+
+DanKeJson is a simple Json library for the .Net
 
 
 
@@ -18,19 +20,11 @@ JSON (J ava S cript O bject N otation) is a simple, yet powerful notation to spe
 
 - API
 
-  - JsonData
+  - [JsonData](./API/JsonData.cs)
 
-  - JSON
-
-  - 注释
+  - [JSON](./API/JSON.cs)
 
     
-
-## About DanKeJson
-
-DanKeJson is a simple Json library for the .Net
-
-
 
 ## License
 
