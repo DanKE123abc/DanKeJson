@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<package >
+  <metadata>
+    <id>DanKeJson</id>
+    <version>1.0.0</version>
+    <title>DanKeJson</title>
+    <authors>DanKe</authors>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <license type="expression">MIT</license>
+    <!-- <icon>icon.png</icon> -->
+    <projectUrl>https://github.com/DanKE123abc/DanKeJson</projectUrl>
+    <description>a simple Json library for the .Net</description>
+    <releaseNotes>The Test Version</releaseNotes>
+    <copyright>Copyright (c) 2023 - present</copyright>
+    <tags>Json DanKe DanKE123abc DanKeJson dankejson</tags>
+  </metadata>
+</package>
