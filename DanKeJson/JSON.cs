@@ -27,6 +27,7 @@ using System.Linq;
 
 namespace DanKeJson
 {
+#pragma warning disable CS8604
 #pragma warning disable CS8603
 #pragma warning disable CS8602
 #pragma warning disable CS8600
