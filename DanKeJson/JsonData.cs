@@ -18,16 +18,17 @@ Github : https://github.com/DanKE123abc
 
 #endregion
 
+#pragma warning disable CS8618
+#pragma warning disable CS8603
+#pragma warning disable CS8600
+#pragma warning disable CS1591
 
 using System;
 using System.Collections.Generic;
 
 namespace DanKeJson
 {
-    #pragma warning disable CS8618
-    #pragma warning disable CS8603
-    #pragma warning disable CS8600
-    
+
     /// <summary>
     /// DanKeJson : JsonData
     /// </summary>

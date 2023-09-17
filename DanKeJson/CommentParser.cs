@@ -24,8 +24,16 @@ using System.Text.RegularExpressions;
 
 namespace DanKeJson
 {
+    /// <summary>
+    /// CommentParser
+    /// </summary>
     public static class CommentParser
     {
+        /// <summary>
+        /// RemoveComments
+        /// </summary>
+        /// <param name="json"></param>
+        /// <returns></returns>
         public static string RemoveComments(string json)
         {
             json = Regex.Replace(json, @"//.*?(?=\r|\n|$)|"".*?""|'.*?'", match =>
