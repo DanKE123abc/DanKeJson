@@ -139,7 +139,8 @@ namespace DanKeJson
                     switch (Type.GetTypeCode(propertyType))
                     {
                         case TypeCode.String:
-                            propertyInfo.SetValue(dataclass, json[propertyInfo.Name].json[1..^1]);
+                            string stringValue = json[propertyInfo.Name];
+                            propertyInfo.SetValue(dataclass, stringValue);
                             break;
                         case TypeCode.Boolean:
                             bool.TryParse(json[propertyInfo.Name].json, out bool boolValue);
