@@ -39,16 +39,20 @@ namespace DanKeJson
     /// </summary>
     public static class JSON
     {
-        
         /// <summary>
         /// Serializing Json(String) to JsonData
         /// About Json : https://json.org
         /// </summary>
         /// <param name="text">the JsonText</param>
+        /// <param name="useComments"></param>
         /// <returns>JsonData</returns>
-        public static JsonData ToData(string text)
+        public static JsonData ToData(string text , bool useComments = false)
         {
-            text = CommentParser.RemoveComments(text);
+            if (useComments)
+            {
+                text = CommentParser.RemoveComments(text);
+            }
+            
             int index = 0;
             JsonData json = ProcessJson(text, ref index);
             if (index == text.Length)
@@ -64,11 +68,16 @@ namespace DanKeJson
         /// About Json : https://json.org
         /// </summary>
         /// <param name="text">the JsonText</param>
+        /// <param name="useComments"></param>
         /// <typeparam name="T">Class</typeparam>
         /// <returns>T Class</returns>
-        public static T ToData<T>(string text) where T : class, new()
+        public static T ToData<T>(string text , bool useComments = false) where T : class, new()
         {
-            text = CommentParser.RemoveComments(text);
+            if (useComments)
+            {
+                text = CommentParser.RemoveComments(text);
+            }
+
             int index = 0;
             JsonData json = ProcessJson(text, ref index);
             if (index == text.Length)
@@ -130,7 +139,8 @@ namespace DanKeJson
                     switch (Type.GetTypeCode(propertyType))
                     {
                         case TypeCode.String:
-                            propertyInfo.SetValue(dataclass, json[propertyInfo.Name].json[1..^1]);
+                            string stringValue = json[propertyInfo.Name];
+                            propertyInfo.SetValue(dataclass, stringValue);
                             break;
                         case TypeCode.Boolean:
                             bool.TryParse(json[propertyInfo.Name].json, out bool boolValue);
