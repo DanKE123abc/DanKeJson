@@ -36,11 +36,11 @@ namespace DanKeJson
     {
         public enum Type
         {
-            Object,
-            Array,
-            Number,
-            Boolean,
-            String
+            Object,//class
+            Array,//list
+            Number,//int...
+            Boolean,//bool
+            String,//string
         }
 
         public Type type { get; set; }

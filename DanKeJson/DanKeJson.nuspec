@@ -2,7 +2,7 @@
 <package >
   <metadata>
     <id>DanKeJson</id>
-    <version>1.0.1</version>
+    <version>1.0.3</version>
     <title>DanKeJson</title>
     <authors>DanKe</authors>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>

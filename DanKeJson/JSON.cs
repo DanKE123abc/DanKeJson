@@ -82,7 +82,6 @@ namespace DanKeJson
             JsonData json = ProcessJson(text, ref index);
             if (index == text.Length)
             {
-                T dataclass = new T();
                 return FromJson<T>(json);
             }
 
