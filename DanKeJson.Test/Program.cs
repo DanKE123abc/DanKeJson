@@ -7,7 +7,6 @@ string jsonText = @"{
                   }";
 person = JSON.ToData<Person>(jsonText);
 JsonData json = JSON.ToData(jsonText);
-
 Console.WriteLine((string)json["name"]);
 Console.WriteLine(person.name);
 

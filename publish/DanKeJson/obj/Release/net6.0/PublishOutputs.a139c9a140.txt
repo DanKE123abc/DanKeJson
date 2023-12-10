@@ -1,0 +1,3 @@
+C:\Users\15860\Documents\DanKeJson\publish\DanKeJson\DanKeJson.dll
+C:\Users\15860\Documents\DanKeJson\publish\DanKeJson\DanKeJson.deps.json
+C:\Users\15860\Documents\DanKeJson\publish\DanKeJson\DanKeJson.pdb
