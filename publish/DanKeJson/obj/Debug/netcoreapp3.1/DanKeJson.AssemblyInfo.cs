@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("DanKeJson")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+117d80dd61d3a828282829088d2aa0abe4b2288b")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+bda3e71956b888b5966800dabbec46c7584dece5")]
 [assembly: System.Reflection.AssemblyProductAttribute("DanKeJson")]
 [assembly: System.Reflection.AssemblyTitleAttribute("DanKeJson")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
