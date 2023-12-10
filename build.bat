@@ -1,1 +1,0 @@
-nuget pack DanKeJson/DanKeJson.nuspec

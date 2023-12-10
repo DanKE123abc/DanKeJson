@@ -1,0 +1,12 @@
+C:\Users\15860\Documents\DanKeJson\DanKeJson\lib\net5.0\DanKeJson.deps.json
+C:\Users\15860\Documents\DanKeJson\DanKeJson\lib\net5.0\DanKeJson.dll
+C:\Users\15860\Documents\DanKeJson\DanKeJson\lib\net5.0\DanKeJson.pdb
+C:\Users\15860\Documents\DanKeJson\DanKeJson\obj\Debug\net5.0\DanKeJson.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\15860\Documents\DanKeJson\DanKeJson\obj\Debug\net5.0\DanKeJson.AssemblyInfoInputs.cache
+C:\Users\15860\Documents\DanKeJson\DanKeJson\obj\Debug\net5.0\DanKeJson.AssemblyInfo.cs
+C:\Users\15860\Documents\DanKeJson\DanKeJson\obj\Debug\net5.0\DanKeJson.csproj.CoreCompileInputs.cache
+C:\Users\15860\Documents\DanKeJson\DanKeJson\obj\Debug\net5.0\DanKeJson.sourcelink.json
+C:\Users\15860\Documents\DanKeJson\DanKeJson\obj\Debug\net5.0\DanKeJson.dll
+C:\Users\15860\Documents\DanKeJson\DanKeJson\obj\Debug\net5.0\refint\DanKeJson.dll
+C:\Users\15860\Documents\DanKeJson\DanKeJson\obj\Debug\net5.0\DanKeJson.pdb
+C:\Users\15860\Documents\DanKeJson\DanKeJson\obj\Debug\net5.0\ref\DanKeJson.dll

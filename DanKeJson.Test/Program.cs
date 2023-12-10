@@ -1,15 +1,16 @@
-﻿using DanKeJson;
+﻿using System.Diagnostics;
+using DanKeJson;
 
-Person person = JSON.ToData<Person>(@"{
-    ""name"": ""John Doe"",
-    ""happy"": false,
-    ""age"": 30
-}");
+Person person;
+string jsonText = @"{
+                      ""name"": null
+                  }";
+person = JSON.ToData<Person>(jsonText);
+JsonData json = JSON.ToData(jsonText);
+Console.WriteLine((string)json["name"]);
+Console.WriteLine(person.name);
 
 public class Person
 {
     public string name { get; set; }
-    public bool happy { get; set; }
-    public int age { get; set; }
 }
-
