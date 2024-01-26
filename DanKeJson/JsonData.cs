@@ -41,6 +41,7 @@ namespace DanKeJson
             Number,//int...
             Boolean,//bool
             String,//string
+            None//null
         }
 
         public Type type { get; set; }
@@ -60,7 +61,6 @@ namespace DanKeJson
             {
                 array = new List<JsonData>();
             }
-
         }
 
         #region string
