@@ -1,16 +1,23 @@
 ﻿using System.Diagnostics;
 using DanKeJson;
 
-Person person;
+Person persondata;
 string jsonText = @"{
-                      ""name"": null
+                      ""name"": ""DanKe"",
+                      ""age"": 16,
+                      ""num"": [1,2,3,4,5,6]
                   }";
-person = JSON.ToData<Person>(jsonText);
-JsonData json = JSON.ToData(jsonText);
-Console.WriteLine((string)json["name"]);
-Console.WriteLine(person.name);
+
+
+persondata = JSON.ToData<Person>(jsonText);
+
+JsonData jsondata = JSON.ToData(jsonText);
+
+Console.WriteLine("");
 
 public class Person
 {
     public string name { get; set; }
+    public int age { get; set; }
+    public List<int> num { get; set; }
 }
