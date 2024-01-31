@@ -1,5 +1,5 @@
 # DanKeJson
-[![NuGet](https://img.shields.io/nuget/v/DanKeJson.svg)]([NuGet Gallery | DanKeJson 1.0.4](https://www.nuget.org/packages/DanKeJson/))
+![NuGet](https://img.shields.io/nuget/v/DanKeJson.svg)
 
 DanKeJson is a simple *.Net* library to handle conversions from and to JSON (JavaScript Object Notation) strings.
 
