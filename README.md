@@ -1,5 +1,5 @@
 # DanKeJson
-[![NuGet](https://img.shields.io/nuget/v/DanKeJson.svg)]([NuGet Gallery | DanKeJson 1.0.4](https://www.nuget.org/packages/DanKeJson/))
+![NuGet](https://img.shields.io/nuget/v/DanKeJson.svg)
 
 DanKeJson is a simple *.Net* library to handle conversions from and to JSON (JavaScript Object Notation) strings.
 
@@ -128,3 +128,10 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 ```
 
+
+
+#### Development with Rider
+
+Thanks to **JetBrains** for supporting DanKeJson
+
+<img src="https://resources.jetbrains.com/storage/products/company/brand/logos/jb_beam.png" alt="JetBrains Logo (Main) logo." width=100 height=100>

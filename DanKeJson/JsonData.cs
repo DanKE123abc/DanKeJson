@@ -41,6 +41,7 @@ namespace DanKeJson
             Number,//int...
             Boolean,//bool
             String,//string
+            None,//mull
         }
 
         public Type type { get; set; }
@@ -60,9 +61,12 @@ namespace DanKeJson
             {
                 array = new List<JsonData>();
             }
-
+            else if (type == Type.None)
+            {
+                json = "null";
+            }
         }
-
+        
         #region string
 
         public static implicit operator JsonData(string value)
@@ -79,7 +83,6 @@ namespace DanKeJson
             {
                 return default;
             }
-
             return jsonData.json[1..^1];
         }
 
