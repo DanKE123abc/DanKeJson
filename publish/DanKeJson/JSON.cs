@@ -42,6 +42,7 @@ namespace DanKeJson
         /// <summary>
         /// Serializing Json(String) to JsonData
         /// About Json : https://json.org
+        /// Using comments can affect performance
         /// </summary>
         /// <param name="text">the JsonText</param>
         /// <param name="useComments"></param>
@@ -66,6 +67,7 @@ namespace DanKeJson
         /// <summary>
         /// Serializing Json(String) to Class
         /// About Json : https://json.org
+        /// Using comments can affect performance
         /// </summary>
         /// <param name="text">the JsonText</param>
         /// <param name="useComments"></param>
@@ -110,7 +112,7 @@ namespace DanKeJson
         /// Deserializing Object to Json(String)
         /// About Json : https://json.org
         /// </summary>
-        /// <param name="jsonObject">Csharp Object</param>
+        /// <param name="jsonObject">object instantiated by the class</param>
         /// <returns>Json(String)</returns>
         public static string ToJson(object jsonObject)
         {
@@ -553,6 +555,9 @@ namespace DanKeJson
                 case JsonData.Type.Boolean:
                     builder.Append(json.json);
                     break;
+                case JsonData.Type.None :
+                    builder.Append("null");
+                    break;
                 case JsonData.Type.Object:
                     builder.Append('{');
                     foreach (var key in json.map.Keys)
@@ -576,6 +581,7 @@ namespace DanKeJson
                     builder.Remove(builder.Length - 1, 1);
                     builder.Append(']');
                     break;
+                
             }
         }
 
@@ -613,6 +619,11 @@ namespace DanKeJson
             {
                 //Array
                 jsonData = ToArray(json, ref index);
+            }
+            else if (cur == 'n')
+            {
+                //None
+                jsonData = ToNone(json, ref index);
             }
 
             SkipWhiteSpace(json, ref index);
@@ -867,6 +878,22 @@ namespace DanKeJson
             index++;
             arr.json = json[start..index];
             return arr;
+        }
+        
+        private static JsonData ToNone(string json, ref int index)
+        {
+            if (index < 0)
+            {
+                return null;
+            }
+
+            if (index + 3 < json.Length && json[index] == 'n' && json[index + 1] == 'u' && json[index + 2] == 'l' &&
+                json[index + 3] == 'l')
+            {
+                index += 4;
+                return new JsonData(JsonData.Type.None);
+            }
+            return null;
         }
 
     }

@@ -83,7 +83,7 @@ paket add DanKeJson --version 1.0.4
 #tool nuget:?package=DanKeJson&version=1.0.4
 ```
 
-Alternatively, just copy the whole tree of files under `./DanKeJson` to your own project's source tree and integrate it with your development environment.
+Alternatively, just copy the whole tree of files under `./publish/DanKeJson` to your own project's source tree and integrate it with your development environment.
 
 
 
