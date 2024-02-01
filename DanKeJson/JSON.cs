@@ -42,6 +42,7 @@ namespace DanKeJson
         /// <summary>
         /// Serializing Json(String) to JsonData
         /// About Json : https://json.org
+        /// Using comments can affect performance
         /// </summary>
         /// <param name="text">the JsonText</param>
         /// <param name="useComments"></param>
@@ -66,6 +67,7 @@ namespace DanKeJson
         /// <summary>
         /// Serializing Json(String) to Class
         /// About Json : https://json.org
+        /// Using comments can affect performance
         /// </summary>
         /// <param name="text">the JsonText</param>
         /// <param name="useComments"></param>
@@ -110,7 +112,7 @@ namespace DanKeJson
         /// Deserializing Object to Json(String)
         /// About Json : https://json.org
         /// </summary>
-        /// <param name="jsonObject">Csharp Object</param>
+        /// <param name="jsonObject">object instantiated by the class</param>
         /// <returns>Json(String)</returns>
         public static string ToJson(object jsonObject)
         {
