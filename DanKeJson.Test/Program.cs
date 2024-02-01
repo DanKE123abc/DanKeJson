@@ -3,7 +3,7 @@ using DanKeJson;
 
 Person persondata;
 string jsonText = @"{
-                      ""name"": ""DanKe"",
+                      ""name"": null,
                       ""age"": 16,
                       ""num"": [1,2,3,4,5,6]
                   }";
@@ -12,7 +12,7 @@ string jsonText = @"{
 persondata = JSON.ToData<Person>(jsonText);
 
 JsonData jsondata = JSON.ToData(jsonText);
-
+string json = JSON.ToJson(jsondata);
 Console.WriteLine("");
 
 public class Person

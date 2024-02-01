@@ -83,7 +83,7 @@ paket add DanKeJson --version 1.0.4
 #tool nuget:?package=DanKeJson&version=1.0.4
 ```
 
-Alternatively, just copy the whole tree of files under `./DanKeJson` to your own project's source tree and integrate it with your development environment.
+Alternatively, just copy the whole tree of files under `./publish/DanKeJson` to your own project's source tree and integrate it with your development environment.
 
 
 
@@ -128,3 +128,10 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 ```
 
+
+
+#### Development with Rider
+
+Thanks to **JetBrains** for supporting DanKeJson
+
+<img src="https://resources.jetbrains.com/storage/products/company/brand/logos/jb_beam.png" alt="JetBrains Logo (Main) logo." width=100 height=100>
