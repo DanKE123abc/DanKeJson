@@ -6,4 +6,5 @@
 /DanKeJson/obj/
 /DanKeJson.Test/bin/
 /DanKeJson.Test/obj/
+/publish/
 *.nupkg
