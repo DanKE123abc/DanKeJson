@@ -36,6 +36,11 @@ namespace DanKeJson
         /// <returns></returns>
         public static string RemoveComments(string json)
         {
+            if (string.IsNullOrEmpty(json))
+            {
+                return json;
+            }
+            
             json = Regex.Replace(json, @"//.*?(?=\r|\n|$)|"".*?""|'.*?'", match =>
             {
                 if (match.Value.StartsWith("\"") || match.Value.StartsWith("'"))

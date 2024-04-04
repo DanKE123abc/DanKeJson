@@ -339,7 +339,7 @@ namespace DanKeJson
 
             return dataclass;
         }
-
+        
         private static JsonData FromObject(object jsonObject)
         {
             JsonData json = new JsonData(JsonData.Type.Object);
@@ -895,6 +895,6 @@ namespace DanKeJson
             }
             return null;
         }
-
+        
     }
 }

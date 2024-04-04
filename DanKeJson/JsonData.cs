@@ -38,10 +38,10 @@ namespace DanKeJson
         {
             Object,//class
             Array,//list
-            Number,//int...
+            Number,//int...and so on
             Boolean,//bool
             String,//string
-            None,//mull
+            None,//null
         }
 
         public Type type { get; set; }
