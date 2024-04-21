@@ -1,1 +1,40 @@
-﻿
+﻿{
+  "users": [
+    {
+      "id": 1,
+      "name": "张三",
+      "email": "zhangsan@example.com",
+      "phone": "123-456-7890",
+      "address": {
+        "street": "中山路",
+        "city": "北京",
+        "postalCode": "100000"
+      },
+      "roles": ["管理员", "用户"]
+    },
+    {
+      "id": 2,
+      "name": "李四",
+      "email": "lisi@example.com",
+      "phone": "987-654-3210",
+      "address": {
+        "street": "南京路",
+        "city": "上海",
+        "postalCode": "200000"
+      },
+      "roles": ["用户"]
+    },
+    {
+      "id": 3,
+      "name": "王五",
+      "email": "wangwu@example.com",
+      "phone": "555-123-4567",
+      "address": {
+        "street": "成都路",
+        "city": "成都",
+        "postalCode": "610000"
+      },
+      "roles": ["管理员", "编辑"]
+    }
+  ]
+}

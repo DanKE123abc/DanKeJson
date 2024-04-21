@@ -1,69 +1,7 @@
 ﻿using System.Diagnostics;
 using DanKeJson;
 
-Person persondata;
-string jsonText = @"{
-  ""id"": 1,
-  ""name"": ""John Doe"",
-  ""email"": ""john.doe@example.com"",
-  ""address"": {
-    ""street"": ""123 Main St"",
-    ""city"": ""Anytown"",
-    ""state"": ""CA"",
-    ""postalCode"": 12346
-  },
-  ""phoneNumbers"": [
-    {
-      ""type"": ""home"",
-      ""number"": ""555-1234""
-    },
-    {
-      ""type"": ""office"",
-      ""number"": ""555-5678""
-    },
-    {
-      ""type"": null,
-      ""number"": ""555-5678""
-    }
-  ],
-  ""role"": ""developer"",
-  ""skills"": [
-    ""C#"",
-    ""JavaScript"",
-    ""SQL""
-  ],
-  ""active"": true
-}";
-
-
-persondata = JSON.ToData<Person>(jsonText);
-
-JsonData jsondata = JSON.ToData(jsonText);
-string json = JSON.ToJson(jsondata);
+string jsonText =
+    "{\n  \"users\": [\n    {\n      \"id\": 1,\n      \"name\": \"张三\",\n      \"email\": \"zhangsan@example.com\",\n      \"phone\": \"123-456-7890\",\n      \"address\": {\n        \"street\": \"中山路\",\n        \"city\": \"北京\",\n        \"postalCode\": \"100000\"\n      },\n      \"roles\": [\n        \"管理员\",\n        \"用户\"\n      ]\n    },\n    {\n      \"id\": 2,\n      \"name\": \"李四\",\n      \"email\": \"lisi@example.com\",\n      \"phone\": \"987-654-3210\",\n      \"address\": {\n        \"street\": \"南京路\",\n        \"city\": \"上海\",\n        \"postalCode\": \"200000\"\n      },\n      \"roles\": [\n        \"用户\"\n      ]\n    },\n    {\n      \"id\": 3,\n      \"name\": \"王五\",\n      \"email\": \"wangwu@example.com\",\n      \"phone\": \"555-123-4567\",\n      \"address\": {\n        \"street\": \"成都路\",\n        \"city\": \"成都\",\n        \"postalCode\": \"610000\"\n      },\n      \"roles\": [\n        \"管理员\",\n        \"编辑\"\n      ]\n    }\n  ]\n}";
+JsonData data = JSON.ToData(jsonText);
 Console.WriteLine("");
-
-public class Person
-{
-  public int id { get; set; }
-  public string name { get; set; }
-  public string email { get; set; }
-  public Address address { get; set; }
-  public List<PhoneNumber> phoneNumbers { get; set; }
-  public string role { get; set; }
-  public List<string> skills { get; set; }
-  public bool active { get; set; }
-}
-
-public class Address
-{
-  public string street { get; set; }
-  public string city { get; set; }
-  public string state { get; set; }
-  public int postalCode { get; set; }
-}
-
-public class PhoneNumber
-{
-  public string type { get; set; }
-  public string number { get; set; }
-}

@@ -27,6 +27,7 @@ Github : https://github.com/DanKE123abc
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using System.Reflection;
 using System.Text;
 using System.Linq;
@@ -49,6 +50,10 @@ namespace DanKeJson
         /// <returns>JsonData</returns>
         public static JsonData ToData(string text , bool useComments = false)
         {
+            if (IsFilePath(text))
+            {
+                text = File.ReadAllText(text);
+            }
             if (useComments)
             {
                 text = CommentParser.RemoveComments(text);
@@ -75,6 +80,10 @@ namespace DanKeJson
         /// <returns>T Class</returns>
         public static T ToData<T>(string text , bool useComments = false) where T : class, new()
         {
+            if (IsFilePath(text))
+            {
+                text = File.ReadAllText(text);
+            }
             if (useComments)
             {
                 text = CommentParser.RemoveComments(text);
@@ -127,6 +136,21 @@ namespace DanKeJson
             return stringBuilder.ToString();
         }
 
+        private static bool IsFilePath(string path)
+        {
+            if (string.IsNullOrEmpty(Path.GetExtension(path)))
+            {
+                return false;
+            }
+            else
+            {
+                if (!File.Exists(path))
+                {
+                    return false;
+                }
+            }
+            return true;
+        }
 
         private static T FromJson<T>(JsonData json) where T : class, new()
         {
