@@ -649,6 +649,10 @@ namespace DanKeJson
                 //None
                 jsonData = ToNone(json, ref index);
             }
+            else
+            {
+                jsonData = Unrecognized(json, ref index);
+            }
 
             SkipWhiteSpace(json, ref index);
 
@@ -917,8 +921,31 @@ namespace DanKeJson
                 index += 4;
                 return new JsonData(JsonData.Type.None);
             }
+
             return null;
         }
-        
+
+        private static JsonData Unrecognized(string json, ref int index)
+        {
+            index += GetDistanceToNextComma(json, ref index);
+            return new JsonData(JsonData.Type.None);
+        }
+
+        private static int GetDistanceToNextComma(string json, ref int startIndex)
+        {
+
+
+            for (int i = startIndex; i < json.Length; i++)
+            {
+                if (json[i] == ',' || json[i] == '}' || json[i] == ']')
+                {
+                    return i - startIndex;
+                }
+            }
+
+            // 如果没有找到逗号，则返回剩余字符串的长度
+            return json.Length - startIndex - 1;
+        }
+
     }
 }
