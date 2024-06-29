@@ -326,10 +326,8 @@ namespace DanKeJson
                                     List<object> list = new List<object>();
                                     foreach (var item in json[propertyInfo.Name].array)
                                     {
-                                        MethodInfo fromJsonMethod = typeof(JSON).GetMethod("FromJson", BindingFlags.Static | BindingFlags.NonPublic);
-                                        MethodInfo genericFromJsonMethod = fromJsonMethod.MakeGenericMethod(listType);
-                                        object[] parameters = new object[] { json[propertyInfo.Name] };
-                                        list.Add(genericFromJsonMethod.Invoke(null, parameters));
+                                        T obj = JSON.FromJson<T>(item);
+                                        list.Add(obj);
                                     }
                                     propertyInfo.SetValue(dataclass, list);
                                 }
@@ -349,11 +347,7 @@ namespace DanKeJson
                             }
                             else if (propertyType.IsClass)
                             {
-                                object propertyValue = Activator.CreateInstance(propertyType);
-                                MethodInfo fromJsonMethod = typeof(JSON).GetMethod("FromJson", BindingFlags.Static | BindingFlags.NonPublic);
-                                MethodInfo genericFromJsonMethod = fromJsonMethod.MakeGenericMethod(propertyType);
-                                object[] parameters = new object[] { json[propertyInfo.Name] };
-                                propertyValue = genericFromJsonMethod.Invoke(null, parameters);
+                                var propertyValue = FromJson<T>(json[propertyInfo.Name].ToString()); 
                                 propertyInfo.SetValue(dataclass, propertyValue);
                             }
                             break;
