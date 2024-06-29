@@ -860,7 +860,7 @@ namespace DanKeJson
 
                 SkipWhiteSpace(json, ref index);
 
-            } while (json[index] == ',');
+            } while (IsObjectEnd(json, ref index));
 
             if (json[index] == '}')
             {
@@ -869,6 +869,24 @@ namespace DanKeJson
             }
 
             return null;
+        }
+
+        private static bool IsObjectEnd(string json, ref int index)
+        {
+            SkipWhiteSpace(json, ref index);
+            
+            if (json[index] == ',')
+            {
+                index++;
+                SkipWhiteSpace(json, ref index);
+                if (json[index] == '}')
+                {
+                    return false;
+                }
+                return true;
+            }
+
+            return false;
         }
 
         private static JsonData ToArray(string json, ref int index)
@@ -896,7 +914,7 @@ namespace DanKeJson
 
                 arr.Add(sub);
                 SkipWhiteSpace(json, ref index);
-            } while (index < json.Length && json[index] == ',');
+            } while (IsArrayEnd(json, ref index));
 
             if (index >= json.Length || json[index] != ']')
             {
@@ -906,6 +924,24 @@ namespace DanKeJson
             index++;
             arr.json = json[start..index];
             return arr;
+        }
+        
+        private static bool IsArrayEnd(string json, ref int index)
+        {
+            SkipWhiteSpace(json, ref index);
+            
+            if (index < json.Length && json[index] == ',')
+            {
+                index++;
+                SkipWhiteSpace(json, ref index);
+                if (json[index] == ']')
+                {
+                    return false;
+                }
+                return true;
+            }
+
+            return false;
         }
         
         private static JsonData ToNone(string json, ref int index)
