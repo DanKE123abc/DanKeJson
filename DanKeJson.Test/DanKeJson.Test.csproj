@@ -12,4 +12,8 @@
       <ProjectReference Include="..\DanKeJson\DanKeJson.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+      <Folder Include="BenchMark\" />
+    </ItemGroup>
+
 </Project>

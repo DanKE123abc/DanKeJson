@@ -41,46 +41,46 @@ DanKeJson is a simple *.Net* library to handle conversions from and to JSON (Jav
 
 ## Using DanKeJson from an application
 
-**[Download package](https://www.nuget.org/api/v2/package/DanKeJson/1.1.1)**
+**[Download package](https://www.nuget.org/api/v2/package/DanKeJson/1.2.0)**
 
 ### Package manager
 
 ```shell
-NuGet\Install-Package DanKeJson -Version 1.1.1
+NuGet\Install-Package DanKeJson -Version 1.2.0
 ```
 
 ### .NET CLI
 
 ```shell
-dotnet add package DanKeJson --version 1.1.1
+dotnet add package DanKeJson --version 1.2.0
 ```
 
 ### PackageReference
 
 ```xaml
-<PackageReference Include="DanKeJson" Version="1.1.1" />
+<PackageReference Include="DanKeJson" Version="1.2.0" />
 ```
 
 ### Paket CLI
 
 ```shell
-paket add DanKeJson --version 1.1.1
+paket add DanKeJson --version 1.2.0
 ```
 
 ### Script & Interactive
 
 ```c#
-#r "nuget: DanKeJson, 1.1.1"
+#r "nuget: DanKeJson, 1.2.0"
 ```
 
 ### Cake
 
 ```C#
 // Install DanKeJson as a Cake Addin
-#addin nuget:?package=DanKeJson&version=1.1.1
+#addin nuget:?package=DanKeJson&version=1.2.0
 
 // Install DanKeJson as a Cake Tool
-#tool nuget:?package=DanKeJson&version=1.1.1
+#tool nuget:?package=DanKeJson&version=1.2.0
 ```
 
 Alternatively, just copy the whole tree of files under `./publish/DanKeJson` to your own project's source tree and integrate it with your development environment.
