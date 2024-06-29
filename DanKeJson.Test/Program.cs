@@ -19,6 +19,6 @@ string jsonText = @"
 
 Stopwatch stopwatch = new Stopwatch();
 stopwatch.Start();
-DanKeJson.JsonData data = JSON.ToData(jsonText, false);
+DanKeJson.JsonData data = JSON.ToData(jsonText);
 stopwatch.Stop();
 Console.WriteLine($"JSON 解析完成，用时：{stopwatch.ElapsedMilliseconds} 毫秒");
