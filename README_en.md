@@ -1,12 +1,12 @@
 # DanKeJson
 
-<u>**中文**</u> | [**English**](./README_en.md)
+[**中文**](./README_en.md) | <u>**English**</u>
 
 ![NuGet](https://img.shields.io/nuget/v/DanKeJson.svg)
 
-DanKeJson 是一个.Net平台上的精简小巧的 JSON 类库，用于处理 JSON (JavaScript Object Notation) 字符串之间的转换。
+DanKeJson is a simple *.Net* library to handle conversions from and to JSON (JavaScript Object Notation) strings.
 
-## 快速开始
+## Quick-Start
 
 [Hello DanKeJson](./Docs/DanKeJson.md)
 
@@ -18,35 +18,35 @@ DanKeJson 是一个.Net平台上的精简小巧的 JSON 类库，用于处理 JS
 
 [Object to Json](./Docs/QuickStart/Object2Json.md)
 
-## 特性
+## Features
 
-DanKeJson 为了方便开发使用，添加了许多特性，包括但不限于：
+DanKeJson has incorporated a variety of features to facilitate development, including but not limited to:
 
-- 以 [JsonData]([JsonData](./Docs/API/JsonData.md)) 类传递数据
-- 隐式转换操作符
-- 允许数组、对象的多余逗号
-- 允许单行注释*
-- 将未经定义的值转换为null
+- Data transmission via the [JsonData](./Docs/API/JsonData.md) class
+- Implicit conversion operators
+- Tolerance for superfluous commas in arrays and objects
+- Single-line comment allowance*
+- Conversion of undefined values to null
 
-更多特性相关内容请看：[**Hello DanKeJson**](./Docs/DanKeJson.md)
+For more information on features, please refer to: [**Hello DanKeJson**](./Docs/DanKeJson.md)
 
-> *: 当前版本的 DanKeJson解析器部分中尚未支持注释，注释支持由CommentParser类通过正则表达式忽略，可能会严重影响解析性能。
+> *Note: The current version of DanKeJson's parser does not fully support comments. Comment support is handled by the CommentParser class using regular expressions, which may significantly impact parsing performance.
 
-## 将来要做的事...
+## Future Tasks...
 
-反序列化部分：
+Deserialization:
 
-- [ ] 解析器支持单行注释与多行注释
-- [ ] 支持日期格式
-- [ ] 键名无需引号
-- [ ] 字符串支持单引号
-- [x] 允许数组、对象的多余逗号
+- [ ] Parser support for single-line and multi-line comments
+- [ ] Support for date formats
+- [ ] Allow key names without quotes
+- [ ] Support for single quotes in strings
+- [x] Allow trailing commas in arrays and objects
 
-序列化部分：
+Serialization:
 
-- [ ] 支持序列化为JSON5格式
+- [ ] Support for serializing to JSON5 format
 
-# API
+## API
 
 [JSON](./Docs/API/JSON.md)
 
@@ -54,7 +54,7 @@ DanKeJson 为了方便开发使用，添加了许多特性，包括但不限于�
 
 [JsonData.Type](./Docs/API/JsonData.Type.md)
 
-## 打包为Nuget发行包
+## Publishing
 
 **Windows**
 
@@ -62,9 +62,9 @@ DanKeJson 为了方便开发使用，添加了许多特性，包括但不限于�
 ./publish.bat
 ```
 
-## 在你的应用中安装 DanKeJson
+## Using DanKeJson from an application
 
-**[点击下载](https://www.nuget.org/api/v2/package/DanKeJson/1.2.0)**
+**[Download package](https://www.nuget.org/api/v2/package/DanKeJson/1.2.0)**
 
 ### Package manager
 
@@ -106,11 +106,11 @@ paket add DanKeJson --version 1.2.0
 #tool nuget:?package=DanKeJson&version=1.2.0
 ```
 
-或者，只需复制目录`./publish/DanKeJson`到您自己项目的源代码树中，并将其与您的开发环境集成。
+Alternatively, just copy the whole tree of files under `./publish/DanKeJson` to your own project's source tree and integrate it with your development environment.
 
-## 开发平台
+## Requirements
 
-DanKeJson 目前支持的平台：
+DanKeJson currently targets and supports
 
 - .NET 8.0
 - .NET 7.0
@@ -122,7 +122,7 @@ DanKeJson 目前支持的平台：
 - Mono
 - Unity
 
-## 开源许可协议
+## License
 
 ```
 MIT License
@@ -148,11 +148,12 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 ```
 
-## 特别鸣谢
+## Thanks
 
-本项目使用 Rider 开发，感谢 **JetBrains** 对 DanKeJson 的支持。
+This project was developed using Rider, and we extend our gratitude to **JetBrains** for their support of DanKeJson.
 
-<img src="https://resources.jetbrains.com/storage/products/company/brand/logos/jb_beam.png" alt="JetBrains Logo (Main) logo." width=100 height=100>
+<img src="https://resources.jetbrains.com/storage/products/company/brand/logos/jb_beam.png" alt="JetBrains Logo (Main)" width="100" height="100">
 
-本项目所有Markdown文件使用 [**Hypora**](https://github.com/DanKE123abc/Hypora) 书写。
+All Markdown files in this project were written using [**Hypora**](https://github.com/DanKE123abc/Hypora).
+
 
