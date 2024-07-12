@@ -1,6 +1,6 @@
 # DanKeJson
 
-[**中文**](./README_en.md) | <u>**English**</u>
+[**中文**](./README.md) | <u>**English**</u>
 
 ![NuGet](https://img.shields.io/nuget/v/DanKeJson.svg)
 
