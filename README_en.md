@@ -25,6 +25,7 @@ DanKeJson has incorporated a variety of features to facilitate development, incl
 - Data transmission via the [JsonData](./Docs/API/JsonData.md) class
 - Implicit conversion operators
 - Tolerance for superfluous commas in arrays and objects
+- Single quotes are permissible in strings.
 - Single-line comment allowance*
 - Conversion of undefined values to null
 
@@ -36,15 +37,15 @@ For more information on features, please refer to: [**Hello DanKeJson**](./Docs/
 
 Deserialization:
 
-- [ ] Parser support for single-line and multi-line comments
-- [ ] Support for date formats
-- [ ] Allow key names without quotes
-- [ ] Support for single quotes in strings
-- [x] Allow trailing commas in arrays and objects
+- [ ]  Parser support for single-line and multi-line comments
+- [ ]  Support for date formats
+- [ ]  Allow key names without quotes
+- [X]  Support for single quotes in strings
+- [X]  Allow trailing commas in arrays and objects
 
 Serialization:
 
-- [ ] Support for serializing to JSON5 format
+- [ ]  Support for serializing to JSON5 format
 
 ## API
 
@@ -64,46 +65,46 @@ Serialization:
 
 ## Using DanKeJson from an application
 
-**[Download package](https://www.nuget.org/api/v2/package/DanKeJson/1.2.0)**
+**[Download package](https://www.nuget.org/api/v2/package/DanKeJson/1.3.0)**
 
 ### Package manager
 
 ```shell
-NuGet\Install-Package DanKeJson -Version 1.2.0
+NuGet\Install-Package DanKeJson -Version 1.3.0
 ```
 
 ### .NET CLI
 
 ```shell
-dotnet add package DanKeJson --version 1.2.0
+dotnet add package DanKeJson --version 1.3.0
 ```
 
 ### PackageReference
 
 ```xaml
-<PackageReference Include="DanKeJson" Version="1.2.0" />
+<PackageReference Include="DanKeJson" Version="1.3.0" />
 ```
 
 ### Paket CLI
 
 ```shell
-paket add DanKeJson --version 1.2.0
+paket add DanKeJson --version 1.3.0
 ```
 
 ### Script & Interactive
 
 ```c#
-#r "nuget: DanKeJson, 1.2.0"
+#r "nuget: DanKeJson, 1.3.0"
 ```
 
 ### Cake
 
 ```C#
 // Install DanKeJson as a Cake Addin
-#addin nuget:?package=DanKeJson&version=1.2.0
+#addin nuget:?package=DanKeJson&version=1.3.0
 
 // Install DanKeJson as a Cake Tool
-#tool nuget:?package=DanKeJson&version=1.2.0
+#tool nuget:?package=DanKeJson&version=1.3.0
 ```
 
 Alternatively, just copy the whole tree of files under `./publish/DanKeJson` to your own project's source tree and integrate it with your development environment.
@@ -119,6 +120,7 @@ DanKeJson currently targets and supports
 - .NET Standard 2.1
 - .NETcoreapp3.1
 - .NETcoreapp3.0
+- Godot (.Net)
 - Mono
 - Unity
 
@@ -155,5 +157,3 @@ This project was developed using Rider, and we extend our gratitude to **JetBrai
 <img src="https://resources.jetbrains.com/storage/products/company/brand/logos/jb_beam.png" alt="JetBrains Logo (Main)" width="100" height="100">
 
 All Markdown files in this project were written using [**Hypora**](https://github.com/DanKE123abc/Hypora).
-
-

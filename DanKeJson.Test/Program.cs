@@ -1,32 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Diagnostics;
 using DanKeJson;
 
-public class Person
+string jsonText = @"
 {
-    public string Name { get; set; }
-    public int Age { get; set; }
-    public List<string> Hobbies { get; set; }
-}
+  ""test1"": ""双引号文本"",
+  ""test2"": [""数组1"", '数组2',],
+  ""test3"": '单引号文本',
+}";
 
-public class JsonTest
-{
-    public static void Main()
-    {
-        // 将C#对象转换为JSON字符串
-        Person person = new Person
-        {
-            Name = "张三",
-            Age = 30,
-            Hobbies = new List<string> { "阅读", "游泳", "旅游" }
-        };
-
-        string jsonString = JSON.ToJson(person);
-        Console.WriteLine(jsonString);
-
-        // 将JSON字符串转换为C#对象
-        string json = "{\"Name\":\"张三\",\"Age\":30,\"Hobbies\":[\"阅读\",\"游泳\",\"旅游\"]}";
-        Person newPerson = JSON.ToData<Person>(json);
-        Console.WriteLine($"姓名：{newPerson.Name}, 年龄：{newPerson.Age}, 爱好：{string.Join(',', newPerson.Hobbies)}");
-    }
-}
+Stopwatch stopwatch = new Stopwatch();
+stopwatch.Start();
+DanKeJson.JsonData data = JSON.ToData(jsonText);
+stopwatch.Stop();
+Console.WriteLine($"JSON 解析完成，用时：{stopwatch.ElapsedMilliseconds} 毫秒");

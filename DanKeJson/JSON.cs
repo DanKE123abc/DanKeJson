@@ -618,6 +618,11 @@ namespace DanKeJson
                 //String
                 jsonData = ToString(json, ref index);
             }
+            else if (cur == '\'')
+            {
+                //String (Single)
+                jsonData = ToString_Single(json, ref index);
+            }
             else if (cur == 't' || cur == 'f')
             {
                 //Boolean
@@ -685,6 +690,32 @@ namespace DanKeJson
                 return null;
             }
 
+            return new JsonData(JsonData.Type.String)
+            {
+                json = json[start..(++index)]
+            };
+
+        }
+        
+        private static JsonData ToString_Single(string json, ref int index)
+        {
+            if (index < 0 || index >= json.Length || json[index] != '\'')
+            {
+                return null;
+            }
+
+            int start = index++;
+
+            while (index < json.Length && json[index] != '\'')
+            {
+                index++;
+            }
+
+            if (index >= json.Length)
+            {
+                return null;
+            }
+            
             return new JsonData(JsonData.Type.String)
             {
                 json = json[start..(++index)]
