@@ -47,7 +47,7 @@ DanKeJson 为了方便开发使用，添加了许多特性，包括但不限于�
 
 - [ ]  支持序列化为JSON5格式
 
-# API
+## API
 
 [JSON](./Docs/API/JSON.md)
 
@@ -125,6 +125,8 @@ DanKeJson 目前支持的平台：
 - Unity
 
 ## 开源许可协议
+
+[中文翻译版](https://github.com/DanKE123abc/DanKE123abc/blob/main/%5B%E4%B8%AD%5D%20MIT%20License.txt)
 
 ```
 MIT License
