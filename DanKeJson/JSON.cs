@@ -11,7 +11,7 @@ JSON : https://json.org
  
 * About Author
 Name : DanKe
-Address : Guangzhou City , Guangdong Provice , China
+Address : Guangzhou City , Guangdong Province , China
 Mail : danke1024@foxmail.com
 Github : https://github.com/DanKE123abc
   */
@@ -36,7 +36,7 @@ namespace DanKeJson
 {
 
     /// <summary>
-    /// DanKeJson : Serialization and Deialization
+    /// DanKeJson : Serialization and Deserialization
     /// </summary>
     public static class JSON
     {
@@ -842,67 +842,79 @@ namespace DanKeJson
             {
                 return null;
             }
-
+        
             int start = index++;
             JsonData obj = new JsonData(JsonData.Type.Object);
             do
             {
-                if (json[index] == ',')
-                {
-                    index++;
-                }
-
                 SkipWhiteSpace(json, ref index);
-                if (json[index] != '"')
+        
+                int keyIndex = index;
+                string key = ReadKey(json, ref index);
+                if (key == null)
                 {
                     return null;
                 }
-
-                int keyIndex = index++;
-                while (index < json.Length && json[index] != '"')
-                {
-                    index++;
-                }
-
-                if (index >= json.Length)
-                {
-                    return null;
-                }
-
-                string key = json[(keyIndex + 1)..(index++)];
-                if (obj.HasKey(key))
-                {
-                    return null;
-                }
-
+        
                 SkipWhiteSpace(json, ref index);
                 if (json[index] != ':')
                 {
                     return null;
                 }
-
+        
                 index++;
-
+        
                 SkipWhiteSpace(json, ref index);
                 JsonData sub = ProcessJson(json, ref index);
                 if (sub == null)
                 {
                     return null;
                 }
-
+        
                 obj[key] = sub;
-
+        
                 SkipWhiteSpace(json, ref index);
-
+        
             } while (IsObjectEnd(json, ref index));
-
+        
             if (json[index] == '}')
             {
                 obj.json = json[start..(++index)];
                 return obj;
             }
-
+        
             return null;
+        }
+        
+        private static string ReadKey(string json, ref int index)
+        {
+            if (json[index] == '"') //键名有引号
+            {
+                index++;
+                int start = index;
+                while (index < json.Length && json[index] != '"')
+                {
+                    index++;
+                }
+                if (index >= json.Length)
+                {
+                    return null;
+                }
+                return json.Substring(start, index++ - start);
+            }
+            else //键名无引号
+            {
+                int start = index;
+                while (index < json.Length && char.IsLetterOrDigit(json[index]) || json[index] == '_')
+                {
+                    index++;
+                }
+                if (start == index)
+                {
+                    return null; // Empty key
+                }
+                return json.Substring(start, index - start);
+            }
         }
 
         private static bool IsObjectEnd(string json, ref int index)

@@ -39,7 +39,7 @@ Deserialization:
 
 - [ ]  Parser support for single-line and multi-line comments
 - [ ]  Support for date formats
-- [ ]  Allow key names without quotes
+- [X]  Allow key names without quotes
 - [X]  Support for single quotes in strings
 - [X]  Allow trailing commas in arrays and objects
 
