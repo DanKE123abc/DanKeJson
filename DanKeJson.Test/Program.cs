@@ -23,30 +23,20 @@
             District = "浦东新区",
             Street = "另一街道"
         },
+    },
+    test = new List<List<int>>
+    {
+        new List<int>
+            {1,2,3},
+        new List<int>
+            {4,5,6},
+        new List<int>
+            {7,8,9},
     }
 };
 
-List<Address> pool = new List<Address>
-{
-    new Address
-    {
-        City = "北京",
-        District = "朝阳区",
-        Street = "某街道"
-    },
-    new Address
-    {
-        City = "上海",
-        District = "浦东新区",
-        Street = "另一街道"
-    },
-    // 可以继续添加更多地址
-};
-
 string json = DanKeJson.JSON.ToJson(person);
-//List<Address> newpool = DanKeJson.JSON.ToData<List<Address>>(json);
-Person newperson = new Person();
-newperson = DanKeJson.JSON.ToData<Person>(json);
+Person newperson = DanKeJson.JSON.ToData<Person>(json);
 
 Console.WriteLine(json);
 
@@ -59,6 +49,8 @@ public class Person
     public Address Address { get; set; }
     
     public List<Address> addresses { get; set; }  
+    
+    public List<List<int>> test {get; set;}
 }
 
 public class Address

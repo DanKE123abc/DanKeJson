@@ -139,7 +139,80 @@ namespace DanKeJson
             ProcessData(json, stringBuilder, config);
             return stringBuilder.ToString();
         }
+        
+        private static void ProcessData(JsonData json, StringBuilder builder, Json5Config config)
+        {
+            if (json == null || builder == null)
+            {
+                return;
+            }
 
+            switch (json.type)
+            {
+                case JsonData.Type.Number:
+                    builder.Append(json.json);
+                    break;
+                case JsonData.Type.String:
+                    switch (config.StringQuoteStyle)
+                    {
+                        case Json5Config.StringQuoteType.DoubleQuote:
+                            builder.Append("\"" + json.json[1..^1] + "\"");
+                            break;
+                        case Json5Config.StringQuoteType.SingleQuote:
+                            builder.Append("'" + json.json[1..^1] + "'");
+                            break;
+                    }
+                    break;
+                case JsonData.Type.Boolean:
+                    builder.Append(json.json);
+                    break;
+                case JsonData.Type.None:
+                    builder.Append("null");
+                    break;
+                case JsonData.Type.Object:
+                    builder.Append('{');
+                    foreach (var key in json.map.Keys)
+                    {
+                        switch (config.KeyNameStyle)
+                        {
+                            case Json5Config.KeyNameType.WithQuotes:
+                                builder.Append("\"" + key + "\":");
+                                break;
+                            case Json5Config.KeyNameType.WithoutQuotes:
+                                builder.Append(key + ":");
+                                break;
+                        }
+                        ProcessData(json[key], builder, config);
+                        builder.Append(',');
+                    }
+
+                    builder.Remove(builder.Length - 1, 1);
+                    if (config.AddCommaForObject)
+                    {
+                        builder.Append(',');
+                    }
+                    builder.Append('}');
+                    break;
+                case JsonData.Type.Array:
+                    builder.Append('[');
+                    foreach (var item in json.array)
+                    {
+                        ProcessData(item, builder, config);
+                        builder.Append(',');
+                    }
+                    builder.Remove(builder.Length - 1, 1);
+                    if (config.AddCommaForArray)
+                    {
+                        builder.Append(',');
+                    }
+                    builder.Append(']');
+                    break;
+
+            }
+        }
+        
+        
+        // 这个函数和JSON类里的是一模一样的
         private static JsonData FromObject(object jsonObject)
         {
             JsonData json = new JsonData(JsonData.Type.Object);
@@ -280,76 +353,6 @@ namespace DanKeJson
             return json;
         }
 
-        private static void ProcessData(JsonData json, StringBuilder builder, Json5Config config)
-        {
-            if (json == null || builder == null)
-            {
-                return;
-            }
-
-            switch (json.type)
-            {
-                case JsonData.Type.Number:
-                    builder.Append(json.json);
-                    break;
-                case JsonData.Type.String:
-                    switch (config.StringQuoteStyle)
-                    {
-                        case Json5Config.StringQuoteType.DoubleQuote:
-                            builder.Append("\"" + json.json[1..^1] + "\"");
-                            break;
-                        case Json5Config.StringQuoteType.SingleQuote:
-                            builder.Append("'" + json.json[1..^1] + "'");
-                            break;
-                    }
-                    break;
-                case JsonData.Type.Boolean:
-                    builder.Append(json.json);
-                    break;
-                case JsonData.Type.None:
-                    builder.Append("null");
-                    break;
-                case JsonData.Type.Object:
-                    builder.Append('{');
-                    foreach (var key in json.map.Keys)
-                    {
-                        switch (config.KeyNameStyle)
-                        {
-                            case Json5Config.KeyNameType.WithQuotes:
-                                builder.Append("\"" + key + "\":");
-                                break;
-                            case Json5Config.KeyNameType.WithoutQuotes:
-                                builder.Append(key + ":");
-                                break;
-                        }
-                        ProcessData(json[key], builder, config);
-                        builder.Append(',');
-                    }
-
-                    builder.Remove(builder.Length - 1, 1);
-                    if (config.AddCommaForObject)
-                    {
-                        builder.Append(',');
-                    }
-                    builder.Append('}');
-                    break;
-                case JsonData.Type.Array:
-                    builder.Append('[');
-                    foreach (var item in json.array)
-                    {
-                        ProcessData(item, builder, config);
-                        builder.Append(',');
-                    }
-                    builder.Remove(builder.Length - 1, 1);
-                    if (config.AddCommaForArray)
-                    {
-                        builder.Append(',');
-                    }
-                    builder.Append(']');
-                    break;
-
-            }
-        }
         
     }
 
