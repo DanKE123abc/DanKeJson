@@ -159,8 +159,7 @@ namespace DanKeJson
                 }
             }
             return true;
-        }
-
+        }   
         private static object FromJson(JsonData json, Type type)
         {
             object dataclass = Activator.CreateInstance(type);
@@ -320,8 +319,7 @@ namespace DanKeJson
                                 propertyInfo.SetValue(dataclass, ushortValue);
                                 break;
                             default:
-                                if (propertyType.IsGenericType &&
-                                    propertyType.GetGenericTypeDefinition() == typeof(List<>))
+                                if (propertyType.IsGenericType && propertyType.GetGenericTypeDefinition() == typeof(List<>))
                                 {
                                     Type listType = propertyType.GetGenericArguments()[0];
                                     if (listType == typeof(string))
@@ -464,7 +462,8 @@ namespace DanKeJson
                                 }
                                 else if (propertyType.IsClass)
                                 {
-                                    var propertyValue = FromJson(json[propertyInfo.Name].ToString(), propertyType);
+                                    JsonData nextjson = ToData(json[propertyInfo.Name].json);
+                                    var propertyValue = FromJson(nextjson, propertyType);
                                     propertyInfo.SetValue(dataclass, propertyValue);
                                 }
 
