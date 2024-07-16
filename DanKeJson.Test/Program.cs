@@ -1,4 +1,6 @@
-﻿Person person = new Person
+﻿using DanKeJson;
+
+Person person = new Person
 {
     Name = "张三",
     Age = 30,
@@ -37,6 +39,13 @@
 
 string json = DanKeJson.JSON.ToJson(person);
 Person newperson = DanKeJson.JSON.ToData<Person>(json);
+string json5 = DanKeJson.JSON5.ToJson(newperson, new Json5Config
+{
+    AddCommaForObject = false,
+    AddCommaForArray = false,
+    KeyNameStyle = Json5Config.KeyNameType.WithoutQuotes,
+    StringQuoteStyle = Json5Config.StringQuoteType.SingleQuote,
+});
 
 Console.WriteLine(json);
 
