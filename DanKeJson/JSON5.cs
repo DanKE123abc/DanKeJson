@@ -71,7 +71,7 @@ namespace DanKeJson
         /// <param name="useComments">Using CommentParser.cs to Use Comments</param>
         /// <param name="skipFileCheck">Skip the file path check</param>
         /// <returns>JsonData</returns>
-        public static JsonData ToData(string text, bool useComments = false, bool skipFileCheck = false)
+        public static JsonData ToData(string text, bool useComments = true, bool skipFileCheck = false)
         {
             return JSON.ToData(text, useComments, skipFileCheck);
         }
@@ -86,7 +86,7 @@ namespace DanKeJson
         /// <param name="skipFileCheck">Skip the file path check</param>
         /// <typeparam name="T">Class</typeparam>
         /// <returns>T Class</returns>
-        public static T ToData<T>(string text, bool useComments = false, bool skipFileCheck = false) where T : class, new()
+        public static T ToData<T>(string text, bool useComments = true, bool skipFileCheck = false) where T : class, new()
         {
             return JSON.ToData<T>(text, useComments, skipFileCheck);
         }
