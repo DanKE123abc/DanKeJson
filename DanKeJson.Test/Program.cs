@@ -1,24 +1,64 @@
-﻿using System.Diagnostics;
-using DanKeJson;
-
-string jsonText = @"
+﻿Person person = new Person
 {
-  ""name"": ""张三"",
-  ""age"": 30,
-  ""city"": ""北京"",
-  ""has_children"": false,
-  ""hobbies"": [""阅读"", ""旅游"", ""编程"", ],
-  ""address"": {
-    ""street"": ""长安街"", 
-    ""number"": 123, 
-    ""postal_code"": ""100000""
-  },
-  ""email"": ""zhangsan@example.com"",
-}
- ";
+    Name = "张三",
+    Age = 30,
+    Hobbies = new List<string> { "阅读", "旅行", "编程" },
+    Address = new Address
+    {
+        City = "北京",
+        District = "朝阳区",
+        Street = "某街道"
+    },
+    addresses = new List<Address>
+    {
+        new Address
+        {
+            City = "北京",
+            District = "朝阳区",
+            Street = "某街道"
+        },
+        new Address
+        {
+            City = "上海",
+            District = "浦东新区",
+            Street = "另一街道"
+        },
+    },
+    test = new List<List<int>>
+    {
+        new List<int>
+            {1,2,3},
+        new List<int>
+            {4,5,6},
+        new List<int>
+            {7,8,9},
+    }
+};
 
-Stopwatch stopwatch = new Stopwatch();
-stopwatch.Start();
-DanKeJson.JsonData data = JSON.ToData(jsonText);
-stopwatch.Stop();
-Console.WriteLine($"JSON 解析完成，用时：{stopwatch.ElapsedMilliseconds} 毫秒");
+string json = DanKeJson.JSON.ToJson(person);
+Person newperson = DanKeJson.JSON.ToData<Person>(json);
+
+Console.WriteLine(json);
+
+
+public class Person
+{
+    public string Name { get; set; }
+    public int Age { get; set; }
+    public List<string> Hobbies { get; set; }
+    public Address Address { get; set; }
+    
+    public List<Address> addresses { get; set; }  
+    
+    public List<List<int>> test {get; set;}
+}
+
+public class Address
+{
+    public string City { get; set; }
+    public string District { get; set; }
+    public string Street { get; set; }
+}
+
+
+
