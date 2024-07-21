@@ -216,6 +216,10 @@ namespace DanKeJson
         private static JsonData FromObject(object jsonObject)
         {
             JsonData json = new JsonData(JsonData.Type.Object);
+            if (jsonObject == null)
+            {
+                json = new JsonData(JsonData.Type.None);
+            }
             System.Type type = jsonObject.GetType();
             if (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(List<>))
             {
@@ -226,8 +230,11 @@ namespace DanKeJson
                 foreach (var item in list)
                 {
                     JsonData jsonDataItem;
-
-                    if (listType == typeof(string))
+                    if (item == null)
+                    {
+                        jsonDataItem = new JsonData(JsonData.Type.None);
+                    }
+                    else if (listType == typeof(string))
                     {
                         jsonDataItem = new JsonData(JsonData.Type.String)
                             { json = "\"" + item.ToString() + "\"" };
@@ -239,7 +246,7 @@ namespace DanKeJson
                              listType == typeof(ushort))
                     {
                         jsonDataItem = new JsonData(JsonData.Type.Number)
-                            { json = item.ToString() };
+                            { json = item.ToString()! };
                     }
                     else if (listType == typeof(bool))
                     {
@@ -261,43 +268,30 @@ namespace DanKeJson
                     if (propertyInfo.CanRead)
                     {
                         object propertyValue = propertyInfo.GetValue(jsonObject);
-                        if (propertyValue == null) continue;
-
                         System.Type propertyType = propertyInfo.PropertyType;
+                        if (propertyValue == null)
+                        {
+                            json[propertyInfo.Name] = new JsonData(JsonData.Type.None);
+                            continue;
+                        }
                         switch (Type.GetTypeCode(propertyType))
                         {
                             case TypeCode.String:
-                                json[propertyInfo.Name] = (string)propertyValue;
+                                json[propertyInfo.Name] = new JsonData(JsonData.Type.String) { json = "\"" + propertyValue.ToString() + "\"" };
                                 break;
                             case TypeCode.Boolean:
-                                json[propertyInfo.Name] = (bool)propertyValue;
+                                json[propertyInfo.Name] = new JsonData(JsonData.Type.Boolean) { json = propertyValue.ToString().ToLower() };
                                 break;
                             case TypeCode.Int32:
-                                json[propertyInfo.Name] = (int)propertyValue;
-                                break;
                             case TypeCode.Int64:
-                                json[propertyInfo.Name] = (long)propertyValue;
-                                break;
                             case TypeCode.Single:
-                                json[propertyInfo.Name] = (float)propertyValue;
-                                break;
                             case TypeCode.Double:
-                                json[propertyInfo.Name] = (double)propertyValue;
-                                break;
                             case TypeCode.SByte:
-                                json[propertyInfo.Name] = (sbyte)propertyValue;
-                                break;
                             case TypeCode.Int16:
-                                json[propertyInfo.Name] = (short)propertyValue;
-                                break;
                             case TypeCode.UInt32:
-                                json[propertyInfo.Name] = (uint)propertyValue;
-                                break;
                             case TypeCode.UInt64:
-                                json[propertyInfo.Name] = (ulong)propertyValue;
-                                break;
                             case TypeCode.UInt16:
-                                json[propertyInfo.Name] = (ushort)propertyValue;
+                                json[propertyInfo.Name] = new JsonData(JsonData.Type.Number) { json = propertyValue.ToString()! };
                                 break;
                             default:
                                 // 确保属性是List<T>
@@ -324,7 +318,7 @@ namespace DanKeJson
                                                  listType == typeof(ushort))
                                         {
                                             jsonDataItem = new JsonData(JsonData.Type.Number) 
-                                                { json = item.ToString() };
+                                                { json = item.ToString()! };
                                         }
                                         else if (listType == typeof(bool))
                                         {
