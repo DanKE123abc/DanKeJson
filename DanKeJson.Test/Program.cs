@@ -2,12 +2,12 @@
 
 Person person = new Person
 {
-    Name = "张三",
+    Name = null,
     Age = 30,
     Hobbies = new List<string> { "阅读", "旅行", "编程" },
     Address = new Address
     {
-        City = "北京",
+        City = null,
         District = "朝阳区",
         Street = "某街道"
     },
@@ -15,7 +15,7 @@ Person person = new Person
     {
         new Address
         {
-            City = "北京",
+            City = null,
             District = "朝阳区",
             Street = "某街道"
         },
@@ -53,7 +53,7 @@ Console.WriteLine(json);
 public class Person
 {
     public string Name { get; set; }
-    public int Age { get; set; }
+    public double Age { get; set; }
     public List<string> Hobbies { get; set; }
     public Address Address { get; set; }
     
