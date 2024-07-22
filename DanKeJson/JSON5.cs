@@ -219,6 +219,7 @@ namespace DanKeJson
             if (jsonObject == null)
             {
                 json = new JsonData(JsonData.Type.None);
+                return json;
             }
             System.Type type = jsonObject.GetType();
             if (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(List<>))
@@ -294,50 +295,7 @@ namespace DanKeJson
                                 json[propertyInfo.Name] = new JsonData(JsonData.Type.Number) { json = propertyValue.ToString()! };
                                 break;
                             default:
-                                // 确保属性是List<T>
-                                if (propertyInfo.PropertyType.IsGenericType &&
-                                    propertyInfo.PropertyType.GetGenericTypeDefinition() == typeof(List<>))
-                                {
-                                    var listType = propertyInfo.PropertyType.GenericTypeArguments[0];
-                                    var list = (IList)propertyValue;
-                                    json[propertyInfo.Name] = new JsonData(JsonData.Type.Array);
-
-                                    foreach (var item in list)
-                                    {
-                                        JsonData jsonDataItem;
-
-                                        if (listType == typeof(string))
-                                        {
-                                            jsonDataItem = new JsonData(JsonData.Type.String)
-                                                { json = "\"" + item.ToString() + "\"" };
-                                        }
-                                        else if (listType == typeof(int) || listType == typeof(long) ||
-                                                 listType == typeof(float) || listType == typeof(double) ||
-                                                 listType == typeof(sbyte) || listType == typeof(short) ||
-                                                 listType == typeof(uint) || listType == typeof(ulong) ||
-                                                 listType == typeof(ushort))
-                                        {
-                                            jsonDataItem = new JsonData(JsonData.Type.Number) 
-                                                { json = item.ToString()! };
-                                        }
-                                        else if (listType == typeof(bool))
-                                        {
-                                            jsonDataItem = new JsonData(JsonData.Type.Boolean)
-                                                { json = item.ToString().ToLower() };
-                                        }
-                                        else
-                                        {
-                                            jsonDataItem = FromObject(item);
-                                        }
-
-                                        json[propertyInfo.Name].array.Add(jsonDataItem);
-                                    }
-                                }
-                                else if (propertyType.IsClass)
-                                {
-                                    json[propertyInfo.Name] = FromObject((object)propertyValue);
-                                }
-
+                                json[propertyInfo.Name] = FromObject((object)propertyValue);
                                 break;
                         }
                     }

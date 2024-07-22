@@ -7,7 +7,7 @@ Person person = new Person
     Hobbies = new List<string> { "阅读", "旅行", "编程" },
     Address = new Address
     {
-        City = "北京",
+        City = null,
         District = "朝阳区",
         Street = "某街道"
     },
@@ -15,7 +15,7 @@ Person person = new Person
     {
         new Address
         {
-            City = "北京",
+            City = null,
             District = "朝阳区",
             Street = "某街道"
         },
