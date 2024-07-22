@@ -26,7 +26,7 @@ DanKeJson has incorporated a variety of features to facilitate development, incl
 - Implicit conversion operators
 - Tolerance for superfluous commas in arrays and objects
 - Single quotes are permissible in strings.
-- Single-line comment allowance*
+- Comment allowance*
 - Conversion of undefined values to null
 
 For more information on features, please refer to: [**Hello DanKeJson**](./Docs/DanKeJson.md)
