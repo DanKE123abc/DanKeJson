@@ -52,6 +52,8 @@ DanKeJson 为了方便开发使用，添加了许多特性，包括但不限于�
 
 [JSON](./Docs/API/JSON.md)
 
+[JSON5](./Docs/API/JSON5.md)
+
 [JsonData](./Docs/API/JsonData.md)
 
 [JsonData.Type](./Docs/API/JsonData.Type.md)

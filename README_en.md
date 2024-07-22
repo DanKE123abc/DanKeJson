@@ -52,6 +52,8 @@ Serialization:
 
 [JSON](./Docs/API/JSON.md)
 
+[JSON5](./Docs/API/JSON5.md)
+
 [JsonData](./Docs/API/JsonData.md)
 
 [JsonData.Type](./Docs/API/JsonData.Type.md)
