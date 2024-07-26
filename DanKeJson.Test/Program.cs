@@ -41,8 +41,8 @@ string json = DanKeJson.JSON.ToJson(person);
 Person newperson = DanKeJson.JSON.ToData<Person>(json);
 string json5 = DanKeJson.JSON5.ToJson(newperson, new Json5Config
 {
-    AddCommaForObject = false,
-    AddCommaForArray = false,
+    AddCommaForObject = true,
+    AddCommaForArray = true,
     KeyNameStyle = Json5Config.KeyNameType.WithoutQuotes,
     StringQuoteStyle = Json5Config.StringQuoteType.SingleQuote,
 });

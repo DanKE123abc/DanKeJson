@@ -48,11 +48,18 @@ namespace DanKeJson
             DoubleQuote
         }
 
+        [Obsolete("Please use the [AddTailingCommaForObject] property, as it will be deprecated in v1.4.0.",false)]
         public bool AddCommaForObject { get; set; } = false;
+        
+        [Obsolete("Please use the [AddTailingCommaForArray] property, as it will be deprecated in v1.4.0.",false)]
         public bool AddCommaForArray { get; set; } = false;
+        
+        public bool AddTailingCommaForObject { get; set; } = false;
+        
+        public bool AddTailingCommaForArray { get; set; } = false;
+        
         public KeyNameType KeyNameStyle { get; set; } = KeyNameType.WithQuotes;
         public StringQuoteType StringQuoteStyle { get; set; } = StringQuoteType.DoubleQuote;
-        
         
     }
 
@@ -109,7 +116,7 @@ namespace DanKeJson
             {
                 config = new Json5Config();
             }
-
+            
             StringBuilder stringBuilder = new StringBuilder();
             ProcessData(json, stringBuilder, config);
             return stringBuilder.ToString();
@@ -146,6 +153,13 @@ namespace DanKeJson
             {
                 return;
             }
+            
+            //TODO：兼容旧接口,在v1.4.0移除
+            if (config.AddTailingCommaForObject != config.AddCommaForObject)
+                config.AddTailingCommaForObject = config.AddCommaForObject;
+            if (config.AddTailingCommaForArray != config.AddCommaForArray)
+                config.AddTailingCommaForArray = config.AddCommaForArray;
+            //END
 
             switch (json.type)
             {
@@ -187,7 +201,7 @@ namespace DanKeJson
                     }
 
                     builder.Remove(builder.Length - 1, 1);
-                    if (config.AddCommaForObject)
+                    if (config.AddTailingCommaForObject)
                     {
                         builder.Append(',');
                     }
@@ -201,7 +215,7 @@ namespace DanKeJson
                         builder.Append(',');
                     }
                     builder.Remove(builder.Length - 1, 1);
-                    if (config.AddCommaForArray)
+                    if (config.AddTailingCommaForArray)
                     {
                         builder.Append(',');
                     }
