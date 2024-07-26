@@ -39,12 +39,12 @@ Person person = new Person
 
 string json = DanKeJson.JSON.ToJson(person);
 Person newperson = DanKeJson.JSON.ToData<Person>(json);
-string json5 = DanKeJson.JSON5.ToJson(newperson, new Json5Config
+string json5 = DanKeJson.JSON5.ToJson(newperson, new Json5Options()
 {
-    AddCommaForObject = true,
-    AddCommaForArray = true,
-    KeyNameStyle = Json5Config.KeyNameType.WithoutQuotes,
-    StringQuoteStyle = Json5Config.StringQuoteType.SingleQuote,
+    AddTailingCommaForObject = true,
+    AddTailingCommaForArray = true,
+    KeyNameStyle = Json5Options.KeyNameType.WithoutQuotes,
+    StringQuoteStyle = Json5Options.StringQuoteType.SingleQuote,
 });
 
 Console.WriteLine(json);

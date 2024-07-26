@@ -34,7 +34,14 @@ using System.Linq;
 
 namespace DanKeJson
 {
-    public class Json5Config
+    //TODO：兼容旧接口,在v1.4.0移除
+    [Obsolete("Please use the [Json5Options] class, as it will be deprecated in v1.4.0.",false)]
+    public class Json5Config : Json5Options
+    {
+    }
+    //END
+    
+    public class Json5Options
     {
         public enum KeyNameType
         {
@@ -103,22 +110,22 @@ namespace DanKeJson
         /// About Json5 : https://json5.org
         /// </summary>
         /// <param name="json">the JsonData</param>
-        /// <param name="config">JSON 5 format preferences</param>
+        /// <param name="options">JSON 5 format preferences</param>
         /// <returns>Json(String)</returns>
-        public static string ToJson(JsonData json, Json5Config config = null)
+        public static string ToJson(JsonData json, Json5Options options = null)
         {
             if (json == null)
             {
                 return null;
             }
             
-            if (config == null)
+            if (options == null)
             {
-                config = new Json5Config();
+                options = new Json5Options();
             }
             
             StringBuilder stringBuilder = new StringBuilder();
-            ProcessData(json, stringBuilder, config);
+            ProcessData(json, stringBuilder, options);
             return stringBuilder.ToString();
         }
 
@@ -127,27 +134,27 @@ namespace DanKeJson
         /// About Json5 : https://json5.org
         /// </summary>
         /// <param name="jsonObject">object instantiated by the class</param>
-        /// <param name="config">JSON 5 format preferences</param>
+        /// <param name="options">JSON 5 format preferences</param>
         /// <returns>Json(String)</returns>
-        public static string ToJson(object jsonObject, Json5Config config = null)
+        public static string ToJson(object jsonObject, Json5Options options = null)
         {
             if (jsonObject == null)
             {
                 return null;
             }
             
-            if (config == null)
+            if (options == null)
             {
-                config = new Json5Config();
+                options = new Json5Options();
             }
 
             JsonData json = FromObject(jsonObject);
             StringBuilder stringBuilder = new StringBuilder();
-            ProcessData(json, stringBuilder, config);
+            ProcessData(json, stringBuilder, options);
             return stringBuilder.ToString();
         }
         
-        private static void ProcessData(JsonData json, StringBuilder builder, Json5Config config)
+        private static void ProcessData(JsonData json, StringBuilder builder, Json5Options options)
         {
             if (json == null || builder == null)
             {
@@ -155,10 +162,10 @@ namespace DanKeJson
             }
             
             //TODO：兼容旧接口,在v1.4.0移除
-            if (config.AddTailingCommaForObject != config.AddCommaForObject)
-                config.AddTailingCommaForObject = config.AddCommaForObject;
-            if (config.AddTailingCommaForArray != config.AddCommaForArray)
-                config.AddTailingCommaForArray = config.AddCommaForArray;
+            if (options.AddTailingCommaForObject != options.AddCommaForObject)
+                options.AddTailingCommaForObject = options.AddCommaForObject;
+            if (options.AddTailingCommaForArray != options.AddCommaForArray)
+                options.AddTailingCommaForArray = options.AddCommaForArray;
             //END
 
             switch (json.type)
@@ -167,7 +174,7 @@ namespace DanKeJson
                     builder.Append(json.json);
                     break;
                 case JsonData.Type.String:
-                    switch (config.StringQuoteStyle)
+                    switch (options.StringQuoteStyle)
                     {
                         case Json5Config.StringQuoteType.DoubleQuote:
                             builder.Append("\"" + json.json[1..^1] + "\"");
@@ -187,7 +194,7 @@ namespace DanKeJson
                     builder.Append('{');
                     foreach (var key in json.map.Keys)
                     {
-                        switch (config.KeyNameStyle)
+                        switch (options.KeyNameStyle)
                         {
                             case Json5Config.KeyNameType.WithQuotes:
                                 builder.Append("\"" + key + "\":");
@@ -196,12 +203,12 @@ namespace DanKeJson
                                 builder.Append(key + ":");
                                 break;
                         }
-                        ProcessData(json[key], builder, config);
+                        ProcessData(json[key], builder, options);
                         builder.Append(',');
                     }
 
                     builder.Remove(builder.Length - 1, 1);
-                    if (config.AddTailingCommaForObject)
+                    if (options.AddTailingCommaForObject)
                     {
                         builder.Append(',');
                     }
@@ -211,11 +218,11 @@ namespace DanKeJson
                     builder.Append('[');
                     foreach (var item in json.array)
                     {
-                        ProcessData(item, builder, config);
+                        ProcessData(item, builder, options);
                         builder.Append(',');
                     }
                     builder.Remove(builder.Length - 1, 1);
-                    if (config.AddTailingCommaForArray)
+                    if (options.AddTailingCommaForArray)
                     {
                         builder.Append(',');
                     }
