@@ -68,46 +68,46 @@ Serialization:
 
 ## Using DanKeJson from an application
 
-**[Download package](https://www.nuget.org/api/v2/package/DanKeJson/1.3.2)**
+**[Download package](https://www.nuget.org/api/v2/package/DanKeJson/1.3.3)**
 
 ### Package manager
 
 ```shell
-NuGet\Install-Package DanKeJson -Version 1.3.2
+NuGet\Install-Package DanKeJson -Version 1.3.3
 ```
 
 ### .NET CLI
 
 ```shell
-dotnet add package DanKeJson --version 1.3.2
+dotnet add package DanKeJson --version 1.3.3
 ```
 
 ### PackageReference
 
 ```xaml
-<PackageReference Include="DanKeJson" Version="1.3.2" />
+<PackageReference Include="DanKeJson" Version="1.3.3" />
 ```
 
 ### Paket CLI
 
 ```shell
-paket add DanKeJson --version 1.3.2
+paket add DanKeJson --version 1.3.3
 ```
 
 ### Script & Interactive
 
 ```c#
-#r "nuget: DanKeJson, 1.3.2"
+#r "nuget: DanKeJson, 1.3.3"
 ```
 
 ### Cake
 
 ```C#
 // Install DanKeJson as a Cake Addin
-#addin nuget:?package=DanKeJson&version=1.3.2
+#addin nuget:?package=DanKeJson&version=1.3.3
 
 // Install DanKeJson as a Cake Tool
-#tool nuget:?package=DanKeJson&version=1.3.2
+#tool nuget:?package=DanKeJson&version=1.3.3
 ```
 
 Alternatively, just copy the whole tree of files under `./publish/DanKeJson` to your own project's source tree and integrate it with your development environment.
