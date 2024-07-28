@@ -160,6 +160,7 @@ namespace DanKeJson
             }
             return true;
         }   
+        
         private static object FromJson(JsonData json, Type type)
         {
             object dataclass = Activator.CreateInstance(type);
