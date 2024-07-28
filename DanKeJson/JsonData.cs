@@ -42,7 +42,6 @@ namespace DanKeJson
             Boolean,//bool
             String,//string
             None,//null
-            Comment,//comment
         }
 
         public Type type { get; set; }
