@@ -28,6 +28,7 @@ DanKeJson has incorporated a variety of features to facilitate development, incl
 - Single quotes are permissible in strings.
 - Comment allowance*
 - Conversion of undefined values to null
+- Key name allows no quotation marks
 
 For more information on features, please refer to: [**Hello DanKeJson**](./Docs/DanKeJson.md)
 
