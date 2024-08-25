@@ -34,13 +34,6 @@ using System.Linq;
 
 namespace DanKeJson
 {
-    //TODO：兼容旧接口,在v1.4.0移除
-    [Obsolete("Please use the [Json5Options] class, as it will be deprecated in v1.4.0.",false)]
-    public class Json5Config : Json5Options
-    {
-    }
-    //END
-    
     public class Json5Options
     {
         public enum KeyNameType
@@ -161,13 +154,6 @@ namespace DanKeJson
                 return;
             }
             
-            //TODO：兼容旧接口,在v1.4.0移除
-            if (options.AddTailingCommaForObject != options.AddCommaForObject)
-                options.AddTailingCommaForObject = options.AddCommaForObject;
-            if (options.AddTailingCommaForArray != options.AddCommaForArray)
-                options.AddTailingCommaForArray = options.AddCommaForArray;
-            //END
-
             switch (json.type)
             {
                 case JsonData.Type.Number:
@@ -176,10 +162,10 @@ namespace DanKeJson
                 case JsonData.Type.String:
                     switch (options.StringQuoteStyle)
                     {
-                        case Json5Config.StringQuoteType.DoubleQuote:
+                        case Json5Options.StringQuoteType.DoubleQuote:
                             builder.Append("\"" + json.json[1..^1] + "\"");
                             break;
-                        case Json5Config.StringQuoteType.SingleQuote:
+                        case Json5Options.StringQuoteType.SingleQuote:
                             builder.Append("'" + json.json[1..^1] + "'");
                             break;
                     }
@@ -196,10 +182,10 @@ namespace DanKeJson
                     {
                         switch (options.KeyNameStyle)
                         {
-                            case Json5Config.KeyNameType.WithQuotes:
+                            case Json5Options.KeyNameType.WithQuotes:
                                 builder.Append("\"" + key + "\":");
                                 break;
-                            case Json5Config.KeyNameType.WithoutQuotes:
+                            case Json5Options.KeyNameType.WithoutQuotes:
                                 builder.Append(key + ":");
                                 break;
                         }
