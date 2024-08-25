@@ -643,7 +643,7 @@ namespace DanKeJson
                 //Boolean
                 jsonData = ToBoolean(json, ref index);
             }
-            else if (cur == '-' || char.IsDigit(cur))
+            else if (cur == '-' || cur == '+' || char.IsDigit(cur) || cur == 'N' || cur == 'I')
             {
                 //Number
                 jsonData = ToNumber(json, ref index);
@@ -769,9 +769,32 @@ namespace DanKeJson
             }
 
             int start = index;
+
             if (json[index] == '-')
             {
                 index++;
+            }
+            else if (json[index] == '+')
+            {
+                start = index + 1;
+                index++;
+            }
+
+            if (index + 2 < json.Length && json.Substring(index, 3).Equals("NaN"))
+            {
+                index += 3;
+                return new JsonData(JsonData.Type.Number)
+                {
+                    json = json[start..index]
+                };
+            }
+            else if (index + 7 < json.Length && json.Substring(index, 8).Equals("Infinity"))
+            {
+                index += 8;
+                return new JsonData(JsonData.Type.Number)
+                {
+                    json = json[start..index]
+                };
             }
 
             bool hasNumber = false;

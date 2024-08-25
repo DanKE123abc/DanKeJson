@@ -2,8 +2,6 @@
 
 ### *enum*
 
-
-
 ## code
 
 ```C#
@@ -13,11 +11,10 @@ public enum Type
 	Array,
 	Number,
 	Boolean,
-	String
+	String,
+    None
 }
 ```
-
-
 
 ### Type
 
@@ -28,3 +25,5 @@ public enum Type
 | Number        | double,float,int,long,sbyte,short,uint,ulong,ushort |
 | Boolean       | bool                                                |
 | String        | string                                              |
+| None          | null                                                |
+
