@@ -7,7 +7,9 @@ string jsonText = @"
             ""positiveInfinityWithPlus"": +Infinity,
             ""negativeInfinity"": -Infinity,
             ""positiveOne"": +1,
-            ""negativeOne"": -1
+            ""negativeOne"": -1,
+            ""True"": true,
+            ""False"": false
         }";
 
 JsonData jsonData = JSON.ToData(jsonText);

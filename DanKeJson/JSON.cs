@@ -745,14 +745,12 @@ namespace DanKeJson
                 return null;
             }
 
-            if (index + 3 < json.Length && json[index] == 't' && json[index + 1] == 'r' && json[index + 2] == 'u' &&
-                json[index + 3] == 'e')
+            if (index + 3 < json.Length && json.Substring(index, 4).Equals("true"))
             {
                 index += 4;
                 return new JsonData(JsonData.Type.Boolean) { json = "true" };
             }
-            else if (index + 4 < json.Length && json[index] == 'f' && json[index + 1] == 'a' &&
-                     json[index + 2] == 'l' && json[index + 3] == 's' && json[index + 4] == 'e')
+            else if (index + 4 < json.Length && json.Substring(index, 5).Equals("false"))
             {
                 index += 5;
                 return new JsonData(JsonData.Type.Boolean) { json = "false" };
