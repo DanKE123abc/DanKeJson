@@ -163,3 +163,7 @@ SOFTWARE.
 <img src="https://resources.jetbrains.com/storage/products/company/brand/logos/jb_beam.png" alt="JetBrains Logo (Main) logo." width=100 height=100>
 
 本项目所有Markdown文件使用 [**Hypora**](https://github.com/DanKE123abc/Hypora) 书写。
+
+## 参考项目
+
+[litjson - C#](https://github.com/LitJSON/litjson)
