@@ -49,6 +49,11 @@ DanKeJson 为了方便开发使用，添加了许多特性，包括但不限于�
 
 - [ ]  支持序列化为JSON5格式
 
+杂项：
+
+- [ ]  支持序列化反序列化MessagePack
+- [ ]  使用Simd技术加快反序列化
+
 ## API
 
 [JSON](./Docs/API/JSON.md)
