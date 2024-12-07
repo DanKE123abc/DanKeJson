@@ -116,6 +116,7 @@ Alternatively, just copy the whole tree of files under `./publish/DanKeJson` to 
 
 DanKeJson currently targets and supports
 
+- .NET 9.0
 - .NET 8.0
 - .NET 7.0
 - .NET 6.0

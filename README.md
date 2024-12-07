@@ -116,6 +116,7 @@ paket add DanKeJson --version 1.4.0
 
 DanKeJson 目前支持的平台：
 
+- .NET 9.0
 - .NET 8.0
 - .NET 7.0
 - .NET 6.0
