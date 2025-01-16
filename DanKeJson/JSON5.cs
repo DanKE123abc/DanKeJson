@@ -47,12 +47,6 @@ namespace DanKeJson
             SingleQuote,
             DoubleQuote
         }
-
-        [Obsolete("Please use the [AddTailingCommaForObject] property, as it will be deprecated in v1.4.0.",false)]
-        public bool AddCommaForObject { get; set; } = false;
-        
-        [Obsolete("Please use the [AddTailingCommaForArray] property, as it will be deprecated in v1.4.0.",false)]
-        public bool AddCommaForArray { get; set; } = false;
         
         public bool AddTailingCommaForObject { get; set; } = false;
         
