@@ -1,23 +1,3 @@
-#region Header
-
-/*
-* MIT License
-
-Copyright (c) 2023 - present DanKe
-
-* DanKeJson
-a simple Json library for the .Net
-JSON : https://json.org
- 
-* About Author
-Name : DanKe
-Address : Guangzhou City , Guangdong Province , China
-Mail : danke1024@foxmail.com
-Github : https://github.com/DanKE123abc
-  */
-
-#endregion
-
 #pragma warning disable CS8618
 #pragma warning disable CS8603
 #pragma warning disable CS8600
