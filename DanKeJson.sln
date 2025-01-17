@@ -2,7 +2,7 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DanKeJson", "DanKeJson\DanKeJson.csproj", "{50CED8D2-E298-4D55-9E89-454CD22D7B8E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DanKeJson.Test", "DanKeJson.Test\DanKeJson.Test.csproj", "{06DD6F18-4582-4117-8A0B-974DC94FE8F2}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DanKeJson.Demo", "DanKeJson.Demo\DanKeJson.Demo.csproj", "{06DD6F18-4582-4117-8A0B-974DC94FE8F2}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
