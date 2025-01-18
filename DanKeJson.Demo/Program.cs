@@ -12,7 +12,7 @@ string jsonText = @"
             ""False"": false
         }";
 
-JsonData jsonData = JSON.ToData(jsonText);
+JsonData jsonData = JSON5.ToData(jsonText);
 double notANumber = jsonData["notANumber"];
 double positiveInfinity = jsonData["positiveInfinity"];
 double positiveInfinityWithPlus = jsonData["positiveInfinityWithPlus"];
