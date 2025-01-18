@@ -1,23 +1,3 @@
-#region Header
-
-/*
-* MIT License
-
-Copyright (c) 2023 - present DanKe
-
-* DanKeJson
-a simple Json library for the .Net
-JSON : https://json.org
- 
-* About Author
-Name : DanKe
-Address : Guangzhou City , Guangdong Province , China
-Mail : danke1024@foxmail.com
-Github : https://github.com/DanKE123abc
-  */
-
-#endregion
-
 #pragma warning disable CS8618
 #pragma warning disable CS8603
 #pragma warning disable CS8600
@@ -158,6 +138,27 @@ namespace DanKeJson
 
         public static implicit operator JsonData(float value)
         {
+            if (value == float.NaN)
+            {
+                return new JsonData(Type.Number)
+                {
+                    json = "NaN"
+                };
+            }
+            else if (value == float.PositiveInfinity)
+            {
+                return new JsonData(Type.Number)
+                {
+                    json = "Infinity"
+                };
+            }
+            else if (value == float.NegativeInfinity)
+            {
+                return new JsonData(Type.Number)
+                {
+                    json = "-Infinity"
+                };
+            }
             return new JsonData(Type.Number)
             {
                 json = value.ToString()
@@ -166,12 +167,27 @@ namespace DanKeJson
 
         public static implicit operator float(JsonData jsonData)
         {
-            if (jsonData == null || jsonData.type != Type.Number || !float.TryParse(jsonData.json, out float value))
+            if (jsonData == null || jsonData.type != Type.Number)
             {
                 return default;
             }
-
-            return value;
+            if (jsonData.json == "NaN")
+            {
+                return float.NaN;
+            }
+            else if(jsonData.json == "Infinity")
+            {
+                return float.PositiveInfinity;
+            }
+            else if(jsonData.json== "-Infinity")
+            {
+                return float.NegativeInfinity;
+            }
+            if (float.TryParse(jsonData.json, out float value))
+            {
+                return value;
+            }
+            return default;
         }
 
         #endregion
@@ -180,20 +196,56 @@ namespace DanKeJson
 
         public static implicit operator JsonData(double value)
         {
+            if (value == double.NaN)
+            {
+                return new JsonData(Type.Number)
+                {
+                    json = "NaN"
+                };
+            }
+            else if (value == double.PositiveInfinity)
+            {
+                return new JsonData(Type.Number)
+                {
+                    json = "Infinity"
+                };
+            }
+            else if (value == double.NegativeInfinity)
+            {
+                return new JsonData(Type.Number)
+                {
+                    json = "-Infinity"
+                };
+            }
             return new JsonData(Type.Number)
             {
                 json = value.ToString()
             };
         }
-
+        
         public static implicit operator double(JsonData jsonData)
         {
-            if (jsonData == null || jsonData.type != Type.Number || !double.TryParse(jsonData.json, out double value))
+            if (jsonData == null || jsonData.type != Type.Number)
             {
                 return default;
             }
-
-            return value;
+            if (jsonData.json == "NaN")
+            {
+                return double.NaN;
+            }
+            else if(jsonData.json == "Infinity")
+            {
+                return double.PositiveInfinity;
+            }
+            else if(jsonData.json== "-Infinity")
+            {
+                return double.NegativeInfinity;
+            }
+            if (double.TryParse(jsonData.json, out double value))
+            {
+                return value;
+            }
+            return default;
         }
 
         #endregion

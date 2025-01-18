@@ -1,14 +1,10 @@
 # DanKeJson
 
-
-
 JSON (J ava S cript O bject N otation) is a simple, yet powerful notation to specify data. It defines simple scalar types such as boolean, number (integers and reals) and string, and a couple of data structures: arrays (lists) and objects (dictionaries). For more information on the JSON format, visit [JSON.org](http://www.json.org/).
 
+JSON5 (JSON for Humans) is an extension to the popular JSON file format that aims to be easier to **write and maintain \*by hand\* (e.g. for config files)**. It is *not intended* to be used for machine-to-machine communication. For more information on the JSON5 format, visit [JSON5.org](http://www.json5.org/).
 
-
-DanKeJson is a simple Json library for the .Net
-
-
+DanKeJson is a simple Json library for the .Net.
 
 ## 目录
 
@@ -22,8 +18,10 @@ DanKeJson is a simple Json library for the .Net
 
   - [JSON](./Docs/API/JSON.md)
 
-  - [JsonData](./Docs/API/JsonData.md)
+  - [JSON5](./Docs/API/JSON5.md)
 
+  - [JsonData](./Docs/API/JsonData.md)
+  
   - [JsonData.Type](./Docs/API/JsonData.Type.md)
   
     

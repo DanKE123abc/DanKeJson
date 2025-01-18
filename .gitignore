@@ -3,8 +3,8 @@
 /DanKeJson/bin/
 /DanKeJson/lib/
 /DanKeJson/obj/
-/DanKeJson.Test/bin/
-/DanKeJson.Test/obj/
+/DanKeJson.Demo/bin/
+/DanKeJson.Demo/obj/
 /publish/
 *.nupkg
 /publish/DanKeJson
