@@ -1,12 +1,26 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <ImplicitUsings>enable</ImplicitUsings>
+        <!-- 基础 SDK 配置 -->
+        <ImplicitUsings>disable</ImplicitUsings>
         <Nullable>enable</Nullable>
         <TargetFrameworks>net9.0;net8.0;net7.0;net6.0;net5.0;netstandard2.1;netcoreapp3.0;netcoreapp3.1</TargetFrameworks>
         <LangVersion>8.0</LangVersion>
-        <ImplicitUsings>disable</ImplicitUsings>
         <OutputPath>$(ProjectDir)lib\</OutputPath>
+
+        <!-- NuGet 包元数据 -->
+        <Version>1.4.1</Version>
+        <PackageId>DanKeJson</PackageId>
+        <Title>DanKeJson</Title>
+        <Authors>DanKe</Authors>
+        <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
+        <PackageLicenseExpression>MIT</PackageLicenseExpression>
+        <PackageProjectUrl>https://github.com/DanKE123abc/DanKeJson</PackageProjectUrl>
+        <Description>a simple Json library for the .Net</Description>
+        <PackageReleaseNotes>net8.0 net7.0 net6.0 net5.0 netstandard2.1 netcoreapp3.0 netcoreapp3.1</PackageReleaseNotes>
+        <Copyright>Copyright (c) 2023 - present</Copyright>
+        <PackageTags>DanKeJson DanKE123abc Json DanKe dankejson</PackageTags>
+        
     </PropertyGroup>
 
     <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
