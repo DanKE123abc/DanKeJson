@@ -63,7 +63,13 @@ DanKeJson 为了方便开发使用，添加了许多特性，包括但不限于�
 **Windows**
 
 ```shell
-./publish.bat
+./build.ps1
+```
+
+**Mac OS / Linux**
+
+```shell
+./build.sh
 ```
 
 ## 在你的应用中安装 DanKeJson
