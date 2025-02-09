@@ -8,6 +8,8 @@ using System.Linq;
 using DanKeJson.Json;
 using DanKeJson.Utils;
 
+#pragma warning disable CS8603
+
 namespace DanKeJson
 {
 

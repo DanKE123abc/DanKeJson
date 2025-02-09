@@ -1,6 +1,8 @@
 ﻿using DanKeJson.Json;
 using static DanKeJson.Json.Reader;
 
+#pragma warning disable CS8603
+
 namespace DanKeJson.Json5
 {
     public class ReaderExts

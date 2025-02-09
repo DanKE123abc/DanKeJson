@@ -8,6 +8,9 @@ using System.Linq;
 using DanKeJson.Json5;
 using DanKeJson.Utils;
 
+#pragma warning disable CS8603
+#pragma warning disable CS8625
+
 namespace DanKeJson
 {
     public class Json5Options
