@@ -6,6 +6,11 @@ namespace DanKeJson
 {
     public class JSONL
     {
+        /// <summary>
+        /// Serializing .jsonl File to List(JsonData)
+        /// </summary>
+        /// <param name="filePath">the jsonl file path</param>
+        /// <returns>JsonData</returns>
         public static List<JsonData> AllLineToData(string filePath)
         {
             var jsonLines = new List<string>();
@@ -21,6 +26,12 @@ namespace DanKeJson
             return dataLines;
         }
 
+        /// <summary>
+        /// Serializing .jsonl File to List(Class)
+        /// </summary>
+        /// <param name="filePath">the jsonl file path</param>
+        /// <typeparam name="T">Class</typeparam>
+        /// <returns>JsonData</returns>
         public static List<T> AllLineToData<T>(string filePath) where T : class, new()
         {
             var jsonLines = new List<string>();
@@ -36,25 +47,38 @@ namespace DanKeJson
             return dataLines;
         }
 
-        public static JsonData LineToData(string text, int lineNumber)
+        /// <summary>
+        /// Serializing .jsonl File to JsonData
+        /// </summary>
+        /// <param name="filePath">the jsonl file path</param>
+        /// <param name="lineNumber">the line number</param>
+        /// <returns>JsonData</returns>
+        public static JsonData LineToData(string filePath, int lineNumber)
         {
             string jsonLine = null;
             JsonData dataLine = null;
-            if (FilePathUtility.IsFilePath(text))
+            if (FilePathUtility.IsFilePath(filePath))
             {
-                jsonLine = FileLineReader.ReadLine(text, lineNumber);
+                jsonLine = FileLineReader.ReadLine(filePath, lineNumber);
                 dataLine = JSON.ToData(jsonLine);
             }
             return dataLine;
         }
 
-        public static T LineToData<T>(string text, int lineNumber) where T : class, new()
+        /// <summary>
+        /// Serializing .jsonl File to Class
+        /// </summary>
+        /// <param name="filePath">the jsonl file path</param>
+        /// <param name="lineNumber">the line number</param>
+        /// <typeparam name="T">Class</typeparam>
+        /// <returns>JsonData</returns>
+        public static T LineToData<T>(string filePath, int lineNumber) where T : class, new()
         {
             string jsonLine = null;
             T dataLine = null;
-            if (FilePathUtility.IsFilePath(text))
+            if (FilePathUtility.IsFilePath(filePath))
             {
-                jsonLine = FileLineReader.ReadLine(text, lineNumber);
+                jsonLine = FileLineReader.ReadLine(filePath, lineNumber);
                 dataLine = JSON.ToData<T>(jsonLine);
             }
             return dataLine;
