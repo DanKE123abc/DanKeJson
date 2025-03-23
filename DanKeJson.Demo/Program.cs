@@ -4,6 +4,8 @@ var test1 = JSONL.LineToData("C:\\Users\\15860\\Downloads\\lora_medical.jsonl",8
 
 var test2 = JSONL.AllLineToData("C:\\Users\\15860\\Downloads\\lora_medical.jsonl");
 
+var test3 = JSONL.ListToJson(test2);
+
 Console.WriteLine();
 
 

@@ -83,6 +83,35 @@ namespace DanKeJson
             }
             return dataLine;
         }
+        
+
+        public static string ListToJson(List<JsonData> jsonDataList)
+        {
+            if (jsonDataList == null)
+            {
+                return null;
+            }
+            var jsonLines = new List<string>();
+            foreach (var l in jsonDataList)
+            {
+                jsonLines.Add(JSON.ToJson(l));
+            }
+            return string.Join("\n", jsonLines);
+        }
+        
+        public static string ListToJson(List<object> jsonDataList)
+        {
+            if (jsonDataList == null)
+            {
+                return null;
+            }
+            var jsonLines = new List<string>();
+            foreach (var l in jsonDataList)
+            {
+                jsonLines.Add(JSON.ToJson(l));
+            }
+            return string.Join("\n", jsonLines);
+        }
 
     }
 }
