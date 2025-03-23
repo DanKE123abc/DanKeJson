@@ -1,0 +1,27 @@
+name: MyGet Publish
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  build-and-publish:
+    runs-on: windows-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup .NET 9.0
+      uses: actions/setup-dotnet@v3
+      with:
+        dotnet-version: 9.0.x
+
+    - name: Build package
+      run: .\build.ps1
+
+    - name: Push to MyGet
+      run: |
+        $nupkg = Get-ChildItem -Path .\artifacts\*.nupkg | Select-Object -First 1
+        dotnet nuget push $nupkg.FullName --source "https://www.myget.org/F/danke/api/v2/package" --api-key ${{ secrets.MYGET_API_KEY }}
+      shell: pwsh
