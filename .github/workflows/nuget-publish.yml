@@ -44,10 +44,10 @@ jobs:
     - name: Publish to GitHub Release
       uses: softprops/action-gh-release@v2
       with:
-        tag_name: v${{ steps.commit-hash.outputs.version }}re
-        name: Release v${{ steps.commit-hash.outputs.version }}
+        tag_name: v${{ steps.package-version.outputs.version }}re
+        name: Release v${{ steps.package-version.outputs.version }}
         files: artifacts/*.nupkg
-        body: "https://www.nuget.org/packages/DanKeJson/${{ steps.commit-hash.outputs.version }}"
+        body: "https://www.nuget.org/packages/DanKeJson/${{ steps.package-version.outputs.version }}"
 
     - name: Create new branch from main
       run: |

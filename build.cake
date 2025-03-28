@@ -45,7 +45,7 @@ Task("Package")
             IncludeSymbols = true,
             OutputDirectory = outputDir,
             MSBuildSettings = new DotNetMSBuildSettings()
-            .WithProperty("Version", $"{version}-01cfc56"),
+            .WithProperty("Version", $"{version}-{suffix}"),
             };
     }
     else

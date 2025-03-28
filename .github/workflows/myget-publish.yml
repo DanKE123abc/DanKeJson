@@ -7,6 +7,9 @@ on:
 
 permissions:
   contents: write
+  
+env:
+  SHORT_SHA: ${{ github.sha[0:7] }}
 
 jobs:
   build-and-publish:
@@ -25,7 +28,7 @@ jobs:
       run: dotnet tool install Cake.Tool --version 5.0.0
 
     - name: Build package
-      run: dotnet cake --suffix=${{ github.sha }}
+      run: dotnet cake --suffix=${{ env.SHORT_SHA }}
 
     - name: Push to MyGet
       run: |
@@ -36,8 +39,8 @@ jobs:
     - name: Publish to GitHub Release
       uses: softprops/action-gh-release@v2
       with:
-        tag_name: preview-${{ github.sha }}
-        name: Preview ${{ github.sha }}
+        tag_name: preview-${{ env.SHORT_SHA }}
+        name: Preview ${{ env.SHORT_SHA }}
         prerelease: true
         files: artifacts/*.nupkg
         body: "https://www.myget.org/feed/danke/package/nuget/DanKeJson"
