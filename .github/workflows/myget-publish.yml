@@ -1,6 +1,7 @@
 name: MyGet Publish
 
 on:
+  workflow_dispatch:
   push:
     branches: [ dev ]
 
