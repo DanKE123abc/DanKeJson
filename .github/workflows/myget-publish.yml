@@ -21,10 +21,19 @@ jobs:
       run: dotnet tool install Cake.Tool --version 5.0.0
 
     - name: Build package
-      run: dotnet cake --version-suffix=$(git rev-parse --short HEAD)
+      run: dotnet cake --suffix=$(git rev-parse --short HEAD)
 
     - name: Push to MyGet
       run: |
         $nupkg = Get-ChildItem -Path .\artifacts\*.nupkg | Select-Object -First 1
         dotnet nuget push $nupkg.FullName --source "https://www.myget.org/F/danke/api/v2/package" --api-key ${{ secrets.MYGET_API_KEY }}
       shell: pwsh
+      
+    - name: Publish to GitHub Release
+      uses: softprops/action-gh-release@v2
+      with:
+        tag: p$(git rev-parse --short HEAD)
+        name: Preview $(git rev-parse --short HEAD)
+        prerelease: true
+        target_commitish: dev
+        files: artifacts/*.nupkg
