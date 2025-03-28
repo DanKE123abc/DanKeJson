@@ -2,6 +2,8 @@ var target = Argument("target", "Default");
 var configuration = Argument("configuration", "Release");
 var outputDir = "./artifacts";
 var projectDir = "./DanKeJson/";
+var suffix = Argument("suffix", "");
+
 
 // 清理发布目录
 Task("Clean")
@@ -23,7 +25,6 @@ Task("Build")
     {
         Configuration = configuration,
         NoIncremental = true,
-        
     });
 });
 
@@ -32,15 +33,32 @@ Task("Package")
     .IsDependentOn("Build")
     .Does(() => 
 {
-    DotNetPack(projectDir,
-        new DotNetPackSettings {
-            Configuration = "Release",
+    var buildSettings = new DotNetPackSettings();
+    var version = XmlPeek(projectDir + "DanKeJson.csproj", "/Project/PropertyGroup/Version");
+    if(suffix != "")
+    {
+        buildSettings = new DotNetPackSettings()
+            {
+            Configuration = configuration,
             NoRestore = true,
             NoBuild = true,
             IncludeSymbols = true,
             OutputDirectory = outputDir,
-        }
-    );
+            MSBuildSettings = new DotNetMSBuildSettings()
+            .WithProperty("Version", $"{version}-01cfc56"),
+            };
+    }
+    else
+    {
+        buildSettings = new DotNetPackSettings {
+            Configuration = configuration,
+            NoRestore = true,
+            NoBuild = true,
+            IncludeSymbols = true,
+            OutputDirectory = outputDir,
+            };
+    }
+    DotNetPack(projectDir,buildSettings);
 });
 
 // 默认任务链
