@@ -25,7 +25,7 @@ jobs:
       run: dotnet tool install Cake.Tool --version 5.0.0
 
     - name: Build package
-      run: dotnet cake --suffix=$(git rev-parse --short HEAD)
+      run: dotnet cake --suffix=${{ github.sha }}
 
     - name: Push to MyGet
       run: |
@@ -33,17 +33,11 @@ jobs:
         dotnet nuget push $nupkg.FullName --source "https://www.myget.org/F/danke/api/v2/package" --api-key ${{ secrets.MYGET_API_KEY }}
       shell: pwsh
 
-    - name: Get short commit hash
-      id: commit-hash
-      run: |
-        echo "short-hash=$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
-      shell: bash
-
     - name: Publish to GitHub Release
       uses: softprops/action-gh-release@v2
       with:
-        tag_name: preview-${{ steps.commit-hash.outputs.short-hash }}
-        name: Preview ${{ steps.commit-hash.outputs.short-hash }}
+        tag_name: preview-${{ github.sha }}
+        name: Preview ${{ github.sha }}
         prerelease: true
         files: artifacts/*.nupkg
         body: "https://www.myget.org/feed/danke/package/nuget/DanKeJson"
