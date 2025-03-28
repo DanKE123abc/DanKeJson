@@ -20,8 +20,12 @@ jobs:
     - name: Install Cake Tool
       run: dotnet tool install Cake.Tool --version 5.0.0
 
+    - name: Get short commit hash
+      id: vars
+      run: echo "SHORT_COMMIT=$(git rev-parse --short HEAD)" >> $GITHUB_ENV
+
     - name: Build package
-      run: dotnet cake
+      run: dotnet cake --version-suffix=${{ env.SHORT_COMMIT }}
 
     - name: Push to MyGet
       run: |
