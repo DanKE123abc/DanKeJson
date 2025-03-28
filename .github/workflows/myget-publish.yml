@@ -32,6 +32,12 @@ jobs:
         dotnet nuget push $nupkg.FullName --source "https://www.myget.org/F/danke/api/v2/package" --api-key ${{ secrets.MYGET_API_KEY }}
       shell: pwsh
 
+    - name: Get short commit hash
+      id: commit-hash
+      run: |
+        echo "short-hash=$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
+      shell: bash
+
     - name: Publish to GitHub Release
       uses: softprops/action-gh-release@v2
       with:
