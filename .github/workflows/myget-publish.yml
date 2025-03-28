@@ -32,7 +32,7 @@ jobs:
     - name: Publish to GitHub Release
       uses: softprops/action-gh-release@v2
       with:
-        tag: p$(git rev-parse --short HEAD)
+        tag_name: preview-$(git rev-parse --short HEAD)
         name: Preview $(git rev-parse --short HEAD)
         prerelease: true
         target_commitish: dev
