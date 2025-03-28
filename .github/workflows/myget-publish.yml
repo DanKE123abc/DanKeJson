@@ -38,6 +38,5 @@ jobs:
         tag_name: preview-${{ steps.commit-hash.outputs.short-hash }}
         name: Preview ${{ steps.commit-hash.outputs.short-hash }}
         prerelease: true
-        target_commitish: dev
         files: artifacts/*.nupkg
         body: "https://www.myget.org/feed/danke/package/nuget/DanKeJson"
