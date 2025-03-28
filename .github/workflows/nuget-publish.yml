@@ -2,6 +2,8 @@ name: NuGet Publish
 
 on:
   workflow_dispatch:
+  push:
+    branches: [ main ]
 
 permissions:
   contents: write
@@ -28,7 +30,7 @@ jobs:
     - name: Push to NuGet
       run: |
         $nupkg = Get-ChildItem -Path .\artifacts\*.nupkg | Select-Object -First 1
-        dotnet nuget push $nupkg.FullName --api-key ${{ secrets.NUGET_API_KEY }}
+        dotnet nuget push $nupkg.FullName --api-key ${{ secrets.NUGET_API_KEY }} --source https://api.nuget.org/v3/index.json
       shell: pwsh
 
     - name: Get NuGet package version
