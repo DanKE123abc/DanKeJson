@@ -1,0 +1,54 @@
+name: NuGet Publish
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build-and-publish:
+    runs-on: windows-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup .NET 9.0
+      uses: actions/setup-dotnet@v3
+      with:
+        dotnet-version: 9.0.x
+
+    - name: Install Cake Tool
+      run: dotnet tool install Cake.Tool --version 5.0.0
+
+    - name: Build package
+      run: dotnet cake
+
+    - name: Push to NuGet
+      run: |
+        $nupkg = Get-ChildItem -Path .\artifacts\*.nupkg | Select-Object -First 1
+        dotnet nuget push $nupkg.FullName --api-key ${{ secrets.NUGET_API_KEY }}
+      shell: pwsh
+
+    - name: Get NuGet package version
+      id: package-version
+      run: |
+        $nupkg = Get-ChildItem -Path .\artifacts\*.nupkg | Select-Object -First 1
+        $version = [System.IO.Path]::GetFileNameWithoutExtension($nupkg.Name).Split('.')[-1]
+        echo "version=$version" >> $GITHUB_OUTPUT
+      shell: pwsh
+
+    - name: Publish to GitHub Release
+      uses: softprops/action-gh-release@v2
+      with:
+        tag_name: v${{ steps.commit-hash.outputs.version }}re
+        name: Release v${{ steps.commit-hash.outputs.version }}
+        files: artifacts/*.nupkg
+        body: "https://www.nuget.org/packages/DanKeJson/${{ steps.commit-hash.outputs.version }}"
+
+    - name: Create new branch from main
+      run: |
+        git checkout -b v${{ steps.package-version.outputs.version }} main
+        git push origin v${{ steps.package-version.outputs.version }}
+      shell: pwsh

@@ -2,7 +2,7 @@
 
 [**中文**](./README.md) | <u>**English**</u>
 
-![NuGet](https://img.shields.io/nuget/v/DanKeJson.svg)
+![NuGet](https://img.shields.io/nuget/v/DanKeJson.svg)![MyGet](https://img.shields.io/myget/danke/vpre/DanKeJson.svg?label=myget)
 
 DanKeJson is a simple *.Net* library to handle conversions from and to JSON (JavaScript Object Notation) strings.
 

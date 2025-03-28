@@ -2,7 +2,7 @@
 
 <u>**中文**</u> | [**English**](./README_en.md)
 
-![NuGet](https://img.shields.io/nuget/v/DanKeJson.svg)
+![NuGet](https://img.shields.io/nuget/v/DanKeJson.svg) ![MyGet](https://img.shields.io/myget/danke/vpre/DanKeJson.svg?label=myget)
 
 DanKeJson 是一个.Net平台上的精简小巧的 JSON 类库，用于处理 JSON (JavaScript Object Notation) 字符串之间的转换。
 
