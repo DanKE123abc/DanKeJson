@@ -1,29 +1,10 @@
 ﻿using DanKeJson;
 
-string jsonText = @"
-        {
-            ""notANumber"": NaN,
-            ""positiveInfinity"": Infinity,
-            ""positiveInfinityWithPlus"": +Infinity,
-            ""negativeInfinity"": -Infinity,
-            ""positiveOne"": +1,
-            ""negativeOne"": -1,
-            ""True"": true,
-            ""False"": false
-        }";
+var test1 = JSONL.LineToData("C:\\Users\\15860\\Downloads\\lora_medical.jsonl",80);
 
-JsonData jsonData = JSON5.ToData(jsonText);
-double notANumber = jsonData["notANumber"];
-double positiveInfinity = jsonData["positiveInfinity"];
-double positiveInfinityWithPlus = jsonData["positiveInfinityWithPlus"];
-double negativeInfinity = jsonData["negativeInfinity"];
-double positiveOne= jsonData["positiveOne"];
+var test2 = JSONL.AllLineToData("C:\\Users\\15860\\Downloads\\lora_medical.jsonl");
 
-JsonData newJsonData = new JsonData(JsonData.Type.Object);
-newJsonData["notANumber"] = notANumber;
-newJsonData["positiveInfinity"] = positiveInfinity;
-newJsonData["positiveInfinityWithPlus"] = positiveInfinityWithPlus;
-newJsonData["negativeInfinity"] = negativeInfinity;
+var test3 = JSONL.ListToJson(test2);
 
 Console.WriteLine();
 

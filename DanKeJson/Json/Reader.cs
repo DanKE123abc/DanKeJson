@@ -1,4 +1,6 @@
-﻿namespace DanKeJson.Json
+﻿#pragma warning disable CS8603
+
+namespace DanKeJson.Json
 {
     public class Reader
     {

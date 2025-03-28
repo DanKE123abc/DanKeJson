@@ -1,0 +1,48 @@
+name: MyGet Publish
+
+on:
+  push:
+    branches: [ dev ]
+
+permissions:
+  contents: write
+
+jobs:
+  build-and-publish:
+    runs-on: windows-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup .NET 9.0
+      uses: actions/setup-dotnet@v3
+      with:
+        dotnet-version: 9.0.x
+
+    - name: Install Cake Tool
+      run: dotnet tool install Cake.Tool --version 5.0.0
+
+    - name: Build package
+      run: dotnet cake --suffix=$(git rev-parse --short HEAD)
+
+    - name: Push to MyGet
+      run: |
+        $nupkg = Get-ChildItem -Path .\artifacts\*.nupkg | Select-Object -First 1
+        dotnet nuget push $nupkg.FullName --source "https://www.myget.org/F/danke/api/v2/package" --api-key ${{ secrets.MYGET_API_KEY }}
+      shell: pwsh
+
+    - name: Get short commit hash
+      id: commit-hash
+      run: |
+        echo "short-hash=$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
+      shell: bash
+
+    - name: Publish to GitHub Release
+      uses: softprops/action-gh-release@v2
+      with:
+        tag_name: preview-${{ steps.commit-hash.outputs.short-hash }}
+        name: Preview ${{ steps.commit-hash.outputs.short-hash }}
+        prerelease: true
+        files: artifacts/*.nupkg
+        body: "https://www.myget.org/feed/danke/package/nuget/DanKeJson"
