@@ -4,6 +4,9 @@ on:
   push:
     branches: [ dev ]
 
+permissions:
+  contents: write
+
 jobs:
   build-and-publish:
     runs-on: windows-latest
@@ -28,7 +31,7 @@ jobs:
         $nupkg = Get-ChildItem -Path .\artifacts\*.nupkg | Select-Object -First 1
         dotnet nuget push $nupkg.FullName --source "https://www.myget.org/F/danke/api/v2/package" --api-key ${{ secrets.MYGET_API_KEY }}
       shell: pwsh
-      
+
     - name: Publish to GitHub Release
       uses: softprops/action-gh-release@v2
       with:
@@ -37,3 +40,4 @@ jobs:
         prerelease: true
         target_commitish: dev
         files: artifacts/*.nupkg
+        body: "https://www.myget.org/feed/danke/package/nuget/DanKeJson"
