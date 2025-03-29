@@ -22,12 +22,14 @@ DanKeJson is a simple *.Net* library to handle conversions from and to JSON (Jav
 
 DanKeJson has incorporated a variety of features to facilitate development, including but not limited to:
 
-- Data transmission via the [JsonData](./Docs/API/JsonData.md) class
-- Implicit conversion operators
-- Tolerance for superfluous commas in arrays and objects
-- Single quotes are permissible in strings.
-- Comment allowance*
-- Conversion of undefined values to null
+- Pass data using the [JsonData]([JsonData](./Docs/API/JsonData.md)) class.
+- Implicit conversion operators.
+- Support reading .jsonl (JSONL).
+- Allow trailing commas in arrays and objects (JSON5).
+- Allow key names without quotes (JSON5).
+- Allow single quotes in strings (JSON5).
+- Allow comments*.
+- Convert undefined values to null.
 
 For more information on features, please refer to: [**Hello DanKeJson**](./Docs/DanKeJson.md)
 
@@ -46,7 +48,7 @@ Deserialization:
 
 Serialization:
 
-- [ ]  Support for serializing to JSON5 format
+- [X]  Support for serializing to JSON5 format
 
 ## API
 
