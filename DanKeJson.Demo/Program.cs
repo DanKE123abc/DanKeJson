@@ -13,11 +13,18 @@ public class JsonRoot
     [JsonProperty("model")]
     public string Model { get;set; }
     
-    public JsonData messages { get;set; }
+    public List<MessagesItem> messages { get;set; }
     
     public double temperature { get;set; }
     
     public int max_tokens { get;set; }
     
     public bool stream { get;set; }
+}
+
+public class MessagesItem
+{
+    public string role { get;set; }
+    
+    public string content { get;set; }
 }

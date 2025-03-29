@@ -35,8 +35,7 @@ namespace DanKeJson.Json
             if (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(List<>))
             {
                 var listType = type.GetGenericArguments()[0];
-                IList list = (IList)Activator.CreateInstance(typeof(List<>).MakeGenericType(listType));
-
+                IList list = (IList)Activator.CreateInstance(typeof(List<>).MakeGenericType(listType)); 
                 switch (Type.GetTypeCode(listType))
                 {
                     case TypeCode.String:
@@ -174,7 +173,13 @@ namespace DanKeJson.Json
                         {
                             propertyName = jsonProperty.Name;
                         }
-
+                        
+                        if (propertyType == typeof(JsonData))
+                        {
+                            JsonData jsonData = json[propertyName];
+                            propertyInfo.SetValue(dataclass, jsonData);
+                        }
+                        
                         switch (Type.GetTypeCode(propertyType))
                         {
                             case TypeCode.String:
@@ -220,13 +225,6 @@ namespace DanKeJson.Json
                             case TypeCode.UInt16:
                                 ushort.TryParse(json[propertyName].json, out ushort ushortValue);
                                 propertyInfo.SetValue(dataclass, ushortValue);
-                                break;
-                            case TypeCode.Object:
-                                if (propertyType == typeof(JsonData))
-                                {
-                                    JsonData jsonData = json[propertyName];
-                                    propertyInfo.SetValue(dataclass, jsonData);
-                                }
                                 break;
                             default:
                                 if (propertyType.IsGenericType && propertyType.GetGenericTypeDefinition() == typeof(List<>))
