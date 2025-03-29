@@ -221,6 +221,13 @@ namespace DanKeJson.Json
                                 ushort.TryParse(json[propertyName].json, out ushort ushortValue);
                                 propertyInfo.SetValue(dataclass, ushortValue);
                                 break;
+                            case TypeCode.Object:
+                                if (propertyType == typeof(JsonData))
+                                {
+                                    JsonData jsonData = json[propertyName];
+                                    propertyInfo.SetValue(dataclass, jsonData);
+                                }
+                                break;
                             default:
                                 if (propertyType.IsGenericType && propertyType.GetGenericTypeDefinition() == typeof(List<>))
                                 {
