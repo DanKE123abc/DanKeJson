@@ -11,6 +11,20 @@ using static DanKeJson.Json.Reader;
 #pragma warning disable CS8600
 #pragma warning disable CS1591
 
+namespace DanKeJson
+{
+    [AttributeUsage(AttributeTargets.Property)]
+    public class JsonProperty : Attribute
+    {
+        public string Name { get; }
+
+        public JsonProperty(string name)
+        {
+            Name = name;
+        }
+    }
+}
+
 namespace DanKeJson.Json
 {
     public class Serializer
@@ -135,61 +149,82 @@ namespace DanKeJson.Json
             }
             else
             {
-                foreach (PropertyInfo propertyInfo in type.GetProperties())
+                // 获取所有属性并按自定义特性排序
+                var properties = type.GetProperties()
+                    .Select(p => new
+                    {
+                        PropertyInfo = p,
+                        JsonProperty = p.GetCustomAttribute<JsonProperty>()
+                    })
+                    .OrderByDescending(p => p.JsonProperty != null)
+                    .ThenBy(p => p.PropertyInfo.Name)
+                    .Select(p => p.PropertyInfo)
+                    .ToList();
+
+                foreach (PropertyInfo propertyInfo in properties)
                 {
                     if (propertyInfo.CanWrite)
                     {
                         Type propertyType = propertyInfo.PropertyType;
+                        string propertyName = propertyInfo.Name;
+
+                        // 获取自定义特性的名称
+                        var jsonProperty = propertyInfo.GetCustomAttribute<JsonProperty>();
+                        if (jsonProperty != null)
+                        {
+                            propertyName = jsonProperty.Name;
+                        }
+
                         switch (Type.GetTypeCode(propertyType))
                         {
                             case TypeCode.String:
-                                string stringValue = json[propertyInfo.Name];
+                                string stringValue = json[propertyName];
                                 propertyInfo.SetValue(dataclass, stringValue);
                                 break;
                             case TypeCode.Boolean:
-                                bool.TryParse(json[propertyInfo.Name].json, out bool boolValue);
+                                bool.TryParse(json[propertyName].json, out bool boolValue);
                                 propertyInfo.SetValue(dataclass, boolValue);
                                 break;
                             case TypeCode.Int32:
-                                int.TryParse(json[propertyInfo.Name].json, out int intValue);
+                                int.TryParse(json[propertyName].json, out int intValue);
                                 propertyInfo.SetValue(dataclass, intValue);
                                 break;
                             case TypeCode.Int64:
-                                long.TryParse(json[propertyInfo.Name].json, out long longValue);
+                                long.TryParse(json[propertyName].json, out long longValue);
                                 propertyInfo.SetValue(dataclass, longValue);
                                 break;
                             case TypeCode.Single:
-                                float.TryParse(json[propertyInfo.Name].json, out float floatValue);
+                                float.TryParse(json[propertyName].json, out float floatValue);
                                 propertyInfo.SetValue(dataclass, floatValue);
                                 break;
                             case TypeCode.Double:
-                                double.TryParse(json[propertyInfo.Name].json, out double doubleValue);
+                                double.TryParse(json[propertyName].json, out double doubleValue);
                                 propertyInfo.SetValue(dataclass, doubleValue);
                                 break;
                             case TypeCode.SByte:
-                                sbyte.TryParse(json[propertyInfo.Name].json, out sbyte sbyteValue);
+                                sbyte.TryParse(json[propertyName].json, out sbyte sbyteValue);
                                 propertyInfo.SetValue(dataclass, sbyteValue);
                                 break;
                             case TypeCode.Int16:
-                                short.TryParse(json[propertyInfo.Name].json, out short shortValue);
+                                short.TryParse(json[propertyName].json, out short shortValue);
                                 propertyInfo.SetValue(dataclass, shortValue);
                                 break;
                             case TypeCode.UInt32:
-                                uint.TryParse(json[propertyInfo.Name].json, out uint uintValue);
+                                uint.TryParse(json[propertyName].json, out uint uintValue);
                                 propertyInfo.SetValue(dataclass, uintValue);
                                 break;
                             case TypeCode.UInt64:
-                                ulong.TryParse(json[propertyInfo.Name].json, out ulong ulongValue);
+                                ulong.TryParse(json[propertyName].json, out ulong ulongValue);
                                 propertyInfo.SetValue(dataclass, ulongValue);
                                 break;
                             case TypeCode.UInt16:
-                                ushort.TryParse(json[propertyInfo.Name].json, out ushort ushortValue);
+                                ushort.TryParse(json[propertyName].json, out ushort ushortValue);
                                 propertyInfo.SetValue(dataclass, ushortValue);
                                 break;
                             default:
                                 if (propertyType.IsGenericType && propertyType.GetGenericTypeDefinition() == typeof(List<>))
                                 {
-                                    JsonData nestedJson = json[propertyInfo.Name];
+                                    JsonData nestedJson = json[propertyName];
                                     if (nestedJson.type == JsonData.Type.Object)
                                     {
                                         var nestedObject = FromJson(nestedJson, propertyType);
@@ -212,7 +247,6 @@ namespace DanKeJson.Json
                 }
 
                 return dataclass;
-
             }
         }
 

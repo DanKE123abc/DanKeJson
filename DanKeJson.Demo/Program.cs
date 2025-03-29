@@ -10,7 +10,8 @@ Console.WriteLine();
 
 public class JsonRoot
 {
-    public string model { get;set; }
+    [JsonProperty("model")]
+    public string Model { get;set; }
     
     public List<MessagesItem> messages { get;set; }
     
