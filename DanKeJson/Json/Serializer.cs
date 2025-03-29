@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -187,155 +187,25 @@ namespace DanKeJson.Json
                                 propertyInfo.SetValue(dataclass, ushortValue);
                                 break;
                             default:
-                                if (propertyType.IsGenericType &&
-                                    propertyType.GetGenericTypeDefinition() == typeof(List<>))
+                                if (propertyType.IsGenericType && propertyType.GetGenericTypeDefinition() == typeof(List<>))
                                 {
-                                    Type listType = propertyType.GetGenericArguments()[0];
-                                    if (listType == typeof(string))
+                                    JsonData nestedJson = json[propertyInfo.Name];
+                                    if (nestedJson.type == JsonData.Type.Object)
                                     {
-                                        List<string> list = new List<string>();
-                                        foreach (var item in json[propertyInfo.Name].array)
-                                        {
-                                            list.Add(item);
-                                        }
-
-                                        propertyInfo.SetValue(dataclass, list);
+                                        var nestedObject = FromJson(nestedJson, propertyType);
+                                        propertyInfo.SetValue(dataclass, nestedObject);
                                     }
-                                    else if (listType == typeof(bool))
+                                    else if (nestedJson.type == JsonData.Type.Array)
                                     {
-                                        List<bool> list = new List<bool>();
-                                        foreach (var item in json[propertyInfo.Name].array)
+                                        IList list = (IList)Activator.CreateInstance(typeof(List<>).MakeGenericType(propertyType.GetGenericArguments()[0]));
+                                        foreach (var item in nestedJson.array)
                                         {
-                                            list.Add(item);
-                                        }
-
-                                        propertyInfo.SetValue(dataclass, list);
-                                    }
-                                    else if (listType == typeof(int))
-                                    {
-                                        List<int> list = new List<int>();
-                                        foreach (var item in json[propertyInfo.Name].array)
-                                        {
-                                            list.Add(item);
-                                        }
-
-                                        propertyInfo.SetValue(dataclass, list);
-                                    }
-                                    else if (listType == typeof(long))
-                                    {
-                                        List<long> list = new List<long>();
-                                        foreach (var item in json[propertyInfo.Name].array)
-                                        {
-                                            list.Add(item);
-                                        }
-
-                                        propertyInfo.SetValue(dataclass, list);
-                                    }
-                                    else if (listType == typeof(float))
-                                    {
-                                        List<float> list = new List<float>();
-                                        foreach (var item in json[propertyInfo.Name].array)
-                                        {
-                                            list.Add(item);
-                                        }
-
-                                        propertyInfo.SetValue(dataclass, list);
-                                    }
-                                    else if (listType == typeof(double))
-                                    {
-                                        List<double> list = new List<double>();
-                                        foreach (var item in json[propertyInfo.Name].array)
-                                        {
-                                            list.Add(item);
-                                        }
-
-                                        propertyInfo.SetValue(dataclass, list);
-                                    }
-                                    else if (listType == typeof(sbyte))
-                                    {
-                                        List<sbyte> list = new List<sbyte>();
-                                        foreach (var item in json[propertyInfo.Name].array)
-                                        {
-                                            list.Add(item);
-                                        }
-
-                                        propertyInfo.SetValue(dataclass, list);
-                                    }
-                                    else if (listType == typeof(short))
-                                    {
-                                        List<short> list = new List<short>();
-                                        foreach (var item in json[propertyInfo.Name].array)
-                                        {
-                                            list.Add(item);
-                                        }
-
-                                        propertyInfo.SetValue(dataclass, list);
-                                    }
-                                    else if (listType == typeof(uint))
-                                    {
-                                        List<uint> list = new List<uint>();
-                                        foreach (var item in json[propertyInfo.Name].array)
-                                        {
-                                            list.Add(item);
-                                        }
-
-                                        propertyInfo.SetValue(dataclass, list);
-                                    }
-                                    else if (listType == typeof(ulong))
-                                    {
-                                        List<ulong> list = new List<ulong>();
-                                        foreach (var item in json[propertyInfo.Name].array)
-                                        {
-                                            list.Add(item);
-                                        }
-
-                                        propertyInfo.SetValue(dataclass, list);
-                                    }
-                                    else if (listType == typeof(ushort))
-                                    {
-                                        List<ushort> list = new List<ushort>();
-                                        foreach (var item in json[propertyInfo.Name].array)
-                                        {
-                                            list.Add(item);
-                                        }
-
-                                        propertyInfo.SetValue(dataclass, list);
-                                    }
-                                    else if (listType.IsClass)
-                                    {
-                                        IList list =
-                                            (IList)Activator.CreateInstance(typeof(List<>).MakeGenericType(listType));
-                                        foreach (var item in json[propertyInfo.Name].array)
-                                        {
-                                            var obj = FromJson(item, listType);
+                                            var obj = FromJson(item, propertyType.GetGenericArguments()[0]);
                                             list.Add(obj);
                                         }
-
                                         propertyInfo.SetValue(dataclass, list);
                                     }
-                                    else if (listType.IsGenericType &&
-                                             listType.GetGenericTypeDefinition() == typeof(List<>))
-                                    {
-                                        IList list =
-                                            (IList)Activator.CreateInstance(typeof(List<>).MakeGenericType(listType));
-                                        foreach (var item in json[propertyInfo.Name].array)
-                                        {
-                                            var obj = FromJson(item, listType);
-                                            list.Add(obj);
-                                        }
-
-                                        IList convertedList = list.Cast<object>().ToList();
-                                        propertyInfo.SetValue(dataclass, convertedList);
-                                    }
-
                                 }
-                                else if (propertyType.IsClass)
-                                {
-                                    JsonData nextjson = JSON5.ToData(json[propertyInfo.Name].json);
-                                    var propertyValue = FromJson(nextjson, propertyType);
-                                    propertyInfo.SetValue(dataclass, propertyValue);
-                                }
-
                                 break;
                         }
                     }

@@ -1,11 +1,29 @@
 ﻿using DanKeJson;
 
-var test1 = JSONL.LineToData("C:\\Users\\15860\\Downloads\\lora_medical.jsonl",80);
+var text =
+    "{\n  \"model\": \"gpt-3.5-turbo\",\n  \"messages\": [\n    {\"role\": \"system\", \"content\": \"你是一个助手\"},\n    {\"role\": \"user\", \"content\": \"你好！\"}\n  ],\n  \"temperature\": 0.7,\n  \"max_tokens\": 100,\n  \"stream\": false\n}";
 
-var test2 = JSONL.AllLineToData("C:\\Users\\15860\\Downloads\\lora_medical.jsonl");
-
-var test3 = JSONL.ListToJson(test2);
+var json = JSON.ToData<JsonRoot>(text);
 
 Console.WriteLine();
 
 
+public class JsonRoot
+{
+    public string model { get;set; }
+    
+    public List<MessagesItem> messages { get;set; }
+    
+    public double temperature { get;set; }
+    
+    public int max_tokens { get;set; }
+    
+    public bool stream { get;set; }
+}
+
+public class MessagesItem
+{
+    public string role { get;set; }
+    
+    public string content { get;set; }
+}

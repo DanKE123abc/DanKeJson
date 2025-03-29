@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.IO;
 using DanKeJson.Utils;
 
 namespace DanKeJson
@@ -55,7 +54,7 @@ namespace DanKeJson
         /// <returns>JsonData</returns>
         public static JsonData LineToData(string filePath, int lineNumber)
         {
-            string jsonLine = null;
+            string jsonLine;
             JsonData dataLine = null;
             if (FilePathUtility.IsFilePath(filePath))
             {
@@ -74,7 +73,7 @@ namespace DanKeJson
         /// <returns>JsonData</returns>
         public static T LineToData<T>(string filePath, int lineNumber) where T : class, new()
         {
-            string jsonLine = null;
+            string jsonLine;
             T dataLine = null;
             if (FilePathUtility.IsFilePath(filePath))
             {
