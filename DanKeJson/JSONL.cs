@@ -83,7 +83,11 @@ namespace DanKeJson
             return dataLine;
         }
         
-
+        /// <summary>
+        /// Deserializing JsonData List to Json(String)
+        /// </summary>
+        /// <param name="jsonDataList">the JsonData list</param>
+        /// <returns></returns>
         public static string ListToJson(List<JsonData> jsonDataList)
         {
             if (jsonDataList == null)
@@ -98,6 +102,11 @@ namespace DanKeJson
             return string.Join("\n", jsonLines);
         }
         
+        /// <summary>
+        /// Deserializing JsonData List Class to Json(String)
+        /// </summary>
+        /// <param name="jsonDataList">the Class list</param>
+        /// <returns></returns>
         public static string ListToJson(List<object> jsonDataList)
         {
             if (jsonDataList == null)
