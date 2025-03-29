@@ -174,10 +174,9 @@ namespace DanKeJson.Json
                             propertyName = jsonProperty.Name;
                         }
                         
-                        if (propertyType == typeof(JsonData))
+                        if ((Nullable.GetUnderlyingType(propertyType) ?? propertyType) == typeof(JsonData))
                         {
-                            JsonData jsonData = json[propertyName];
-                            propertyInfo.SetValue(dataclass, jsonData);
+                            propertyInfo.SetValue(dataclass, json[propertyName]);
                         }
                         
                         switch (Type.GetTypeCode(propertyType))
