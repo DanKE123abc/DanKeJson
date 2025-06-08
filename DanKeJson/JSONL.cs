@@ -19,7 +19,7 @@ namespace DanKeJson
                 jsonLines = FileLineReader.ReadAllLines(filePath);
                 foreach (var l in jsonLines)
                 {
-                    dataLines.Add(JSON.ToData(l));
+                    dataLines.Add(JSON.ToData(l, true));
                 }
             }
             return dataLines;
@@ -40,7 +40,7 @@ namespace DanKeJson
                 jsonLines = FileLineReader.ReadAllLines(filePath);
                 foreach (var l in jsonLines)
                 {
-                    dataLines.Add(JSON.ToData<T>(l));
+                    dataLines.Add(JSON.ToData<T>(l,true));
                 }
             }
             return dataLines;
@@ -59,7 +59,7 @@ namespace DanKeJson
             if (FilePathUtility.IsFilePath(filePath))
             {
                 jsonLine = FileLineReader.ReadLine(filePath, lineNumber);
-                dataLine = JSON.ToData(jsonLine);
+                dataLine = JSON.ToData(jsonLine, true);
             }
             return dataLine;
         }
@@ -78,7 +78,7 @@ namespace DanKeJson
             if (FilePathUtility.IsFilePath(filePath))
             {
                 jsonLine = FileLineReader.ReadLine(filePath, lineNumber);
-                dataLine = JSON.ToData<T>(jsonLine);
+                dataLine = JSON.ToData<T>(jsonLine, true);
             }
             return dataLine;
         }
@@ -87,25 +87,6 @@ namespace DanKeJson
         /// Deserializing JsonData List to Json(String)
         /// </summary>
         /// <param name="jsonDataList">the JsonData list</param>
-        /// <returns></returns>
-        public static string ListToJson(List<JsonData> jsonDataList)
-        {
-            if (jsonDataList == null)
-            {
-                return null;
-            }
-            var jsonLines = new List<string>();
-            foreach (var l in jsonDataList)
-            {
-                jsonLines.Add(JSON.ToJson(l));
-            }
-            return string.Join("\n", jsonLines);
-        }
-        
-        /// <summary>
-        /// Deserializing JsonData List Class to Json(String)
-        /// </summary>
-        /// <param name="jsonDataList">the Class list</param>
         /// <returns></returns>
         public static string ListToJson(List<JsonData> jsonDataList)
         {
