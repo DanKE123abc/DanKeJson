@@ -107,7 +107,7 @@ namespace DanKeJson
         /// </summary>
         /// <param name="jsonDataList">the Class list</param>
         /// <returns></returns>
-        public static string ListToJson(List<object> jsonDataList)
+        public static string ListToJson(List<JsonData> jsonDataList)
         {
             if (jsonDataList == null)
             {
