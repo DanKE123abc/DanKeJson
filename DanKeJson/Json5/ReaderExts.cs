@@ -7,6 +7,25 @@ namespace DanKeJson.Json5
 {
     public class ReaderExts
     {
+        public static void StringIndexResolver(string json, ref int index)
+        {
+            while (index < json.Length && json[index] != '\'')
+            {
+                index++;
+            }
+
+            var lazy_index = index;
+            if (json[lazy_index + 1] == ',' || json[lazy_index + 1] == ']' || json[lazy_index + 1] == '}')
+            {
+                return;
+            }
+            else
+            {
+                index++;
+                StringIndexResolver(json, ref index);
+            }
+        }
+        
         //json5单引号字符串
         public static JsonData ToString_Single(string json, ref int index)
         {
@@ -17,11 +36,8 @@ namespace DanKeJson.Json5
 
             int start = index++;
 
-            while (index < json.Length && json[index] != '\'')
-            {
-                index++;
-            }
-
+            StringIndexResolver(json, ref index);
+            
             if (index >= json.Length)
             {
                 return null;

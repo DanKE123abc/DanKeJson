@@ -17,6 +17,25 @@ namespace DanKeJson.Json
             }
         }
         
+        public static void StringIndexResolver(string json, ref int index)
+        {
+            while (index < json.Length && json[index] != '\"')
+            {
+                index++;
+            }
+
+            var lazy_index = index;
+            if (json[lazy_index + 1] == ',' || json[lazy_index + 1] == ']' || json[lazy_index + 1] == '}')
+            {
+                return;
+            }
+            else
+            {
+                index++;
+                StringIndexResolver(json, ref index);
+            }
+        }
+        
         public static JsonData ToString_Double(string json, ref int index)
         {
             if (index < 0 || index >= json.Length || json[index] != '\"')
@@ -26,16 +45,13 @@ namespace DanKeJson.Json
 
             int start = index++;
 
-            while (index < json.Length && json[index] != '\"')
-            {
-                index++;
-            }
-
+            StringIndexResolver(json, ref index);
+            
             if (index >= json.Length)
             {
                 return null;
             }
-
+            
             return new JsonData(JsonData.Type.String)
             {
                 json = json[start..(++index)]
