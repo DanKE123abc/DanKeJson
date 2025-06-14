@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.IO;
+using System.Text;
 using DanKeJson.Utils;
 
 namespace DanKeJson
@@ -106,10 +107,12 @@ namespace DanKeJson
             {
                 jsonLines.Add(JSON.ToJson(l));
             }
-            string result = string.Join("\n", jsonLines);
-            if (!string.IsNullOrEmpty(filePath))
+            using (var writer = new StreamWriter(filePath, false, Encoding.UTF8))
             {
-                File.WriteAllText(filePath, result);
+                foreach (var line in jsonLines)
+                {
+                    writer.WriteLine(line);
+                }
             }
             return string.Join("\n", jsonLines);
         }
@@ -133,12 +136,14 @@ namespace DanKeJson
             {
                 jsonLines.Add(JSON.ToJson(l));
             }
-            string result = string.Join("\n", jsonLines);
-            if (!string.IsNullOrEmpty(filePath))
+            using (var writer = new StreamWriter(filePath, false, Encoding.UTF8))
             {
-                File.WriteAllText(filePath, result);
+                foreach (var line in jsonLines)
+                {
+                    writer.WriteLine(line);
+                }
             }
-            return result;
+            return string.Join("\n", jsonLines);
         }
 
     }
