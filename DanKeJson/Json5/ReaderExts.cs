@@ -11,7 +11,7 @@ namespace DanKeJson.Json5
     {
         
         //json5单引号字符串
-        public static JsonData ToString_Double(string json, ref int index)
+        public static JsonData ToString_Single(string json, ref int index)
         {
             if (index < 0 || index >= json.Length || json[index] != '\'')
             {
