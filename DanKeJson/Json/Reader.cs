@@ -1,4 +1,7 @@
-﻿#pragma warning disable CS8603
+﻿using System.Globalization;
+using System.Text;
+
+#pragma warning disable CS8603
 
 namespace DanKeJson.Json
 {
@@ -24,24 +27,86 @@ namespace DanKeJson.Json
                 return null;
             }
 
-            int start = index++;
-
-            while (index < json.Length && json[index] != '\"')
+            StringBuilder sb = new StringBuilder();
+            int start = index; // 记录起始位置
+            index++; // 跳过起始引号
+            
+            while (index < json.Length)
             {
-                index++;
+                char current = json[index];
+                
+                if (current == '\"')
+                {
+                    index++;
+                    return new JsonData(JsonData.Type.String)
+                    {
+                        json = sb.ToString()
+                    };
+                }
+
+                // 4. 处理转义序列
+                if (current == '\\')
+                {
+                    index++; // 跳过反斜杠
+                    if (index >= json.Length) break; // 防止越界
+
+                    switch (json[index++]) // 处理转义字符并移动索引
+                    {
+                        case '\"':
+                            sb.Append('\"');
+                            break;
+                        case '\\':
+                            sb.Append('\\');
+                            break;
+                        case '/':
+                            sb.Append('/');
+                            break;
+                        case 'b':
+                            sb.Append('\b');
+                            break;
+                        case 'f':
+                            sb.Append('\f');
+                            break;
+                        case 'n':
+                            sb.Append('\n');
+                            break;
+                        case 'r':
+                            sb.Append('\r');
+                            break;
+                        case 't':
+                            sb.Append('\t');
+                            break;
+                        case 'u': // Unicode转义处理
+                            if (index + 4 <= json.Length)
+                            {
+                                string hex = json.Substring(index, 4);
+                                if (int.TryParse(hex, NumberStyles.HexNumber, null, out int code))
+                                {
+                                    sb.Append((char)code);
+                                }
+
+                                index += 4;
+                            }
+
+                            break;
+                        default: // 未知转义序列保持原样
+                            sb.Append('\\');
+                            sb.Append(json[index - 1]);
+                            break;
+                    }
+                }
+                else
+                {
+                    // 5. 普通字符直接添加
+                    sb.Append(current);
+                    index++;
+                }
             }
 
-            if (index >= json.Length)
-            {
-                return null;
-            }
-
-            return new JsonData(JsonData.Type.String)
-            {
-                json = json[start..(++index)]
-            };
-
+            // 6. 未找到结束引号（字符串未闭合）
+            return null;
         }
+
 
         public static JsonData ToBoolean(string json, ref int index)
         {
@@ -174,7 +239,7 @@ namespace DanKeJson.Json
             {
                 return null;
             }
-        
+
             int start = index++;
             JsonData obj = new JsonData(JsonData.Type.Object);
             do
@@ -206,34 +271,34 @@ namespace DanKeJson.Json
                 {
                     return null;
                 }
-        
+
                 SkipWhiteSpace(json, ref index);
                 if (json[index] != ':')
                 {
                     return null;
                 }
-        
+
                 index++;
-        
+
                 SkipWhiteSpace(json, ref index);
                 JsonData sub = Serializer.ProcessJson(json, ref index);
                 if (sub == null)
                 {
                     return null;
                 }
-        
+
                 obj[key] = sub;
-        
+
                 SkipWhiteSpace(json, ref index);
-        
+
             } while (json[index] == ',');
-        
+
             if (json[index] == '}')
             {
                 obj.json = json[start..(++index)];
                 return obj;
             }
-        
+
             return null;
         }
 
@@ -273,7 +338,7 @@ namespace DanKeJson.Json
             arr.json = json[start..index];
             return arr;
         }
-        
+
         public static JsonData ToNone(string json, ref int index)
         {
             if (index < 0)

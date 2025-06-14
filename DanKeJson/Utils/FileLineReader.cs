@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.IO;
 
+#pragma warning disable CS8603
+
 namespace DanKeJson.Utils
 {
     public class FileLineReader
@@ -10,30 +12,25 @@ namespace DanKeJson.Utils
         {
             try
             {
-                // 检查行号是否有效
-                if (lineNumber < 1)
+                if (lineNumber < 1 || !File.Exists(filePath))
                 {
                     return null;
                 }
-                using (var reader = new StreamReader(filePath))
+                using var reader = new StreamReader(filePath);
+                for (int currentLine = 1; !reader.EndOfStream; currentLine++)
                 {
-                    int currentLine = 1;
-                    while (!reader.EndOfStream)
-                    {
-                        string line = reader.ReadLine();
-                        if (currentLine == lineNumber)
-                            return line;
-                        currentLine++;
-                    }
+                    var line = reader.ReadLine();
+                    if (currentLine == lineNumber)
+                        return line;
                 }
-                // 文件行数不足
                 return null;
+                // 文件行数不足
             }
             catch (FileNotFoundException)
             {
                 return null;
             }
-            catch (Exception ex)
+            catch
             {
                 return null;
             }
@@ -51,8 +48,7 @@ namespace DanKeJson.Utils
             {
                 return new List<string>();
             }
-            catch (Exception ex)
-            {
+            catch {
                 return new List<string>();
             }
         }

@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.IO;
 using DanKeJson.Utils;
 
 namespace DanKeJson
@@ -13,14 +12,15 @@ namespace DanKeJson
         /// <returns>JsonData</returns>
         public static List<JsonData> AllLineToData(string filePath)
         {
-            var jsonLines = new List<string>();
             var dataLines = new List<JsonData>();
             if (FilePathUtility.IsFilePath(filePath))
             {
-                jsonLines = FileLineReader.ReadAllLines(filePath);
+                var jsonLines = FileLineReader.ReadAllLines(filePath);
                 foreach (var l in jsonLines)
                 {
-                    dataLines.Add(JSON.ToData(l));
+                    // 添加空行检查
+                    if (string.IsNullOrWhiteSpace(l)) continue;
+                    dataLines.Add(JSON.ToData(l, true));
                 }
             }
             return dataLines;
@@ -34,14 +34,15 @@ namespace DanKeJson
         /// <returns>JsonData</returns>
         public static List<T> AllLineToData<T>(string filePath) where T : class, new()
         {
-            var jsonLines = new List<string>();
             var dataLines = new List<T>();
             if (FilePathUtility.IsFilePath(filePath))
             {
-                jsonLines = FileLineReader.ReadAllLines(filePath);
+                var jsonLines = FileLineReader.ReadAllLines(filePath);
                 foreach (var l in jsonLines)
                 {
-                    dataLines.Add(JSON.ToData<T>(l));
+                    // 添加空行检查
+                    if (string.IsNullOrWhiteSpace(l)) continue;
+                    dataLines.Add(JSON.ToData<T>(l, true));
                 }
             }
             return dataLines;
@@ -55,14 +56,15 @@ namespace DanKeJson
         /// <returns>JsonData</returns>
         public static JsonData LineToData(string filePath, int lineNumber)
         {
-            string jsonLine = null;
-            JsonData dataLine = null;
             if (FilePathUtility.IsFilePath(filePath))
             {
-                jsonLine = FileLineReader.ReadLine(filePath, lineNumber);
-                dataLine = JSON.ToData(jsonLine);
+                var jsonLine = FileLineReader.ReadLine(filePath, lineNumber);
+                if (!string.IsNullOrWhiteSpace(jsonLine))
+                {
+                    return JSON.ToData(jsonLine, true);
+                }
             }
-            return dataLine;
+            return null;
         }
 
         /// <summary>
@@ -74,17 +76,22 @@ namespace DanKeJson
         /// <returns>JsonData</returns>
         public static T LineToData<T>(string filePath, int lineNumber) where T : class, new()
         {
-            string jsonLine = null;
-            T dataLine = null;
             if (FilePathUtility.IsFilePath(filePath))
             {
-                jsonLine = FileLineReader.ReadLine(filePath, lineNumber);
-                dataLine = JSON.ToData<T>(jsonLine);
+                var jsonLine = FileLineReader.ReadLine(filePath, lineNumber);
+                if (!string.IsNullOrWhiteSpace(jsonLine))
+                {
+                    return JSON.ToData<T>(jsonLine, true);
+                }
             }
-            return dataLine;
+            return null;
         }
         
-
+        /// <summary>
+        /// Deserializing JsonData List to Json(String)
+        /// </summary>
+        /// <param name="jsonDataList">the JsonData list</param>
+        /// <returns></returns>
         public static string ListToJson(List<JsonData> jsonDataList)
         {
             if (jsonDataList == null)
@@ -99,7 +106,14 @@ namespace DanKeJson
             return string.Join("\n", jsonLines);
         }
         
-        public static string ListToJson(List<object> jsonDataList)
+        
+        /// <summary>
+        /// Deserializing Object List to Json(String)
+        /// </summary>
+        /// <param name="jsonDataList">the JsonData list</param>
+        /// <typeparam name="T">Class</typeparam>
+        /// <returns></returns>
+        public static string ListToJson<T>(List<T> jsonDataList) where T : class, new()
         {
             if (jsonDataList == null)
             {

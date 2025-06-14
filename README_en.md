@@ -22,13 +22,14 @@ DanKeJson is a simple *.Net* library to handle conversions from and to JSON (Jav
 
 DanKeJson has incorporated a variety of features to facilitate development, including but not limited to:
 
-- Data transmission via the [JsonData](./Docs/API/JsonData.md) class
-- Implicit conversion operators
-- Tolerance for superfluous commas in arrays and objects
-- Single quotes are permissible in strings.
-- Comment allowance*
-- Conversion of undefined values to null
-- Key name allows no quotation marks
+- Pass data using the [JsonData]([JsonData](./Docs/API/JsonData.md)) class.
+- Implicit conversion operators.
+- Support reading .jsonl (JSONL).
+- Allow trailing commas in arrays and objects (JSON5).
+- Allow key names without quotes (JSON5).
+- Allow single quotes in strings (JSON5).
+- Allow comments*.
+- Convert undefined values to null.
 
 For more information on features, please refer to: [**Hello DanKeJson**](./Docs/DanKeJson.md)
 
@@ -47,7 +48,7 @@ Deserialization:
 
 Serialization:
 
-- [ ]  Support for serializing to JSON5 format
+- [X]  Support for serializing to JSON5 format
 
 ## API
 
@@ -75,46 +76,46 @@ Serialization:
 
 ## Using DanKeJson from an application
 
-**[Download package](https://www.nuget.org/api/v2/package/DanKeJson/1.4.2)**
+**[Download package](https://www.nuget.org/api/v2/package/DanKeJson/1.4.3)**
 
 ### Package manager
 
 ```shell
-NuGet\Install-Package DanKeJson -Version 1.4.2
+NuGet\Install-Package DanKeJson -Version 1.4.3
 ```
 
 ### .NET CLI
 
 ```shell
-dotnet add package DanKeJson --version 1.4.2
+dotnet add package DanKeJson --version 1.4.3
 ```
 
 ### PackageReference
 
 ```xaml
-<PackageReference Include="DanKeJson" Version="1.4.2" />
+<PackageReference Include="DanKeJson" Version="1.4.3" />
 ```
 
 ### Paket CLI
 
 ```shell
-paket add DanKeJson --version 1.4.2
+paket add DanKeJson --version 1.4.3
 ```
 
 ### Script & Interactive
 
 ```c#
-#r "nuget: DanKeJson, 1.4.2"
+#r "nuget: DanKeJson, 1.4.3"
 ```
 
 ### Cake
 
 ```C#
 // Install DanKeJson as a Cake Addin
-#addin nuget:?package=DanKeJson&version=1.4.2
+#addin nuget:?package=DanKeJson&version=1.4.3
 
 // Install DanKeJson as a Cake Tool
-#tool nuget:?package=DanKeJson&version=1.4.2
+#tool nuget:?package=DanKeJson&version=1.4.3
 ```
 
 Alternatively, just copy the whole tree of files under `./publish/DanKeJson` to your own project's source tree and integrate it with your development environment.

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,6 +11,20 @@ using static DanKeJson.Json.Reader;
 #pragma warning disable CS8600
 #pragma warning disable CS1591
 
+namespace DanKeJson
+{
+    [AttributeUsage(AttributeTargets.Property)]
+    public class JsonProperty : Attribute
+    {
+        public string Name { get; }
+
+        public JsonProperty(string name)
+        {
+            Name = name;
+        }
+    }
+}
+
 namespace DanKeJson.Json
 {
     public class Serializer
@@ -21,8 +35,7 @@ namespace DanKeJson.Json
             if (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(List<>))
             {
                 var listType = type.GetGenericArguments()[0];
-                IList list = (IList)Activator.CreateInstance(typeof(List<>).MakeGenericType(listType));
-
+                IList list = (IList)Activator.CreateInstance(typeof(List<>).MakeGenericType(listType)); 
                 switch (Type.GetTypeCode(listType))
                 {
                     case TypeCode.String:
@@ -135,214 +148,109 @@ namespace DanKeJson.Json
             }
             else
             {
-                foreach (PropertyInfo propertyInfo in type.GetProperties())
+                // 获取所有属性并按自定义特性排序
+                var properties = type.GetProperties()
+                    .Select(p => new
+                    {
+                        PropertyInfo = p,
+                        JsonProperty = p.GetCustomAttribute<JsonProperty>()
+                    })
+                    .OrderByDescending(p => p.JsonProperty != null)
+                    .ThenBy(p => p.PropertyInfo.Name)
+                    .Select(p => p.PropertyInfo)
+                    .ToList();
+
+                foreach (PropertyInfo propertyInfo in properties)
                 {
                     if (propertyInfo.CanWrite)
                     {
                         Type propertyType = propertyInfo.PropertyType;
+                        string propertyName = propertyInfo.Name;
+
+                        // 获取自定义特性的名称
+                        var jsonProperty = propertyInfo.GetCustomAttribute<JsonProperty>();
+                        if (jsonProperty != null)
+                        {
+                            propertyName = jsonProperty.Name;
+                        }
+                        
+                        if ((Nullable.GetUnderlyingType(propertyType) ?? propertyType) == typeof(JsonData))
+                        {
+                            propertyInfo.SetValue(dataclass, json[propertyName]);
+                        }
+                        
                         switch (Type.GetTypeCode(propertyType))
                         {
                             case TypeCode.String:
-                                string stringValue = json[propertyInfo.Name];
+                                string stringValue = json[propertyName];
                                 propertyInfo.SetValue(dataclass, stringValue);
                                 break;
                             case TypeCode.Boolean:
-                                bool.TryParse(json[propertyInfo.Name].json, out bool boolValue);
+                                bool.TryParse(json[propertyName].json, out bool boolValue);
                                 propertyInfo.SetValue(dataclass, boolValue);
                                 break;
                             case TypeCode.Int32:
-                                int.TryParse(json[propertyInfo.Name].json, out int intValue);
+                                int.TryParse(json[propertyName].json, out int intValue);
                                 propertyInfo.SetValue(dataclass, intValue);
                                 break;
                             case TypeCode.Int64:
-                                long.TryParse(json[propertyInfo.Name].json, out long longValue);
+                                long.TryParse(json[propertyName].json, out long longValue);
                                 propertyInfo.SetValue(dataclass, longValue);
                                 break;
                             case TypeCode.Single:
-                                float.TryParse(json[propertyInfo.Name].json, out float floatValue);
+                                float.TryParse(json[propertyName].json, out float floatValue);
                                 propertyInfo.SetValue(dataclass, floatValue);
                                 break;
                             case TypeCode.Double:
-                                double.TryParse(json[propertyInfo.Name].json, out double doubleValue);
+                                double.TryParse(json[propertyName].json, out double doubleValue);
                                 propertyInfo.SetValue(dataclass, doubleValue);
                                 break;
                             case TypeCode.SByte:
-                                sbyte.TryParse(json[propertyInfo.Name].json, out sbyte sbyteValue);
+                                sbyte.TryParse(json[propertyName].json, out sbyte sbyteValue);
                                 propertyInfo.SetValue(dataclass, sbyteValue);
                                 break;
                             case TypeCode.Int16:
-                                short.TryParse(json[propertyInfo.Name].json, out short shortValue);
+                                short.TryParse(json[propertyName].json, out short shortValue);
                                 propertyInfo.SetValue(dataclass, shortValue);
                                 break;
                             case TypeCode.UInt32:
-                                uint.TryParse(json[propertyInfo.Name].json, out uint uintValue);
+                                uint.TryParse(json[propertyName].json, out uint uintValue);
                                 propertyInfo.SetValue(dataclass, uintValue);
                                 break;
                             case TypeCode.UInt64:
-                                ulong.TryParse(json[propertyInfo.Name].json, out ulong ulongValue);
+                                ulong.TryParse(json[propertyName].json, out ulong ulongValue);
                                 propertyInfo.SetValue(dataclass, ulongValue);
                                 break;
                             case TypeCode.UInt16:
-                                ushort.TryParse(json[propertyInfo.Name].json, out ushort ushortValue);
+                                ushort.TryParse(json[propertyName].json, out ushort ushortValue);
                                 propertyInfo.SetValue(dataclass, ushortValue);
                                 break;
                             default:
-                                if (propertyType.IsGenericType &&
-                                    propertyType.GetGenericTypeDefinition() == typeof(List<>))
+                                if (propertyType.IsGenericType && propertyType.GetGenericTypeDefinition() == typeof(List<>))
                                 {
-                                    Type listType = propertyType.GetGenericArguments()[0];
-                                    if (listType == typeof(string))
+                                    JsonData nestedJson = json[propertyName];
+                                    if (nestedJson.type == JsonData.Type.Object)
                                     {
-                                        List<string> list = new List<string>();
-                                        foreach (var item in json[propertyInfo.Name].array)
-                                        {
-                                            list.Add(item);
-                                        }
-
-                                        propertyInfo.SetValue(dataclass, list);
+                                        var nestedObject = FromJson(nestedJson, propertyType);
+                                        propertyInfo.SetValue(dataclass, nestedObject);
                                     }
-                                    else if (listType == typeof(bool))
+                                    else if (nestedJson.type == JsonData.Type.Array)
                                     {
-                                        List<bool> list = new List<bool>();
-                                        foreach (var item in json[propertyInfo.Name].array)
+                                        IList list = (IList)Activator.CreateInstance(typeof(List<>).MakeGenericType(propertyType.GetGenericArguments()[0]));
+                                        foreach (var item in nestedJson.array)
                                         {
-                                            list.Add(item);
-                                        }
-
-                                        propertyInfo.SetValue(dataclass, list);
-                                    }
-                                    else if (listType == typeof(int))
-                                    {
-                                        List<int> list = new List<int>();
-                                        foreach (var item in json[propertyInfo.Name].array)
-                                        {
-                                            list.Add(item);
-                                        }
-
-                                        propertyInfo.SetValue(dataclass, list);
-                                    }
-                                    else if (listType == typeof(long))
-                                    {
-                                        List<long> list = new List<long>();
-                                        foreach (var item in json[propertyInfo.Name].array)
-                                        {
-                                            list.Add(item);
-                                        }
-
-                                        propertyInfo.SetValue(dataclass, list);
-                                    }
-                                    else if (listType == typeof(float))
-                                    {
-                                        List<float> list = new List<float>();
-                                        foreach (var item in json[propertyInfo.Name].array)
-                                        {
-                                            list.Add(item);
-                                        }
-
-                                        propertyInfo.SetValue(dataclass, list);
-                                    }
-                                    else if (listType == typeof(double))
-                                    {
-                                        List<double> list = new List<double>();
-                                        foreach (var item in json[propertyInfo.Name].array)
-                                        {
-                                            list.Add(item);
-                                        }
-
-                                        propertyInfo.SetValue(dataclass, list);
-                                    }
-                                    else if (listType == typeof(sbyte))
-                                    {
-                                        List<sbyte> list = new List<sbyte>();
-                                        foreach (var item in json[propertyInfo.Name].array)
-                                        {
-                                            list.Add(item);
-                                        }
-
-                                        propertyInfo.SetValue(dataclass, list);
-                                    }
-                                    else if (listType == typeof(short))
-                                    {
-                                        List<short> list = new List<short>();
-                                        foreach (var item in json[propertyInfo.Name].array)
-                                        {
-                                            list.Add(item);
-                                        }
-
-                                        propertyInfo.SetValue(dataclass, list);
-                                    }
-                                    else if (listType == typeof(uint))
-                                    {
-                                        List<uint> list = new List<uint>();
-                                        foreach (var item in json[propertyInfo.Name].array)
-                                        {
-                                            list.Add(item);
-                                        }
-
-                                        propertyInfo.SetValue(dataclass, list);
-                                    }
-                                    else if (listType == typeof(ulong))
-                                    {
-                                        List<ulong> list = new List<ulong>();
-                                        foreach (var item in json[propertyInfo.Name].array)
-                                        {
-                                            list.Add(item);
-                                        }
-
-                                        propertyInfo.SetValue(dataclass, list);
-                                    }
-                                    else if (listType == typeof(ushort))
-                                    {
-                                        List<ushort> list = new List<ushort>();
-                                        foreach (var item in json[propertyInfo.Name].array)
-                                        {
-                                            list.Add(item);
-                                        }
-
-                                        propertyInfo.SetValue(dataclass, list);
-                                    }
-                                    else if (listType.IsClass)
-                                    {
-                                        IList list =
-                                            (IList)Activator.CreateInstance(typeof(List<>).MakeGenericType(listType));
-                                        foreach (var item in json[propertyInfo.Name].array)
-                                        {
-                                            var obj = FromJson(item, listType);
+                                            var obj = FromJson(item, propertyType.GetGenericArguments()[0]);
                                             list.Add(obj);
                                         }
-
                                         propertyInfo.SetValue(dataclass, list);
                                     }
-                                    else if (listType.IsGenericType &&
-                                             listType.GetGenericTypeDefinition() == typeof(List<>))
-                                    {
-                                        IList list =
-                                            (IList)Activator.CreateInstance(typeof(List<>).MakeGenericType(listType));
-                                        foreach (var item in json[propertyInfo.Name].array)
-                                        {
-                                            var obj = FromJson(item, listType);
-                                            list.Add(obj);
-                                        }
-
-                                        IList convertedList = list.Cast<object>().ToList();
-                                        propertyInfo.SetValue(dataclass, convertedList);
-                                    }
-
                                 }
-                                else if (propertyType.IsClass)
-                                {
-                                    JsonData nextjson = JSON5.ToData(json[propertyInfo.Name].json);
-                                    var propertyValue = FromJson(nextjson, propertyType);
-                                    propertyInfo.SetValue(dataclass, propertyValue);
-                                }
-
                                 break;
                         }
                     }
                 }
 
                 return dataclass;
-
             }
         }
 

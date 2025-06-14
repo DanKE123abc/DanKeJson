@@ -9,7 +9,7 @@
         <OutputPath>$(ProjectDir)lib\</OutputPath>
 
         <!-- NuGet 包元数据 -->
-        <Version>1.4.2</Version>
+        <Version>1.4.3</Version>
         <PackageId>DanKeJson</PackageId>
         <Title>DanKeJson</Title>
         <Authors>DanKe</Authors>

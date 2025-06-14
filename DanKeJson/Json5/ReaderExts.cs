@@ -1,4 +1,6 @@
-﻿using DanKeJson.Json;
+﻿using System.Globalization;
+using System.Text;
+using DanKeJson.Json;
 using static DanKeJson.Json.Reader;
 
 #pragma warning disable CS8603
@@ -7,6 +9,7 @@ namespace DanKeJson.Json5
 {
     public class ReaderExts
     {
+        
         //json5单引号字符串
         public static JsonData ToString_Single(string json, ref int index)
         {
@@ -15,23 +18,84 @@ namespace DanKeJson.Json5
                 return null;
             }
 
-            int start = index++;
-
-            while (index < json.Length && json[index] != '\'')
+            StringBuilder sb = new StringBuilder();
+            int start = index; // 记录起始位置
+            index++; // 跳过起始引号
+            
+            while (index < json.Length)
             {
-                index++;
+                char current = json[index];
+                
+                if (current == '\"')
+                {
+                    index++;
+                    return new JsonData(JsonData.Type.String)
+                    {
+                        json = sb.ToString()
+                    };
+                }
+
+                // 4. 处理转义序列
+                if (current == '\\')
+                {
+                    index++; // 跳过反斜杠
+                    if (index >= json.Length) break; // 防止越界
+
+                    switch (json[index++]) // 处理转义字符并移动索引
+                    {
+                        case '\"':
+                            sb.Append('\"');
+                            break;
+                        case '\\':
+                            sb.Append('\\');
+                            break;
+                        case '/':
+                            sb.Append('/');
+                            break;
+                        case 'b':
+                            sb.Append('\b');
+                            break;
+                        case 'f':
+                            sb.Append('\f');
+                            break;
+                        case 'n':
+                            sb.Append('\n');
+                            break;
+                        case 'r':
+                            sb.Append('\r');
+                            break;
+                        case 't':
+                            sb.Append('\t');
+                            break;
+                        case 'u': // Unicode转义处理
+                            if (index + 4 <= json.Length)
+                            {
+                                string hex = json.Substring(index, 4);
+                                if (int.TryParse(hex, NumberStyles.HexNumber, null, out int code))
+                                {
+                                    sb.Append((char)code);
+                                }
+
+                                index += 4;
+                            }
+
+                            break;
+                        default: // 未知转义序列保持原样
+                            sb.Append('\\');
+                            sb.Append(json[index - 1]);
+                            break;
+                    }
+                }
+                else
+                {
+                    // 5. 普通字符直接添加
+                    sb.Append(current);
+                    index++;
+                }
             }
 
-            if (index >= json.Length)
-            {
-                return null;
-            }
-
-            return new JsonData(JsonData.Type.String)
-            {
-                json = json[start..(++index)]
-            };
-
+            // 6. 未找到结束引号（字符串未闭合）
+            return null;
         }
 
         //json5键名
