@@ -111,6 +111,7 @@ namespace DanKeJson
             {
                 foreach (var line in jsonLines)
                 {
+                    string escapedLine = line.Replace("\r\n", "\\n").Replace("\n", "\\n");
                     writer.WriteLine(line);
                 }
             }
@@ -140,6 +141,7 @@ namespace DanKeJson
             {
                 foreach (var line in jsonLines)
                 {
+                    string escapedLine = line.Replace("\r\n", "\\n").Replace("\n", "\\n");
                     writer.WriteLine(line);
                 }
             }
