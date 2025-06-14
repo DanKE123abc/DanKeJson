@@ -30,6 +30,7 @@ DanKeJson 为了方便开发使用，添加了许多特性，包括但不限于�
 - 字符串允许使用单引号(JSON5)
 - 允许注释*
 - 将未经定义的值转换为null
+- 键名允许不使用引号
 
 更多特性相关内容请看：[**Hello DanKeJson**](./Docs/DanKeJson.md)
 
@@ -49,6 +50,11 @@ DanKeJson 为了方便开发使用，添加了许多特性，包括但不限于�
 序列化部分：
 
 - [X]  支持序列化为JSON5格式
+
+杂项：
+
+- [ ]  支持序列化反序列化MessagePack
+- [ ]  使用Simd技术加快反序列化
 
 ## API
 
@@ -171,3 +177,7 @@ SOFTWARE.
 <img src="https://resources.jetbrains.com/storage/products/company/brand/logos/jb_beam.png" alt="JetBrains Logo (Main) logo." width=100 height=100>
 
 本项目所有Markdown文件使用 [**Hypora**](https://github.com/DanKE123abc/Hypora) 书写。
+
+## 参考项目
+
+[litjson - C#](https://github.com/LitJSON/litjson)

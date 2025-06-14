@@ -169,3 +169,7 @@ This project was developed using Rider, and we extend our gratitude to **JetBrai
 <img src="https://resources.jetbrains.com/storage/products/company/brand/logos/jb_beam.png" alt="JetBrains Logo (Main)" width="100" height="100">
 
 All Markdown files in this project were written using [**Hypora**](https://github.com/DanKE123abc/Hypora).
+
+## Reference
+
+[litjson - C#](https://github.com/LitJSON/litjson)
