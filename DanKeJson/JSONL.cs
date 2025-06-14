@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.IO;
 using DanKeJson.Utils;
 
 namespace DanKeJson
@@ -87,12 +88,14 @@ namespace DanKeJson
             return null;
         }
         
+        
         /// <summary>
         /// Deserializing JsonData List to Json(String)
         /// </summary>
         /// <param name="jsonDataList">the JsonData list</param>
+        /// <param name="filePath">the output file path</param>
         /// <returns></returns>
-        public static string ListToJson(List<JsonData> jsonDataList)
+        public static string ListToJson(List<JsonData> jsonDataList, string filePath = null)
         {
             if (jsonDataList == null)
             {
@@ -102,6 +105,11 @@ namespace DanKeJson
             foreach (var l in jsonDataList)
             {
                 jsonLines.Add(JSON.ToJson(l));
+            }
+            string result = string.Join("\n", jsonLines);
+            if (!string.IsNullOrEmpty(filePath))
+            {
+                File.WriteAllText(filePath, result);
             }
             return string.Join("\n", jsonLines);
         }
@@ -111,9 +119,10 @@ namespace DanKeJson
         /// Deserializing Object List to Json(String)
         /// </summary>
         /// <param name="jsonDataList">the JsonData list</param>
+        /// <param name="filePath">the output file path</param>
         /// <typeparam name="T">Class</typeparam>
         /// <returns></returns>
-        public static string ListToJson<T>(List<T> jsonDataList) where T : class, new()
+        public static string ListToJson<T>(List<T> jsonDataList, string filePath = null) where T : class, new()
         {
             if (jsonDataList == null)
             {
@@ -124,7 +133,12 @@ namespace DanKeJson
             {
                 jsonLines.Add(JSON.ToJson(l));
             }
-            return string.Join("\n", jsonLines);
+            string result = string.Join("\n", jsonLines);
+            if (!string.IsNullOrEmpty(filePath))
+            {
+                File.WriteAllText(filePath, result);
+            }
+            return result;
         }
 
     }
