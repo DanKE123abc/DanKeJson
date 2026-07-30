@@ -40,7 +40,7 @@ namespace DanKeJson.Json
                     index++;
                     return new JsonData(JsonData.Type.String)
                     {
-                        json = sb.ToString()
+                        json = "\"" + sb.ToString() + "\""
                     };
                 }
 

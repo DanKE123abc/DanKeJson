@@ -26,12 +26,12 @@ namespace DanKeJson.Json5
             {
                 char current = json[index];
                 
-                if (current == '\"')
+                if (current == '\'')
                 {
                     index++;
                     return new JsonData(JsonData.Type.String)
                     {
-                        json = sb.ToString()
+                        json = "\"" + sb.ToString() + "\""
                     };
                 }
 
@@ -45,6 +45,9 @@ namespace DanKeJson.Json5
                     {
                         case '\"':
                             sb.Append('\"');
+                            break;
+                        case '\'':
+                            sb.Append('\'');
                             break;
                         case '\\':
                             sb.Append('\\');
