@@ -16,10 +16,10 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v4
 
-    - name: Setup .NET 9.0
+    - name: Setup .NET 10.0
       uses: actions/setup-dotnet@v3
       with:
-        dotnet-version: 9.0.x
+        dotnet-version: 10.0.x
 
     - name: Install Cake Tool
       run: dotnet tool install Cake.Tool --version 5.0.0
@@ -37,14 +37,15 @@ jobs:
       id: package-version
       run: |
         $nupkg = Get-ChildItem -Path .\artifacts\*.nupkg | Select-Object -First 1
-        $version = [System.IO.Path]::GetFileNameWithoutExtension($nupkg.Name).Split('.')[-1]
+        $name = [System.IO.Path]::GetFileNameWithoutExtension($nupkg.Name)
+        $version = $name.Substring($name.IndexOf('.') + 1)
         echo "version=$version" >> $GITHUB_OUTPUT
       shell: pwsh
 
     - name: Publish to GitHub Release
       uses: softprops/action-gh-release@v2
       with:
-        tag_name: v${{ steps.package-version.outputs.version }}re
+        tag_name: v${{ steps.package-version.outputs.version }}
         name: Release v${{ steps.package-version.outputs.version }}
         files: artifacts/*.nupkg
         body: "https://www.nuget.org/packages/DanKeJson/${{ steps.package-version.outputs.version }}"
