@@ -64,16 +64,8 @@ Serialization:
 
 ## Publishing
 
-**Windows**
-
 ```shell
 ./build.ps1
-```
-
-**Mac OS / Linux**
-
-```shell
-./build.sh
 ```
 
 ## Using DanKeJson from an application
