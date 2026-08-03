@@ -41,7 +41,7 @@ namespace DanKeJson.Json
                     case TypeCode.String:
                         foreach (var item in json.array)
                         {
-                            string stringValue = item.json;
+                            string stringValue = item;
                             list.Add(stringValue);
                         }
 
