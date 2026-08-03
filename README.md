@@ -2,7 +2,7 @@
 
 <u>**中文**</u> | [**English**](./README_en.md)
 
-![NuGet](https://img.shields.io/nuget/v/DanKeJson.svg) ![MyGet](https://img.shields.io/myget/danke/vpre/DanKeJson.svg?label=myget)
+![NuGet](https://img.shields.io/nuget/v/DanKeJson.svg)
 
 DanKeJson 是一个.Net平台上的精简小巧的 JSON 类库，用于处理 JSON (JavaScript Object Notation) 字符串之间的转换。
 
@@ -40,21 +40,21 @@ DanKeJson 为了方便开发使用，添加了许多特性，包括但不限于�
 
 反序列化部分：
 
-- [ ]  解析器支持单行注释与多行注释
-- [ ]  支持日期格式
-- [ ]  支持更多 .net 版本
-- [X]  键名无需引号
-- [X]  字符串支持单引号
-- [X]  允许数组、对象的多余逗号
+- [ ] 解析器支持单行注释与多行注释
+- [ ] 支持日期格式
+- [ ] 支持更多 .net 版本
+- [x] 键名无需引号
+- [x] 字符串支持单引号
+- [x] 允许数组、对象的多余逗号
 
 序列化部分：
 
-- [X]  支持序列化为JSON5格式
+- [x] 支持序列化为JSON5格式
 
 杂项：
 
-- [ ]  支持序列化反序列化MessagePack
-- [ ]  使用Simd技术加快反序列化
+- [ ] 支持序列化反序列化MessagePack
+- [ ] 使用Simd技术加快反序列化
 
 ## API
 
@@ -184,3 +184,5 @@ SOFTWARE.
 ## 参考项目
 
 [litjson - C#](https://github.com/LitJSON/litjson)
+
+

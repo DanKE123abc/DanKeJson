@@ -2,7 +2,7 @@
 
 [**中文**](./README.md) | <u>**English**</u>
 
-![NuGet](https://img.shields.io/nuget/v/DanKeJson.svg)![MyGet](https://img.shields.io/myget/danke/vpre/DanKeJson.svg?label=myget)
+![NuGet](https://img.shields.io/nuget/v/DanKeJson.svg)
 
 DanKeJson is a simple *.Net* library to handle conversions from and to JSON (JavaScript Object Notation) strings.
 
@@ -39,16 +39,16 @@ For more information on features, please refer to: [**Hello DanKeJson**](./Docs/
 
 Deserialization:
 
-- [ ]  Parser support for single-line and multi-line comments
-- [ ]  Support for date formats
-- [ ]  Support more dotnet version
-- [X]  Allow key names without quotes
-- [X]  Support for single quotes in strings
-- [X]  Allow trailing commas in arrays and objects
+- [ ] Parser support for single-line and multi-line comments
+- [ ] Support for date formats
+- [ ] Support more dotnet version
+- [x] Allow key names without quotes
+- [x] Support for single quotes in strings
+- [x] Allow trailing commas in arrays and objects
 
 Serialization:
 
-- [X]  Support for serializing to JSON5 format
+- [x] Support for serializing to JSON5 format
 
 ## API
 
