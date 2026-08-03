@@ -8,23 +8,58 @@ DanKeJson is a simple Json library for the .Net.
 
 ## 目录
 
+- [Hello DanKeJson](#hello-dankejson)
 - 快速开始
-  - 从实体类序列化
-  - 从JsonData序列化
-  - 反序列化到实体类
-  - 反序列化到JsonData	
-
+  - [将 JSON 读取为 JsonData](./QuickStart/Json2JsonData.md)
+  - [将 JSON 读取为 .NET 对象](./QuickStart/Json2Object.md)
+  - [将 JsonData 编写为 JSON](./QuickStart/JsonData2Json.md)
+  - [将 .NET 对象编写为 JSON](./QuickStart/Object2Json.md)
 - API
+  - [JSON](./API/JSON.md)
+  - [JSON5](./API/JSON5.md)
+  - [JSONL](./API/JSONL.md)
+  - [JsonData](./API/JsonData.md)
+  - [JsonData.Type](./API/JsonData.Type.md)
 
-  - [JSON](./Docs/API/JSON.md)
+## Hello DanKeJson
 
-  - [JSON5](./Docs/API/JSON5.md)
+下面是最简单的使用示例。完整示例请参考上方「快速开始」中的各篇文档。
 
-  - [JsonData](./Docs/API/JsonData.md)
-  
-  - [JsonData.Type](./Docs/API/JsonData.Type.md)
-  
-    
+```csharp
+using DanKeJson;
+
+// 1. 字符串 -> JsonData（反序列化）
+string text = "{\"name\":\"DanKe\",\"age\":25}";
+JsonData data = JSON.ToData(text);
+Console.WriteLine(data["name"]);   // DanKe
+Console.WriteLine(data["age"]);    // 25
+
+// 2. 字符串 -> 实体类（反序列化）
+User user = JSON.ToData<User>(text);
+
+// 3. JsonData -> 字符串（序列化）
+string json = JSON.ToJson(data);
+
+// 4. 实体类 -> 字符串（序列化）
+string json2 = JSON.ToJson(user);
+
+// 5. JSON5（注释、单引号、无引号键名、多余逗号）
+JsonData data5 = JSON5.ToData("{ name: 'DanKe', age: 25, }");
+string json5 = JSON5.ToJson(data5, new Json5Options
+{
+    KeyNameStyle = Json5Options.KeyNameType.WithoutQuotes,
+    StringQuoteStyle = Json5Options.StringQuoteType.SingleQuote
+});
+
+// 6. JSONL（.jsonl 文件）
+List<JsonData> lines = JSONL.AllLineToData("data.jsonl");
+
+public class User
+{
+    public string name { get; set; }
+    public int age { get; set; }
+}
+```
 
 ## License
 
@@ -51,4 +86,3 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 ```
-

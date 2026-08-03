@@ -2,7 +2,7 @@
 
 <u>**中文**</u> | [**English**](./README_en.md)
 
-![NuGet](https://img.shields.io/nuget/v/DanKeJson.svg) ![MyGet](https://img.shields.io/myget/danke/vpre/DanKeJson.svg?label=myget)
+![NuGet](https://img.shields.io/nuget/v/DanKeJson.svg)
 
 DanKeJson 是一个.Net平台上的精简小巧的 JSON 类库，用于处理 JSON (JavaScript Object Notation) 字符串之间的转换。
 
@@ -40,27 +40,29 @@ DanKeJson 为了方便开发使用，添加了许多特性，包括但不限于�
 
 反序列化部分：
 
-- [ ]  解析器支持单行注释与多行注释
-- [ ]  支持日期格式
-- [ ]  支持更多 .net 版本
-- [X]  键名无需引号
-- [X]  字符串支持单引号
-- [X]  允许数组、对象的多余逗号
+- [ ] 解析器支持单行注释与多行注释
+- [ ] 支持日期格式
+- [ ] 支持更多 .net 版本
+- [x] 键名无需引号
+- [x] 字符串支持单引号
+- [x] 允许数组、对象的多余逗号
 
 序列化部分：
 
-- [X]  支持序列化为JSON5格式
+- [x] 支持序列化为JSON5格式
 
 杂项：
 
-- [ ]  支持序列化反序列化MessagePack
-- [ ]  使用Simd技术加快反序列化
+- [ ] 支持序列化反序列化MessagePack
+- [ ] 使用Simd技术加快反序列化
 
 ## API
 
 [JSON](./Docs/API/JSON.md)
 
 [JSON5](./Docs/API/JSON5.md)
+
+[JSONL](./Docs/API/JSONL.md)
 
 [JsonData](./Docs/API/JsonData.md)
 
@@ -82,46 +84,46 @@ DanKeJson 为了方便开发使用，添加了许多特性，包括但不限于�
 
 ## 在你的应用中安装 DanKeJson
 
-**[点击下载](https://www.nuget.org/api/v2/package/DanKeJson/1.4.3)**
+**[点击下载](https://www.nuget.org/api/v2/package/DanKeJson/1.5.0)**
 
 ### Package manager
 
 ```shell
-NuGet\Install-Package DanKeJson -Version 1.4.3
+NuGet\Install-Package DanKeJson -Version 1.5.0
 ```
 
 ### .NET CLI
 
 ```shell
-dotnet add package DanKeJson --version 1.4.3
+dotnet add package DanKeJson --version 1.5.0
 ```
 
 ### PackageReference
 
 ```xaml
-<PackageReference Include="DanKeJson" Version="1.4.3" />
+<PackageReference Include="DanKeJson" Version="1.5.0" />
 ```
 
 ### Paket CLI
 
 ```shell
-paket add DanKeJson --version 1.4.3
+paket add DanKeJson --version 1.5.0
 ```
 
 ### Script & Interactive
 
 ```c#
-#r "nuget: DanKeJson, 1.4.3"
+#r "nuget: DanKeJson, 1.5.0"
 ```
 
 ### Cake
 
 ```C#
 // Install DanKeJson as a Cake Addin
-#addin nuget:?package=DanKeJson&version=1.4.3
+#addin nuget:?package=DanKeJson&version=1.5.0
 
 // Install DanKeJson as a Cake Tool
-#tool nuget:?package=DanKeJson&version=1.4.3
+#tool nuget:?package=DanKeJson&version=1.5.0
 ```
 
 或者，只需复制目录`./publish/DanKeJson`到您自己项目的源代码树中，并将其与您的开发环境集成。
@@ -130,6 +132,7 @@ paket add DanKeJson --version 1.4.3
 
 DanKeJson 目前支持的平台：
 
+- .NET 10.0
 - .NET 9.0
 - .NET 8.0
 - .NET 7.0
@@ -181,3 +184,5 @@ SOFTWARE.
 ## 参考项目
 
 [litjson - C#](https://github.com/LitJSON/litjson)
+
+

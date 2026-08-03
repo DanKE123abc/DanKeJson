@@ -1,4 +1,6 @@
 ﻿using System.Collections.Generic;
+using System.IO;
+using System.Text;
 using DanKeJson.Utils;
 
 namespace DanKeJson
@@ -20,7 +22,7 @@ namespace DanKeJson
                 {
                     // 添加空行检查
                     if (string.IsNullOrWhiteSpace(l)) continue;
-                    dataLines.Add(JSON.ToData(l, true));
+                    dataLines.Add(JSON.ToData(l));
                 }
             }
             return dataLines;
@@ -42,7 +44,7 @@ namespace DanKeJson
                 {
                     // 添加空行检查
                     if (string.IsNullOrWhiteSpace(l)) continue;
-                    dataLines.Add(JSON.ToData<T>(l, true));
+                    dataLines.Add(JSON.ToData<T>(l));
                 }
             }
             return dataLines;
@@ -61,7 +63,7 @@ namespace DanKeJson
                 var jsonLine = FileLineReader.ReadLine(filePath, lineNumber);
                 if (!string.IsNullOrWhiteSpace(jsonLine))
                 {
-                    return JSON.ToData(jsonLine, true);
+                    return JSON.ToData(jsonLine);
                 }
             }
             return null;
@@ -81,18 +83,20 @@ namespace DanKeJson
                 var jsonLine = FileLineReader.ReadLine(filePath, lineNumber);
                 if (!string.IsNullOrWhiteSpace(jsonLine))
                 {
-                    return JSON.ToData<T>(jsonLine, true);
+                    return JSON.ToData<T>(jsonLine);
                 }
             }
             return null;
         }
         
+        
         /// <summary>
         /// Deserializing JsonData List to Json(String)
         /// </summary>
         /// <param name="jsonDataList">the JsonData list</param>
+        /// <param name="filePath">the output file path</param>
         /// <returns></returns>
-        public static string ListToJson(List<JsonData> jsonDataList)
+        public static string ListToJson(List<JsonData> jsonDataList, string filePath = null)
         {
             if (jsonDataList == null)
             {
@@ -102,6 +106,14 @@ namespace DanKeJson
             foreach (var l in jsonDataList)
             {
                 jsonLines.Add(JSON.ToJson(l));
+            }
+            using (var writer = new StreamWriter(filePath, false, Encoding.UTF8))
+            {
+                foreach (var line in jsonLines)
+                {
+                    string escapedLine = line.Replace("\r\n", "\\n").Replace("\n", "\\n");
+                    writer.WriteLine(escapedLine);
+                }
             }
             return string.Join("\n", jsonLines);
         }
@@ -111,9 +123,10 @@ namespace DanKeJson
         /// Deserializing Object List to Json(String)
         /// </summary>
         /// <param name="jsonDataList">the JsonData list</param>
+        /// <param name="filePath">the output file path</param>
         /// <typeparam name="T">Class</typeparam>
         /// <returns></returns>
-        public static string ListToJson<T>(List<T> jsonDataList) where T : class, new()
+        public static string ListToJson<T>(List<T> jsonDataList, string filePath = null) where T : class, new()
         {
             if (jsonDataList == null)
             {
@@ -123,6 +136,14 @@ namespace DanKeJson
             foreach (var l in jsonDataList)
             {
                 jsonLines.Add(JSON.ToJson(l));
+            }
+            using (var writer = new StreamWriter(filePath, false, Encoding.UTF8))
+            {
+                foreach (var line in jsonLines)
+                {
+                    string escapedLine = line.Replace("\r\n", "\\n").Replace("\n", "\\n");
+                    writer.WriteLine(escapedLine);
+                }
             }
             return string.Join("\n", jsonLines);
         }
