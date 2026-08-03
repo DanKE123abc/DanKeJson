@@ -65,7 +65,7 @@ Serialization:
 ## Publishing
 
 ```shell
-./build.ps1
+dotnet cake .\build.cake
 ```
 
 ## Using DanKeJson from an application

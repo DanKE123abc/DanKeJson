@@ -71,7 +71,7 @@ DanKeJson 为了方便开发使用，添加了许多特性，包括但不限于�
 ## 打包为Nuget发行包
 
 ```shell
-
+dotnet cake .\build.cake
 ```
 
 ## 在你的应用中安装 DanKeJson
