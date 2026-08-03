@@ -62,6 +62,8 @@ DanKeJson 为了方便开发使用，添加了许多特性，包括但不限于�
 
 [JSON5](./Docs/API/JSON5.md)
 
+[JSONL](./Docs/API/JSONL.md)
+
 [JsonData](./Docs/API/JsonData.md)
 
 [JsonData.Type](./Docs/API/JsonData.Type.md)
@@ -82,46 +84,46 @@ DanKeJson 为了方便开发使用，添加了许多特性，包括但不限于�
 
 ## 在你的应用中安装 DanKeJson
 
-**[点击下载](https://www.nuget.org/api/v2/package/DanKeJson/1.4.3)**
+**[点击下载](https://www.nuget.org/api/v2/package/DanKeJson/1.5.0)**
 
 ### Package manager
 
 ```shell
-NuGet\Install-Package DanKeJson -Version 1.4.3
+NuGet\Install-Package DanKeJson -Version 1.5.0
 ```
 
 ### .NET CLI
 
 ```shell
-dotnet add package DanKeJson --version 1.4.3
+dotnet add package DanKeJson --version 1.5.0
 ```
 
 ### PackageReference
 
 ```xaml
-<PackageReference Include="DanKeJson" Version="1.4.3" />
+<PackageReference Include="DanKeJson" Version="1.5.0" />
 ```
 
 ### Paket CLI
 
 ```shell
-paket add DanKeJson --version 1.4.3
+paket add DanKeJson --version 1.5.0
 ```
 
 ### Script & Interactive
 
 ```c#
-#r "nuget: DanKeJson, 1.4.3"
+#r "nuget: DanKeJson, 1.5.0"
 ```
 
 ### Cake
 
 ```C#
 // Install DanKeJson as a Cake Addin
-#addin nuget:?package=DanKeJson&version=1.4.3
+#addin nuget:?package=DanKeJson&version=1.5.0
 
 // Install DanKeJson as a Cake Tool
-#tool nuget:?package=DanKeJson&version=1.4.3
+#tool nuget:?package=DanKeJson&version=1.5.0
 ```
 
 或者，只需复制目录`./publish/DanKeJson`到您自己项目的源代码树中，并将其与您的开发环境集成。
@@ -130,6 +132,7 @@ paket add DanKeJson --version 1.4.3
 
 DanKeJson 目前支持的平台：
 
+- .NET 10.0
 - .NET 9.0
 - .NET 8.0
 - .NET 7.0

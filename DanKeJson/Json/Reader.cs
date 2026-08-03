@@ -242,14 +242,44 @@ namespace DanKeJson.Json
 
             int start = index++;
             JsonData obj = new JsonData(JsonData.Type.Object);
-            do
+            bool hasItem = false;
+            while (true)
             {
-                if (json[index] == ',')
+                SkipWhiteSpace(json, ref index);
+                if (index >= json.Length)
                 {
-                    index++;
+                    return null;
                 }
 
-                SkipWhiteSpace(json, ref index);
+                if (json[index] == '}')
+                {
+                    obj.json = json[start..(++index)];
+                    return obj;
+                }
+
+                if (json[index] == ',')
+                {
+                    if (!hasItem)
+                    {
+                        return null;
+                    }
+
+                    index++;
+                    SkipWhiteSpace(json, ref index);
+                    if (index >= json.Length)
+                    {
+                        return null;
+                    }
+
+                    if (json[index] == '}')
+                    {
+                        obj.json = json[start..(++index)];
+                        return obj;
+                    }
+
+                    continue;
+                }
+
                 if (json[index] != '"')
                 {
                     return null;
@@ -273,7 +303,7 @@ namespace DanKeJson.Json
                 }
 
                 SkipWhiteSpace(json, ref index);
-                if (json[index] != ':')
+                if (index >= json.Length || json[index] != ':')
                 {
                     return null;
                 }
@@ -281,25 +311,37 @@ namespace DanKeJson.Json
                 index++;
 
                 SkipWhiteSpace(json, ref index);
-                JsonData sub = Serializer.ProcessJson(json, ref index);
+                if (index >= json.Length || json[index] == ',' || json[index] == '}')
+                {
+                    return null;
+                }
+
+                JsonData sub = Deserializer.ProcessJson(json, ref index);
                 if (sub == null)
                 {
                     return null;
                 }
 
                 obj[key] = sub;
+                hasItem = true;
 
                 SkipWhiteSpace(json, ref index);
+                if (index >= json.Length)
+                {
+                    return null;
+                }
 
-            } while (json[index] == ',');
+                if (json[index] == '}')
+                {
+                    obj.json = json[start..(++index)];
+                    return obj;
+                }
 
-            if (json[index] == '}')
-            {
-                obj.json = json[start..(++index)];
-                return obj;
+                if (json[index] != ',')
+                {
+                    return null;
+                }
             }
-
-            return null;
         }
 
         public static JsonData ToArray(string json, ref int index)
@@ -311,32 +353,72 @@ namespace DanKeJson.Json
 
             int start = index++;
             JsonData arr = new JsonData(JsonData.Type.Array);
-            do
+            bool hasItem = false;
+            while (true)
             {
-                if (json[index] == ',')
+                SkipWhiteSpace(json, ref index);
+                if (index >= json.Length)
                 {
-                    index++;
+                    return null;
                 }
 
-                SkipWhiteSpace(json, ref index);
-                JsonData sub = Serializer.ProcessJson(json, ref index);
+                if (json[index] == ']')
+                {
+                    index++;
+                    arr.json = json[start..index];
+                    return arr;
+                }
+
+                if (json[index] == ',')
+                {
+                    if (!hasItem)
+                    {
+                        return null;
+                    }
+
+                    index++;
+                    SkipWhiteSpace(json, ref index);
+                    if (index >= json.Length)
+                    {
+                        return null;
+                    }
+
+                    if (json[index] == ']')
+                    {
+                        index++;
+                        arr.json = json[start..index];
+                        return arr;
+                    }
+
+                    continue;
+                }
+
+                JsonData sub = Deserializer.ProcessJson(json, ref index);
                 if (sub == null)
                 {
                     return null;
                 }
 
                 arr.Add(sub);
+                hasItem = true;
                 SkipWhiteSpace(json, ref index);
-            } while (index < json.Length && json[index] == ',');
+                if (index >= json.Length)
+                {
+                    return null;
+                }
 
-            if (index >= json.Length || json[index] != ']')
-            {
-                return null;
+                if (json[index] == ']')
+                {
+                    index++;
+                    arr.json = json[start..index];
+                    return arr;
+                }
+
+                if (json[index] != ',')
+                {
+                    return null;
+                }
             }
-
-            index++;
-            arr.json = json[start..index];
-            return arr;
         }
 
         public static JsonData ToNone(string json, ref int index)

@@ -5,6 +5,9 @@
 
 using System;
 using System.Collections.Generic;
+using System.Globalization;
+using System.Text;
+using DanKeJson.Utils;
 
 namespace DanKeJson
 {
@@ -25,8 +28,28 @@ namespace DanKeJson
         }
 
         public Type type { get; set; }
-        public string json { get; set; }
-        
+
+        private string _json;
+
+        public string json
+        {
+            get
+            {
+                if (type == Type.Object || type == Type.Array)
+                {
+                    StringBuilder sb = new StringBuilder();
+                    BuildJson(sb);
+                    _json = sb.ToString();
+                }
+
+                return _json;
+            }
+            set
+            {
+                _json = value;
+            }
+        }
+
         public Dictionary<string, JsonData> map;
         public List<JsonData> array;
 
@@ -44,6 +67,72 @@ namespace DanKeJson
             else if (type == Type.None)
             {
                 json = "null";
+            }
+        }
+
+        private void BuildJson(StringBuilder sb)
+        {
+            switch (type)
+            {
+                case Type.Object:
+                    sb.Append('{');
+                    bool firstObject = true;
+                    foreach (var kv in map)
+                    {
+                        if (!firstObject)
+                        {
+                            sb.Append(',');
+                        }
+
+                        firstObject = false;
+                        sb.Append('"');
+                        sb.Append(JsonString.Escape(kv.Key));
+                        sb.Append("\":");
+                        AppendValue(sb, kv.Value);
+                    }
+
+                    sb.Append('}');
+                    break;
+                case Type.Array:
+                    sb.Append('[');
+                    bool firstArray = true;
+                    foreach (var item in array)
+                    {
+                        if (!firstArray)
+                        {
+                            sb.Append(',');
+                        }
+
+                        firstArray = false;
+                        AppendValue(sb, item);
+                    }
+
+                    sb.Append(']');
+                    break;
+                case Type.String:
+                    sb.Append('"');
+                    sb.Append(JsonString.Escape(JsonString.Unquote(_json)));
+                    sb.Append('"');
+                    break;
+                case Type.Number:
+                case Type.Boolean:
+                    sb.Append(_json);
+                    break;
+                case Type.None:
+                    sb.Append("null");
+                    break;
+            }
+        }
+
+        private static void AppendValue(StringBuilder sb, JsonData value)
+        {
+            if (value == null)
+            {
+                sb.Append("null");
+            }
+            else
+            {
+                value.BuildJson(sb);
             }
         }
         
@@ -74,7 +163,7 @@ namespace DanKeJson
         {
             return new JsonData(Type.Boolean)
             {
-                json = value.ToString().ToLower()
+                json = value.ToString(CultureInfo.InvariantCulture).ToLower()
             };
         }
 
@@ -96,7 +185,7 @@ namespace DanKeJson
         {
             return new JsonData(Type.Number)
             {
-                json = value.ToString()
+                json = value.ToString(CultureInfo.InvariantCulture)
             };
         }
 
@@ -118,7 +207,7 @@ namespace DanKeJson
         {
             return new JsonData(Type.Number)
             {
-                json = value.ToString()
+                json = value.ToString(CultureInfo.InvariantCulture)
             };
         }
 
@@ -161,7 +250,7 @@ namespace DanKeJson
             }
             return new JsonData(Type.Number)
             {
-                json = value.ToString()
+                json = value.ToString(CultureInfo.InvariantCulture)
             };
         }
 
@@ -219,7 +308,7 @@ namespace DanKeJson
             }
             return new JsonData(Type.Number)
             {
-                json = value.ToString()
+                json = value.ToString(CultureInfo.InvariantCulture)
             };
         }
         
@@ -256,7 +345,7 @@ namespace DanKeJson
         {
             return new JsonData(Type.Number)
             {
-                json = value.ToString()
+                json = value.ToString(CultureInfo.InvariantCulture)
             };
         }
 
@@ -278,7 +367,7 @@ namespace DanKeJson
         {
             return new JsonData(Type.Number)
             {
-                json = value.ToString()
+                json = value.ToString(CultureInfo.InvariantCulture)
             };
         }
 
@@ -300,7 +389,7 @@ namespace DanKeJson
         {
             return new JsonData(Type.Number)
             {
-                json = value.ToString()
+                json = value.ToString(CultureInfo.InvariantCulture)
             };
         }
 
@@ -322,7 +411,7 @@ namespace DanKeJson
         {
             return new JsonData(Type.Number)
             {
-                json = value.ToString()
+                json = value.ToString(CultureInfo.InvariantCulture)
             };
         }
 
@@ -344,7 +433,7 @@ namespace DanKeJson
         {
             return new JsonData(Type.Number)
             {
-                json = value.ToString()
+                json = value.ToString(CultureInfo.InvariantCulture)
             };
         }
 
@@ -437,7 +526,6 @@ namespace DanKeJson
                 {
                     map.Add(key,value);
                 }
-                
             }
         }
 

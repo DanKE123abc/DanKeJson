@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
-using System.Text;
 using DanKeJson.Json;
+using static DanKeJson.Json.Reader;
+using static DanKeJson.Json5.ReaderExts;
 
 #pragma warning disable CS8604
 #pragma warning disable CS8603
@@ -13,83 +15,74 @@ using DanKeJson.Json;
 
 namespace DanKeJson.Json5
 {
+    /// <summary>
+    /// Deserializer : parse Json5 text into JsonData / .NET objects.
+    /// </summary>
     public class Deserializer
     {
-        public static JsonData FromObject(object jsonObject)
+        public static object FromJson(JsonData json, Type type)
         {
-            return Json.Deserializer.FromObject(jsonObject);
+            return Json.Deserializer.FromJson(json, type);
         }
         
-        public static void ProcessData(JsonData json, StringBuilder builder, Json5Options options)
+        public static JsonData ProcessJson(string json, ref int index)
         {
-            if (json == null || builder == null)
+            if (index < 0 || index >= json.Length)
             {
-                return;
+                return null;
             }
-            
-            switch (json.type)
+
+            SkipWhiteSpace(json, ref index);
+            if (index >= json.Length)
             {
-                case JsonData.Type.Number:
-                    builder.Append(json.json);
-                    break;
-                case JsonData.Type.String:
-                    switch (options.StringQuoteStyle)
-                    {
-                        case Json5Options.StringQuoteType.DoubleQuote:
-                            builder.Append("\"" + json.json[1..^1] + "\"");
-                            break;
-                        case Json5Options.StringQuoteType.SingleQuote:
-                            builder.Append("'" + json.json[1..^1] + "'");
-                            break;
-                    }
-                    break;
-                case JsonData.Type.Boolean:
-                    builder.Append(json.json);
-                    break;
-                case JsonData.Type.None:
-                    builder.Append("null");
-                    break;
-                case JsonData.Type.Object:
-                    builder.Append('{');
-                    foreach (var key in json.map.Keys)
-                    {
-                        switch (options.KeyNameStyle)
-                        {
-                            case Json5Options.KeyNameType.WithQuotes:
-                                builder.Append("\"" + key + "\":");
-                                break;
-                            case Json5Options.KeyNameType.WithoutQuotes:
-                                builder.Append(key + ":");
-                                break;
-                        }
-                        ProcessData(json[key], builder, options);
-                        builder.Append(',');
-                    }
-
-                    builder.Remove(builder.Length - 1, 1);
-                    if (options.AddTailingCommaForObject)
-                    {
-                        builder.Append(',');
-                    }
-                    builder.Append('}');
-                    break;
-                case JsonData.Type.Array:
-                    builder.Append('[');
-                    foreach (var item in json.array)
-                    {
-                        ProcessData(item, builder, options);
-                        builder.Append(',');
-                    }
-                    builder.Remove(builder.Length - 1, 1);
-                    if (options.AddTailingCommaForArray)
-                    {
-                        builder.Append(',');
-                    }
-                    builder.Append(']');
-                    break;
-
+                return null;
             }
+
+            char cur = json[index];
+            JsonData jsonData = null;
+            if (cur == '\"')
+            {
+                //String (Double/Standard)
+                jsonData = ToString_Double(json, ref index);
+            }
+            else if (cur == '\'')
+            {
+                //String (Single)
+                jsonData = ToString_Single(json, ref index);
+            }
+            else if (cur == 't' || cur == 'f')
+            {
+                //Boolean
+                jsonData = ToBoolean(json, ref index);
+            }
+            else if (cur == '-' || cur == '+' || char.IsDigit(cur) || cur == 'N' || cur == 'I')
+            {
+                //Number
+                jsonData = ToNumber(json, ref index);
+            }
+            else if (cur == '{')
+            {
+                //Object
+                jsonData = ReaderExts.ToObject(json, ref index);
+            }
+            else if (cur == '[')
+            {
+                //Array
+                jsonData = ReaderExts.ToArray(json, ref index);
+            }
+            else if (cur == 'n')
+            {
+                //None
+                jsonData = ToNone(json, ref index);
+            }
+            else
+            {
+                jsonData = Unrecognized(json, ref index);
+            }
+
+            SkipWhiteSpace(json, ref index);
+
+            return jsonData;
         }
-        
     }
 }

@@ -56,6 +56,8 @@ Serialization:
 
 [JSON5](./Docs/API/JSON5.md)
 
+[JSONL](./Docs/API/JSONL.md)
+
 [JsonData](./Docs/API/JsonData.md)
 
 [JsonData.Type](./Docs/API/JsonData.Type.md)
@@ -76,46 +78,46 @@ Serialization:
 
 ## Using DanKeJson from an application
 
-**[Download package](https://www.nuget.org/api/v2/package/DanKeJson/1.4.3)**
+**[Download package](https://www.nuget.org/api/v2/package/DanKeJson/1.5.0)**
 
 ### Package manager
 
 ```shell
-NuGet\Install-Package DanKeJson -Version 1.4.3
+NuGet\Install-Package DanKeJson -Version 1.5.0
 ```
 
 ### .NET CLI
 
 ```shell
-dotnet add package DanKeJson --version 1.4.3
+dotnet add package DanKeJson --version 1.5.0
 ```
 
 ### PackageReference
 
 ```xaml
-<PackageReference Include="DanKeJson" Version="1.4.3" />
+<PackageReference Include="DanKeJson" Version="1.5.0" />
 ```
 
 ### Paket CLI
 
 ```shell
-paket add DanKeJson --version 1.4.3
+paket add DanKeJson --version 1.5.0
 ```
 
 ### Script & Interactive
 
 ```c#
-#r "nuget: DanKeJson, 1.4.3"
+#r "nuget: DanKeJson, 1.5.0"
 ```
 
 ### Cake
 
 ```C#
 // Install DanKeJson as a Cake Addin
-#addin nuget:?package=DanKeJson&version=1.4.3
+#addin nuget:?package=DanKeJson&version=1.5.0
 
 // Install DanKeJson as a Cake Tool
-#tool nuget:?package=DanKeJson&version=1.4.3
+#tool nuget:?package=DanKeJson&version=1.5.0
 ```
 
 Alternatively, just copy the whole tree of files under `./publish/DanKeJson` to your own project's source tree and integrate it with your development environment.
@@ -124,6 +126,7 @@ Alternatively, just copy the whole tree of files under `./publish/DanKeJson` to 
 
 DanKeJson currently targets and supports
 
+- .NET 10.0
 - .NET 9.0
 - .NET 8.0
 - .NET 7.0

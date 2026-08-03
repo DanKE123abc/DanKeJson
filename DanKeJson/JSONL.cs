@@ -22,7 +22,7 @@ namespace DanKeJson
                 {
                     // 添加空行检查
                     if (string.IsNullOrWhiteSpace(l)) continue;
-                    dataLines.Add(JSON.ToData(l, true));
+                    dataLines.Add(JSON.ToData(l));
                 }
             }
             return dataLines;
@@ -44,7 +44,7 @@ namespace DanKeJson
                 {
                     // 添加空行检查
                     if (string.IsNullOrWhiteSpace(l)) continue;
-                    dataLines.Add(JSON.ToData<T>(l, true));
+                    dataLines.Add(JSON.ToData<T>(l));
                 }
             }
             return dataLines;
@@ -63,7 +63,7 @@ namespace DanKeJson
                 var jsonLine = FileLineReader.ReadLine(filePath, lineNumber);
                 if (!string.IsNullOrWhiteSpace(jsonLine))
                 {
-                    return JSON.ToData(jsonLine, true);
+                    return JSON.ToData(jsonLine);
                 }
             }
             return null;
@@ -83,7 +83,7 @@ namespace DanKeJson
                 var jsonLine = FileLineReader.ReadLine(filePath, lineNumber);
                 if (!string.IsNullOrWhiteSpace(jsonLine))
                 {
-                    return JSON.ToData<T>(jsonLine, true);
+                    return JSON.ToData<T>(jsonLine);
                 }
             }
             return null;

@@ -46,20 +46,17 @@ namespace DanKeJson
         /// Using comments can affect performance
         /// </summary>
         /// <param name="text">the JsonText</param>
-        /// <param name="skipFileCheck">Skip the file path check</param>
         /// <returns>JsonData</returns>
-        public static JsonData ToData(string text, bool skipFileCheck = false)
+        public static JsonData ToData(string text)
         {
-            if (!skipFileCheck)
+            if (text == null)
             {
-                if (FilePathUtility.IsFilePath(text))
-                {
-                    text = File.ReadAllText(text);
-                }
+                return null;
             }
+
             text = CommentParser.RemoveComments(text);
             int index = 0;
-            JsonData json = Serializer.ProcessJson(text, ref index);
+            JsonData json = Deserializer.ProcessJson(text, ref index);
             if (index == text.Length)
             {
                 return json;
@@ -74,27 +71,45 @@ namespace DanKeJson
         /// Using comments can affect performance
         /// </summary>
         /// <param name="text">the JsonText</param>
-        /// <param name="skipFileCheck">Skip the file path check</param>
         /// <typeparam name="T">Class</typeparam>
         /// <returns>T Class</returns>
-        public static T ToData<T>(string text, bool skipFileCheck = false) where T : class, new()
+        public static T ToData<T>(string text) where T : class, new()
         {
-            if (!skipFileCheck)
+            if (text == null)
             {
-                if (FilePathUtility.IsFilePath(text))
-                {
-                    text = File.ReadAllText(text);
-                }
+                return default(T);
             }
+
             text = CommentParser.RemoveComments(text);
             int index = 0;
-            JsonData json = Serializer.ProcessJson(text, ref index);
+            JsonData json = Deserializer.ProcessJson(text, ref index);
             if (index == text.Length)
             {
-                return (T)Serializer.FromJson(json, typeof(T));
+                return (T)Deserializer.FromJson(json, typeof(T));
             }
 
             return default(T);
+        }
+
+        /// <summary>
+        /// Read a Json5 file and parse it to JsonData
+        /// </summary>
+        /// <param name="filePath">the file path</param>
+        /// <returns>JsonData</returns>
+        public static JsonData ToDataFromFile(string filePath)
+        {
+            return ToData(File.ReadAllText(filePath));
+        }
+
+        /// <summary>
+        /// Read a Json5 file and deserialize it to Class
+        /// </summary>
+        /// <param name="filePath">the file path</param>
+        /// <typeparam name="T">Class</typeparam>
+        /// <returns>T Class</returns>
+        public static T ToDataFromFile<T>(string filePath) where T : class, new()
+        {
+            return ToData<T>(File.ReadAllText(filePath));
         }
 
         /// <summary>
@@ -117,7 +132,7 @@ namespace DanKeJson
             }
             
             StringBuilder stringBuilder = new StringBuilder();
-            Deserializer.ProcessData(json, stringBuilder, options);
+            Serializer.ProcessData(json, stringBuilder, options);
             return stringBuilder.ToString();
         }
 
@@ -140,9 +155,9 @@ namespace DanKeJson
                 options = new Json5Options();
             }
 
-            JsonData json = Deserializer.FromObject(jsonObject);
+            JsonData json = Serializer.FromObject(jsonObject);
             StringBuilder stringBuilder = new StringBuilder();
-            Deserializer.ProcessData(json, stringBuilder, options);
+            Serializer.ProcessData(json, stringBuilder, options);
             return stringBuilder.ToString();
         }
         
