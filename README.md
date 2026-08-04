@@ -70,16 +70,8 @@ DanKeJson 为了方便开发使用，添加了许多特性，包括但不限于�
 
 ## 打包为Nuget发行包
 
-**Windows**
-
 ```shell
-./build.ps1
-```
-
-**Mac OS / Linux**
-
-```shell
-./build.sh
+dotnet cake .\build.cake
 ```
 
 ## 在你的应用中安装 DanKeJson
@@ -184,5 +176,3 @@ SOFTWARE.
 ## 参考项目
 
 [litjson - C#](https://github.com/LitJSON/litjson)
-
-
