@@ -107,12 +107,15 @@ namespace DanKeJson
             {
                 jsonLines.Add(JSON.ToJson(l));
             }
-            using (var writer = new StreamWriter(filePath, false, Encoding.UTF8))
+            if (!string.IsNullOrEmpty(filePath))
             {
-                foreach (var line in jsonLines)
+                using (var writer = new StreamWriter(filePath, false, Encoding.UTF8))
                 {
-                    string escapedLine = line.Replace("\r\n", "\\n").Replace("\n", "\\n");
-                    writer.WriteLine(escapedLine);
+                    foreach (var line in jsonLines)
+                    {
+                        string escapedLine = line.Replace("\r\n", "\\n").Replace("\n", "\\n");
+                        writer.WriteLine(escapedLine);
+                    }
                 }
             }
             return string.Join("\n", jsonLines);
@@ -137,12 +140,15 @@ namespace DanKeJson
             {
                 jsonLines.Add(JSON.ToJson(l));
             }
-            using (var writer = new StreamWriter(filePath, false, Encoding.UTF8))
+            if (!string.IsNullOrEmpty(filePath))
             {
-                foreach (var line in jsonLines)
+                using (var writer = new StreamWriter(filePath, false, Encoding.UTF8))
                 {
-                    string escapedLine = line.Replace("\r\n", "\\n").Replace("\n", "\\n");
-                    writer.WriteLine(escapedLine);
+                    foreach (var line in jsonLines)
+                    {
+                        string escapedLine = line.Replace("\r\n", "\\n").Replace("\n", "\\n");
+                        writer.WriteLine(escapedLine);
+                    }
                 }
             }
             return string.Join("\n", jsonLines);

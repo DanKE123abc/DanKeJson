@@ -35,7 +35,7 @@ Console.WriteLine(user.isVip);  // True
 
 ## 支持的类型
 
-反序列化支持以下属性类型：
+反序列化支持以下成员类型（公共属性或公共字段）：
 
 | 类型                                | 说明                                        |
 | :---------------------------------- | :------------------------------------------ |
@@ -45,9 +45,41 @@ Console.WriteLine(user.isVip);  // True
 | `List<T>`                           | JSON 数组，`T` 可以是基本类型或自定义类      |
 | `JsonData`                          | 原始 [JsonData](../API/JsonData.md)         |
 
+## 使用字段定义实体类
+
+与 LitJSON 类似，可以直接使用**公共字段**定义实体类，无需编写 `{ get; set; }`：
+
+```csharp
+using DanKeJson;
+
+public class User
+{
+    public string name;
+    public int age;
+    public bool isVip;
+}
+
+string text = """
+    {
+        "name": "DanKe",
+        "age": 25,
+        "isVip": true
+    }
+    """;
+
+User user = JSON.ToData<User>(text);
+
+Console.WriteLine(user.name);   // DanKe
+Console.WriteLine(user.age);    // 25
+Console.WriteLine(user.isVip);  // True
+```
+
+- 反序列化时公共属性和公共字段均可被识别。
+- `readonly` 字段会被跳过。
+
 ## 键名映射（JsonProperty）
 
-当 JSON 的键名与属性名不一致时，使用 `[JsonProperty("...")]` 特性指定 JSON 中的键名：
+当 JSON 的键名与成员名（属性或字段）不一致时，使用 `[JsonProperty("...")]` 特性指定 JSON 中的键名（特性同样适用于字段）：
 
 ```csharp
 using DanKeJson;
@@ -139,7 +171,5 @@ List<User> users = JSONL.AllLineToData<User>("users.jsonl");
 
 User second = JSONL.LineToData<User>("users.jsonl", 2);
 ```
-
-> **限制**：当前版本不支持属性类型为自定义类的直接嵌套（非 `List<T>` 成员）。例如上面示例中的 `items` 必须声明为 `List<Item>` 才能正确反序列化。
 
 [下一页：将 JsonData 编写为 JSON](./JsonData2Json.md)
