@@ -38,7 +38,7 @@ JsonData json = JSON.ToData("{\"name\":\"DanKe\",\"age\":25}");
 
 将 JSON 文本反序列化为实体类 `T`（`T` 需为带无参构造函数的 class）。
 
-- 支持 `string` / `bool` / 数字类型 / `List<T>` / `JsonData` 属性，详见 [将 JSON 读取为 .NET 对象](../QuickStart/Json2Object.md)。
+- 支持 `string` / `bool` / 数字类型 / `List<T>` / `JsonData` 成员（属性或字段），详见 [将 JSON 读取为 .NET 对象](../QuickStart/Json2Object.md)。
 
 ```csharp
 User user = JSON.ToData<User>("{\"name\":\"DanKe\",\"age\":25}");
@@ -81,8 +81,7 @@ string text = JSON.ToJson(json);   // {"a":1}
 
 将 .NET 对象（实体类实例）序列化为标准 JSON 字符串，传入 `null` 时返回 `null`。
 
-- 序列化所有可读（public getter）属性，键名为属性原名。
-- `[JsonProperty]` 特性不影响序列化。
+- 序列化所有可读（public getter）属性与公共字段，键名为成员原名；可用 `[JsonProperty("...")]` 指定键名。
 
 ```csharp
 User user = new User { name = "DanKe", age = 25 };

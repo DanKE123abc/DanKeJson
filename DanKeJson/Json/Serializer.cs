@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Globalization;
+using System.Linq;
 using System.Reflection;
 using System.Text;
 using DanKeJson.Utils;
@@ -21,109 +22,228 @@ namespace DanKeJson.Json
     {
         public static JsonData FromObject(object jsonObject)
         {
-            JsonData json = new JsonData(JsonData.Type.Object);
+            return FromObject(jsonObject, null);
+        }
+
+        private static JsonData FromObject(object jsonObject, HashSet<object> stack)
+        {
             if (jsonObject == null)
             {
-                json = new JsonData(JsonData.Type.None);
-                return json;
+                return new JsonData(JsonData.Type.None);
             }
 
             System.Type type = jsonObject.GetType();
-            if (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(List<>))
+
+            // 数组 / 列表（List<T>、int[]、ArrayList 等）
+            if (jsonObject is IList list)
             {
-                var listType = type.GetGenericArguments()[0];
-                var list = (IList)jsonObject;
-                json = new JsonData(JsonData.Type.Array);
-
-                foreach (var item in list)
+                JsonData arrayJson = new JsonData(JsonData.Type.Array);
+                foreach (object item in list)
                 {
-                    JsonData jsonDataItem;
-                    if (item == null)
-                    {
-                        jsonDataItem = new JsonData(JsonData.Type.None);
-                    }
-                    else if (listType == typeof(string))
-                    {
-                        jsonDataItem = new JsonData(JsonData.Type.String)
-                            { json = "\"" + item.ToString() + "\"" };
-                    }
-                    else if (listType == typeof(int) || listType == typeof(long) ||
-                             listType == typeof(float) || listType == typeof(double) ||
-                             listType == typeof(sbyte) || listType == typeof(short) ||
-                             listType == typeof(uint) || listType == typeof(ulong) ||
-                             listType == typeof(ushort))
-                    {
-                        string number = item is float f
-                            ? f.ToString(CultureInfo.InvariantCulture)
-                            : item is double d
-                                ? d.ToString(CultureInfo.InvariantCulture)
-                                : item.ToString();
-                        jsonDataItem = new JsonData(JsonData.Type.Number) { json = number! };
-                    }
-                    else if (listType == typeof(bool))
-                    {
-                        jsonDataItem = new JsonData(JsonData.Type.Boolean)
-                            { json = item.ToString().ToLower() };
-                    }
-                    else
-                    {
-                        jsonDataItem = FromObject(item);
-                    }
+                    arrayJson.array.Add(item == null
+                        ? new JsonData(JsonData.Type.None)
+                        : FromObject(item, stack));
+                }
 
-                    json.array.Add(jsonDataItem);
+                return arrayJson;
+            }
+
+            // 字典
+            if (jsonObject is IDictionary dictionary)
+            {
+                JsonData objectJson = new JsonData(JsonData.Type.Object);
+                foreach (DictionaryEntry entry in dictionary)
+                {
+                    objectJson[entry.Key.ToString()] = entry.Value == null
+                        ? new JsonData(JsonData.Type.None)
+                        : FromObject(entry.Value, stack);
+                }
+
+                return objectJson;
+            }
+
+            switch (Type.GetTypeCode(type))
+            {
+                case TypeCode.String:
+                    return new JsonData(JsonData.Type.String)
+                        { json = "\"" + jsonObject + "\"" };
+                case TypeCode.Boolean:
+                    return new JsonData(JsonData.Type.Boolean)
+                        { json = ((bool)jsonObject).ToString(CultureInfo.InvariantCulture).ToLower() };
+                case TypeCode.Byte:
+                case TypeCode.SByte:
+                case TypeCode.Int16:
+                case TypeCode.Int32:
+                case TypeCode.Int64:
+                case TypeCode.UInt16:
+                case TypeCode.UInt32:
+                case TypeCode.UInt64:
+                    return new JsonData(JsonData.Type.Number)
+                        { json = jsonObject.ToString() };
+                case TypeCode.Single:
+                    return new JsonData(JsonData.Type.Number)
+                        { json = ((float)jsonObject).ToString(CultureInfo.InvariantCulture) };
+                case TypeCode.Double:
+                    return new JsonData(JsonData.Type.Number)
+                        { json = ((double)jsonObject).ToString(CultureInfo.InvariantCulture) };
+                case TypeCode.Decimal:
+                    return new JsonData(JsonData.Type.Number)
+                        { json = ((decimal)jsonObject).ToString(CultureInfo.InvariantCulture) };
+                case TypeCode.DateTime:
+                    return new JsonData(JsonData.Type.String)
+                        { json = "\"" + ((DateTime)jsonObject).ToString("o", CultureInfo.InvariantCulture) + "\"" };
+            }
+
+            if (type == typeof(Guid))
+            {
+                return new JsonData(JsonData.Type.String) { json = "\"" + jsonObject + "\"" };
+            }
+
+            if (type == typeof(TimeSpan))
+            {
+                return new JsonData(JsonData.Type.String)
+                    { json = "\"" + ((TimeSpan)jsonObject).ToString("c", CultureInfo.InvariantCulture) + "\"" };
+            }
+
+            if (type == typeof(DateTimeOffset))
+            {
+                return new JsonData(JsonData.Type.String)
+                    { json = "\"" + ((DateTimeOffset)jsonObject).ToString("o", CultureInfo.InvariantCulture) + "\"" };
+            }
+
+            if (type == typeof(JsonData))
+            {
+                return (JsonData)jsonObject;
+            }
+
+            if (type.IsEnum)
+            {
+                object underlying = Convert.ChangeType(jsonObject, Enum.GetUnderlyingType(type), CultureInfo.InvariantCulture);
+                return new JsonData(JsonData.Type.Number) { json = underlying.ToString() };
+            }
+
+            // 循环引用检测（仅引用类型）
+            bool referenceType = !type.IsValueType;
+            if (referenceType)
+            {
+                if (stack == null)
+                {
+                    stack = new HashSet<object>(ReferenceComparer.Instance);
+                }
+
+                if (!stack.Add(jsonObject))
+                {
+                    throw new InvalidOperationException(
+                        "Detected a circular reference while serializing type " + type.FullName +
+                        ". JSON does not support object cycles.");
                 }
             }
-            else
-            {
-                foreach (PropertyInfo propertyInfo in type.GetProperties())
-                {
-                    if (propertyInfo.CanRead)
-                    {
-                        object propertyValue = propertyInfo.GetValue(jsonObject);
-                        System.Type propertyType = propertyInfo.PropertyType;
-                        if (propertyValue == null)
-                        {
-                            json[propertyInfo.Name] = new JsonData(JsonData.Type.None);
-                            continue;
-                        }
 
-                        switch (Type.GetTypeCode(propertyType))
-                        {
-                            case TypeCode.String:
-                                json[propertyInfo.Name] = new JsonData(JsonData.Type.String)
-                                    { json = "\"" + propertyValue.ToString() + "\"" };
-                                break;
-                            case TypeCode.Boolean:
-                                json[propertyInfo.Name] = new JsonData(JsonData.Type.Boolean)
-                                    { json = propertyValue.ToString().ToLower() };
-                                break;
-                            case TypeCode.Int32:
-                            case TypeCode.Int64:
-                            case TypeCode.SByte:
-                            case TypeCode.Int16:
-                            case TypeCode.UInt32:
-                            case TypeCode.UInt64:
-                            case TypeCode.UInt16:
-                                json[propertyInfo.Name] = new JsonData(JsonData.Type.Number)
-                                    { json = propertyValue.ToString() };
-                                break;
-                            case TypeCode.Single:
-                                json[propertyInfo.Name] = new JsonData(JsonData.Type.Number)
-                                    { json = ((float)propertyValue).ToString(CultureInfo.InvariantCulture) };
-                                break;
-                            case TypeCode.Double:
-                                json[propertyInfo.Name] = new JsonData(JsonData.Type.Number)
-                                    { json = ((double)propertyValue).ToString(CultureInfo.InvariantCulture) };
-                                break;
-                            default:
-                                json[propertyInfo.Name] = FromObject((object)propertyValue);
-                                break;
-                        }
+            JsonData json = new JsonData(JsonData.Type.Object);
+            const BindingFlags flags = BindingFlags.Public | BindingFlags.Instance;
+            foreach (MemberInfo member in type.GetFields(flags)
+                .Select<FieldInfo, MemberInfo>(f => f)
+                .Concat(type.GetProperties(flags)))
+            {
+                object memberValue;
+                Type memberType;
+                string memberName = member.Name;
+
+                if (member is PropertyInfo propertyInfo)
+                {
+                    if (!propertyInfo.CanRead)
+                    {
+                        continue;
                     }
+
+                    memberValue = propertyInfo.GetValue(jsonObject);
+                    memberType = propertyInfo.PropertyType;
                 }
+                else if (member is FieldInfo fieldInfo)
+                {
+                    memberValue = fieldInfo.GetValue(jsonObject);
+                    memberType = fieldInfo.FieldType;
+                }
+                else
+                {
+                    continue;
+                }
+
+                // 获取自定义特性的名称
+                var jsonProperty = member.GetCustomAttribute<JsonProperty>();
+                if (jsonProperty != null)
+                {
+                    memberName = jsonProperty.Name;
+                }
+
+                if (memberValue == null)
+                {
+                    json[memberName] = new JsonData(JsonData.Type.None);
+                    continue;
+                }
+
+                if (memberType.IsEnum)
+                {
+                    object underlying = Convert.ChangeType(memberValue, Enum.GetUnderlyingType(memberType), CultureInfo.InvariantCulture);
+                    json[memberName] = new JsonData(JsonData.Type.Number) { json = underlying.ToString() };
+                    continue;
+                }
+
+                switch (Type.GetTypeCode(memberType))
+                {
+                    case TypeCode.String:
+                        json[memberName] = new JsonData(JsonData.Type.String)
+                            { json = "\"" + memberValue.ToString() + "\"" };
+                        break;
+                    case TypeCode.Boolean:
+                        json[memberName] = new JsonData(JsonData.Type.Boolean)
+                            { json = memberValue.ToString().ToLower() };
+                        break;
+                    case TypeCode.Int32:
+                    case TypeCode.Int64:
+                    case TypeCode.SByte:
+                    case TypeCode.Int16:
+                    case TypeCode.UInt32:
+                    case TypeCode.UInt64:
+                    case TypeCode.UInt16:
+                        json[memberName] = new JsonData(JsonData.Type.Number)
+                            { json = memberValue.ToString() };
+                        break;
+                    case TypeCode.Single:
+                        json[memberName] = new JsonData(JsonData.Type.Number)
+                            { json = ((float)memberValue).ToString(CultureInfo.InvariantCulture) };
+                        break;
+                    case TypeCode.Double:
+                        json[memberName] = new JsonData(JsonData.Type.Number)
+                            { json = ((double)memberValue).ToString(CultureInfo.InvariantCulture) };
+                        break;
+                    default:
+                        json[memberName] = FromObject(memberValue, stack);
+                        break;
+                }
+            }
+
+            if (referenceType)
+            {
+                stack.Remove(jsonObject);
             }
 
             return json;
+        }
+
+        private sealed class ReferenceComparer : IEqualityComparer<object>
+        {
+            public static readonly ReferenceComparer Instance = new ReferenceComparer();
+
+            public new bool Equals(object x, object y)
+            {
+                return ReferenceEquals(x, y);
+            }
+
+            public int GetHashCode(object obj)
+            {
+                return System.Runtime.CompilerServices.RuntimeHelpers.GetHashCode(obj);
+            }
         }
 
         public static void ProcessData(JsonData json, StringBuilder builder)

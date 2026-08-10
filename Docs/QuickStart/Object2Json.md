@@ -31,11 +31,11 @@ Console.WriteLine(text);   // {"name":"DanKe","age":25,"isVip":true}
 
 ## 序列化规则
 
-- 序列化对象所有**可读（public getter）**的属性。
+- 序列化对象所有**可读（public getter）属性**与**公共字段**。
 - 支持 `string`、`bool`、数字类型（`int` / `long` / `float` / `double` / `sbyte` / `short` / `uint` / `ulong` / `ushort`）。
 - 支持 `List<T>`，以及嵌套的自定义类。
-- `null` 属性序列化为 `null`。
-- 键名使用属性的原始名称，`[JsonProperty]` 特性只影响[反序列化](./Json2Object.md)，不影响序列化。
+- `null` 成员序列化为 `null`。
+- 键名默认使用成员的原始名称；可通过 `[JsonProperty("...")]` 特性指定 JSON 中的键名（与[反序列化](./Json2Object.md)一致，属性与字段均适用）。
 
 ## 嵌套对象与数组
 
