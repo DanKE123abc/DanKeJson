@@ -76,46 +76,46 @@ dotnet cake .\build.cake
 
 ## 在你的应用中安装 DanKeJson
 
-**[点击下载](https://www.nuget.org/api/v2/package/DanKeJson/1.5.0)**
+**[点击下载](https://www.nuget.org/api/v2/package/DanKeJson/1.5.1)**
 
 ### Package manager
 
 ```shell
-NuGet\Install-Package DanKeJson -Version 1.5.0
+NuGet\Install-Package DanKeJson -Version 1.5.1
 ```
 
 ### .NET CLI
 
 ```shell
-dotnet add package DanKeJson --version 1.5.0
+dotnet add package DanKeJson --version 1.5.1
 ```
 
 ### PackageReference
 
 ```xaml
-<PackageReference Include="DanKeJson" Version="1.5.0" />
+<PackageReference Include="DanKeJson" Version="1.5.1" />
 ```
 
 ### Paket CLI
 
 ```shell
-paket add DanKeJson --version 1.5.0
+paket add DanKeJson --version 1.5.1
 ```
 
 ### Script & Interactive
 
 ```c#
-#r "nuget: DanKeJson, 1.5.0"
+#r "nuget: DanKeJson, 1.5.1"
 ```
 
 ### Cake
 
 ```C#
 // Install DanKeJson as a Cake Addin
-#addin nuget:?package=DanKeJson&version=1.5.0
+#addin nuget:?package=DanKeJson&version=1.5.1
 
 // Install DanKeJson as a Cake Tool
-#tool nuget:?package=DanKeJson&version=1.5.0
+#tool nuget:?package=DanKeJson&version=1.5.1
 ```
 
 或者，只需复制目录`./publish/DanKeJson`到您自己项目的源代码树中，并将其与您的开发环境集成。
