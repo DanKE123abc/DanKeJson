@@ -317,5 +317,62 @@ namespace DanKeJson.Tests
                 CultureInfo.CurrentCulture = original;
             }
         }
+
+        [Fact]
+        public void ToData_IgnoresItemKeyWhenClassHasIndexer()
+        {
+            IndexerModel m = JSON.ToData<IndexerModel>("{\"Item\":\"x\",\"Name\":\"y\"}");
+
+            Assert.Equal("y", m.Name);
+        }
+
+        [Fact]
+        public void ToData_ListOfJsonData_KeepsRawNodes()
+        {
+            JsonDataListModel m = JSON.ToData<JsonDataListModel>("{\"items\":[{\"a\":1},\"x\",5,null]}");
+
+            Assert.Equal(4, m.items.Count);
+            Assert.Equal(JsonData.Type.Object, m.items[0].type);
+            Assert.Equal(1, (int)m.items[0]["a"]);
+            Assert.Equal("x", (string)m.items[1]);
+            Assert.Equal(5, (int)m.items[2]);
+            Assert.Equal(JsonData.Type.None, m.items[3].type);
+        }
+
+        [Fact]
+        public void ToData_TopLevelListOfJsonData()
+        {
+            List<JsonData> list = JSON.ToData<List<JsonData>>("[{\"a\":1}]");
+
+            Assert.Single(list);
+            Assert.Equal(JsonData.Type.Object, list[0].type);
+            Assert.Equal(1, (int)list[0]["a"]);
+        }
+
+        [Fact]
+        public void ToData_TopLevelDictionary()
+        {
+            Dictionary<string, int> map = JSON.ToData<Dictionary<string, int>>("{\"a\":1,\"b\":2}");
+
+            Assert.Equal(2, map.Count);
+            Assert.Equal(2, map["b"]);
+        }
+
+        [Fact]
+        public void ToData_ListOfDictionary()
+        {
+            List<Dictionary<string, int>> list = JSON.ToData<List<Dictionary<string, int>>>("[{\"a\":1}]");
+
+            Assert.Single(list);
+            Assert.Equal(1, list[0]["a"]);
+        }
+
+        [Fact]
+        public void ToData_PlainListUnaffected()
+        {
+            JsonDataListModel m = JSON.ToData<JsonDataListModel>("{\"typed\":[{\"name\":\"a\"}]}");
+
+            Assert.Equal("a", m.typed[0].name);
+        }
     }
 }

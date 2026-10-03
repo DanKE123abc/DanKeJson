@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.Linq;
 using Xunit;
 
 namespace DanKeJson.Tests
@@ -242,6 +243,36 @@ namespace DanKeJson.Tests
             Assert.Equal(original.items[0].name, restored.items[0].name);
             Assert.Equal(original.items[0].price, restored.items[0].price, 10);
             Assert.Equal(original.tags, restored.tags);
+        }
+
+        [Fact]
+        public void ToJson_IgnoresIndexerProperties()
+        {
+            Assert.Equal("{\"Name\":\"n\"}", JSON.ToJson(new IndexerModel()));
+        }
+
+        [Fact]
+        public void ToJson_NonListEnumerable_IsArray()
+        {
+            Assert.Equal("[3,2,1]", JSON.ToJson(new Stack<int>(new[] { 1, 2, 3 })));
+            Assert.Equal("[\"a\"]", JSON.ToJson(new Queue<string>(new[] { "a" })));
+            Assert.Equal("[1]", JSON.ToJson(new HashSet<int> { 1 }));
+            Assert.Equal("[1,2,3]", JSON.ToJson(Enumerable.Range(1, 3)));
+        }
+
+        [Fact]
+        public void ToJson_StringIsNotTreatedAsEnumerable()
+        {
+            Assert.Equal("\"abc\"", JSON.ToJson("abc"));
+        }
+
+        [Fact]
+        public void ToJson_UnpairedSurrogate_IsEscaped()
+        {
+            Assert.Equal("\"\\ud800\"", JSON.ToJson("\uD800"));
+            Assert.Equal("\"\\udc00\"", JSON.ToJson("\uDC00"));
+            Assert.Equal("\"😀\"", JSON.ToJson("😀"));
+            Assert.Equal(0xD800, (int)((string)JSON.ToData(JSON.ToJson("\uD800")))[0]);
         }
     }
 }

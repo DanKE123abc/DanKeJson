@@ -22,7 +22,10 @@ namespace DanKeJson
                 {
                     // 添加空行检查
                     if (string.IsNullOrWhiteSpace(l)) continue;
-                    dataLines.Add(JSON.ToData(l));
+                    // 跳过无法解析的行（例如被换行拆开的美化 JSON），避免插入 null 元素
+                    JsonData line = JSON.ToData(l);
+                    if (line == null) continue;
+                    dataLines.Add(line);
                 }
             }
             return dataLines;
@@ -44,7 +47,10 @@ namespace DanKeJson
                 {
                     // 添加空行检查
                     if (string.IsNullOrWhiteSpace(l)) continue;
-                    dataLines.Add(JSON.ToData<T>(l));
+                    // 解析失败的行（或该行就是 null）会被跳过，避免插入 null 元素
+                    T line = JSON.ToData<T>(l);
+                    if (line == null) continue;
+                    dataLines.Add(line);
                 }
             }
             return dataLines;
@@ -105,12 +111,15 @@ namespace DanKeJson
             var jsonLines = new List<string>();
             foreach (var l in jsonDataList)
             {
-                jsonLines.Add(JSON.ToJson(l));
+                // 列表中允许出现 null 元素，写成 JSON 的 null
+                jsonLines.Add(JSON.ToJson(l) ?? "null");
             }
             if (!string.IsNullOrEmpty(filePath))
             {
-                using (var writer = new StreamWriter(filePath, false, Encoding.UTF8))
+                // 不带 BOM 的 UTF-8，行分隔符统一为 \n（与返回值一致）
+                using (var writer = new StreamWriter(filePath, false, new UTF8Encoding(false)))
                 {
+                    writer.NewLine = "\n";
                     foreach (var line in jsonLines)
                     {
                         string escapedLine = line.Replace("\r\n", "\\n").Replace("\n", "\\n");
@@ -138,12 +147,15 @@ namespace DanKeJson
             var jsonLines = new List<string>();
             foreach (var l in jsonDataList)
             {
-                jsonLines.Add(JSON.ToJson(l));
+                // 列表中允许出现 null 元素，写成 JSON 的 null
+                jsonLines.Add(JSON.ToJson(l) ?? "null");
             }
             if (!string.IsNullOrEmpty(filePath))
             {
-                using (var writer = new StreamWriter(filePath, false, Encoding.UTF8))
+                // 不带 BOM 的 UTF-8，行分隔符统一为 \n（与返回值一致）
+                using (var writer = new StreamWriter(filePath, false, new UTF8Encoding(false)))
                 {
+                    writer.NewLine = "\n";
                     foreach (var line in jsonLines)
                     {
                         string escapedLine = line.Replace("\r\n", "\\n").Replace("\n", "\\n");

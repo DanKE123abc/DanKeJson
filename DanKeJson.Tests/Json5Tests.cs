@@ -224,5 +224,36 @@ namespace DanKeJson.Tests
             Assert.Equal("DanKe", restored.name);
             Assert.True(restored.isVip);
         }
+
+        [Fact]
+        public void ToData_Json5Escapes()
+        {
+            Assert.Equal("A", (string)JSON5.ToData("{a:'\\x41'}")["a"]);
+            Assert.Equal("A", (string)JSON5.ToData("{a:\"\\x41\"}")["a"]);
+            Assert.Equal('\v', ((string)JSON5.ToData("{a:'\\v'}")["a"])[0]);
+            Assert.Equal('\0', ((string)JSON5.ToData("{a:'\\0'}")["a"])[0]);
+            Assert.Equal(3, ((string)JSON5.ToData("{a:'\\01'}")["a"]).Length);
+            Assert.Equal("it's", (string)JSON5.ToData("{a:\"it\\'s\"}")["a"]);
+        }
+
+        [Fact]
+        public void ToData_StringContinuation()
+        {
+            Assert.Equal("line1line2", (string)JSON5.ToData("{a:'line1\\\nline2'}")["a"]);
+            Assert.Equal("line1line2", (string)JSON5.ToData("{a:'line1\\\r\nline2'}")["a"]);
+        }
+
+        [Fact]
+        public void ToData_EscapesInQuotedKeys()
+        {
+            Assert.Equal(1, (int)JSON5.ToData("{'\\x41':1}")["A"]);
+        }
+
+        [Fact]
+        public void Json_KeepsUnknownEscapesVerbatim()
+        {
+            Assert.Equal("a\\x41b", (string)JSON.ToData("\"a\\x41b\""));
+            Assert.Equal("a\\\nb", (string)JSON.ToData("\"a\\\nb\""));
+        }
     }
 }

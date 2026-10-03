@@ -37,6 +37,31 @@ namespace DanKeJson.Json
     {
         public static object FromJson(JsonData json, Type type)
         {
+            DepthGuard.Enter();
+            try
+            {
+                return FromJsonCore(json, type);
+            }
+            finally
+            {
+                DepthGuard.Exit();
+            }
+        }
+
+        private static object FromJsonCore(JsonData json, Type type)
+        {
+            // JsonData 目标：保留原始节点（JsonData 没有无参构造，不能走 Activator）
+            if (type == typeof(JsonData))
+            {
+                return json;
+            }
+
+            // 字典目标：顶层、成员、集合元素共用同一实现
+            if (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(Dictionary<,>))
+            {
+                return DictionaryFromJson(json, type);
+            }
+
             if (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(List<>))
             {
                 var listType = type.GetGenericArguments()[0];
@@ -227,7 +252,8 @@ namespace DanKeJson.Json
             const BindingFlags flags = BindingFlags.Public | BindingFlags.Instance;
             return type.GetFields(flags)
                 .Select<FieldInfo, MemberInfo>(f => f)
-                .Concat(type.GetProperties(flags))
+                // 索引器（带参数的属性）无法直接 SetValue，必须排除
+                .Concat(type.GetProperties(flags).Where(p => p.GetIndexParameters().Length == 0))
                 .Select(m => new
                 {
                     Member = m,
@@ -656,6 +682,13 @@ namespace DanKeJson.Json
                 default:
                     foreach (var item in json.array)
                     {
+                        if (elementType == typeof(JsonData))
+                        {
+                            // JsonData 元素直接保留原始节点（含 None 节点）
+                            list.Add(item);
+                            continue;
+                        }
+
                         if (item == null || item.type == JsonData.Type.None)
                         {
                             if (elementType.IsValueType)
@@ -711,13 +744,29 @@ namespace DanKeJson.Json
             }
             else if (cur == '{')
             {
-                //Object
-                jsonData = ToObject(json, ref index);
+                //Object；每进入一层容器计数一次，使 MaxDepth 与文档嵌套层级一致
+                DepthGuard.Enter();
+                try
+                {
+                    jsonData = ToObject(json, ref index);
+                }
+                finally
+                {
+                    DepthGuard.Exit();
+                }
             }
             else if (cur == '[')
             {
                 //Array
-                jsonData = ToArray(json, ref index);
+                DepthGuard.Enter();
+                try
+                {
+                    jsonData = ToArray(json, ref index);
+                }
+                finally
+                {
+                    DepthGuard.Exit();
+                }
             }
             else if (cur == 'n')
             {

@@ -172,5 +172,14 @@ namespace DanKeJson.Tests
             Assert.False(FilePathUtility.IsFilePath(""));
             Assert.False(FilePathUtility.IsFilePath(null));
         }
+
+        [Fact]
+        public void Escape_EscapesUnpairedSurrogatesButKeepsPairs()
+        {
+            Assert.Equal("\\ud800", JsonString.Escape("\uD800"));
+            Assert.Equal("\\udc00", JsonString.Escape("\uDC00"));
+            Assert.Equal("😀", JsonString.Escape("😀"));
+            Assert.Equal("\\ud800", JsonString.EscapeSingleQuote("\uD800"));
+        }
     }
 }

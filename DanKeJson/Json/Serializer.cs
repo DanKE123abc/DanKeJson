@@ -28,6 +28,19 @@ namespace DanKeJson.Json
 
         private static JsonData FromObject(object jsonObject, HashSet<object> stack)
         {
+            DepthGuard.Enter();
+            try
+            {
+                return FromObjectCore(jsonObject, stack);
+            }
+            finally
+            {
+                DepthGuard.Exit();
+            }
+        }
+
+        private static JsonData FromObjectCore(object jsonObject, HashSet<object> stack)
+        {
             if (jsonObject == null)
             {
                 return new JsonData(JsonData.Type.None);
@@ -55,12 +68,30 @@ namespace DanKeJson.Json
                 JsonData objectJson = new JsonData(JsonData.Type.Object);
                 foreach (DictionaryEntry entry in dictionary)
                 {
-                    objectJson[entry.Key.ToString()] = entry.Value == null
+                    // JSON 的键必须是字符串；Hashtable 允许 null 键，这里统一写成空键
+                    string entryKey = entry.Key == null ? string.Empty : entry.Key.ToString();
+                    objectJson[entryKey] = entry.Value == null
                         ? new JsonData(JsonData.Type.None)
                         : FromObject(entry.Value, stack);
                 }
 
                 return objectJson;
+            }
+
+            // 其它可枚举类型（Stack / Queue / HashSet / LINQ 结果等）按数组序列化，
+            // 否则会退化成 {"Count":n,...} 这种错误结果。
+            // string 同样是 IEnumerable，但必须留给下面的字符串分支。
+            if (jsonObject is IEnumerable enumerable && !(jsonObject is string))
+            {
+                JsonData enumerableJson = new JsonData(JsonData.Type.Array);
+                foreach (object item in enumerable)
+                {
+                    enumerableJson.array.Add(item == null
+                        ? new JsonData(JsonData.Type.None)
+                        : FromObject(item, stack));
+                }
+
+                return enumerableJson;
             }
 
             // 枚举必须早于 Type.GetTypeCode 判断：枚举的 TypeCode 是其基础类型，
@@ -148,7 +179,7 @@ namespace DanKeJson.Json
             const BindingFlags flags = BindingFlags.Public | BindingFlags.Instance;
             foreach (MemberInfo member in type.GetFields(flags)
                 .Select<FieldInfo, MemberInfo>(f => f)
-                .Concat(type.GetProperties(flags)))
+                .Concat(type.GetProperties(flags).Where(p => p.GetIndexParameters().Length == 0)))
             {
                 object memberValue;
                 Type memberType;

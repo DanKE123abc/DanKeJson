@@ -84,9 +84,46 @@ namespace DanKeJson.Json5
                             }
 
                             break;
+                        // JSON5 扩展转义
+                        case 'x':
+                            if (TryReadHexEscape(json, ref index, 2, out char hexValue))
+                            {
+                                sb.Append(hexValue);
+                            }
+                            else
+                            {
+                                AppendVerbatimEscape(sb, json, index);
+                            }
+
+                            break;
+                        case 'v':
+                            sb.Append('\v');
+                            break;
+                        case '0':
+                            if (index >= json.Length || !char.IsDigit(json[index]))
+                            {
+                                sb.Append('\0');
+                            }
+                            else
+                            {
+                                AppendVerbatimEscape(sb, json, index);
+                            }
+
+                            break;
+                        case '\n':
+                        case '\u2028':
+                        case '\u2029':
+                            // 字符串续行：反斜杠与行终止符都被移除
+                            break;
+                        case '\r':
+                            if (index < json.Length && json[index] == '\n')
+                            {
+                                index++;
+                            }
+
+                            break;
                         default: // 未知转义序列保持原样
-                            sb.Append('\\');
-                            sb.Append(json[index - 1]);
+                            AppendVerbatimEscape(sb, json, index);
                             break;
                     }
                 }
@@ -182,7 +219,7 @@ namespace DanKeJson.Json5
             {
                 // 复用字符串解析：带引号的键名同样需要处理 \" \\ \uXXXX 等转义
                 JsonData keyNode = json[index] == '"'
-                    ? ToString_Double(json, ref index)
+                    ? ToString_Double(json, ref index, true)
                     : ToString_Single(json, ref index);
 
                 return keyNode == null ? null : JsonString.Unquote(keyNode.json);

@@ -500,7 +500,7 @@ namespace DanKeJson
 
         public bool HasKey(string key)
         {
-            if (map == null)
+            if (map == null || key == null)
             {
                 return false;
             }
@@ -512,7 +512,7 @@ namespace DanKeJson
         {
             get
             {
-                if (map == null)
+                if (map == null || key == null)
                 {
                     return null;
                 }
@@ -525,7 +525,7 @@ namespace DanKeJson
             }
             set
             {
-                if (map == null)
+                if (map == null || key == null)
                 {
                     return;
                 }

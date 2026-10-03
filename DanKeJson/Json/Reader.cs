@@ -23,6 +23,14 @@ namespace DanKeJson.Json
         
         public static JsonData ToString_Double(string json, ref int index)
         {
+            return ToString_Double(json, ref index, false);
+        }
+
+        /// <summary>
+        /// 解析双引号字符串。json5 为 true 时额外支持 \x、\v、\0、\' 转义与字符串续行。
+        /// </summary>
+        public static JsonData ToString_Double(string json, ref int index, bool json5)
+        {
             if (index < 0 || index >= json.Length || json[index] != '\"')
             {
                 return null;
@@ -90,9 +98,77 @@ namespace DanKeJson.Json
                             }
 
                             break;
+                        // 以下转义仅在 JSON5 中生效，纯 JSON 保持原样输出
+                        case 'x':
+                            if (json5 && TryReadHexEscape(json, ref index, 2, out char hexValue))
+                            {
+                                sb.Append(hexValue);
+                            }
+                            else
+                            {
+                                AppendVerbatimEscape(sb, json, index);
+                            }
+
+                            break;
+                        case 'v':
+                            if (json5)
+                            {
+                                sb.Append('\v');
+                            }
+                            else
+                            {
+                                AppendVerbatimEscape(sb, json, index);
+                            }
+
+                            break;
+                        case '0':
+                            if (json5 && (index >= json.Length || !char.IsDigit(json[index])))
+                            {
+                                sb.Append('\0');
+                            }
+                            else
+                            {
+                                AppendVerbatimEscape(sb, json, index);
+                            }
+
+                            break;
+                        case '\'':
+                            if (json5)
+                            {
+                                sb.Append('\'');
+                            }
+                            else
+                            {
+                                AppendVerbatimEscape(sb, json, index);
+                            }
+
+                            break;
+                        case '\n':
+                        case '\u2028':
+                        case '\u2029':
+                            // JSON5 字符串续行：反斜杠与行终止符都被移除
+                            if (!json5)
+                            {
+                                AppendVerbatimEscape(sb, json, index);
+                            }
+
+                            break;
+                        case '\r':
+                            if (json5)
+                            {
+                                if (index < json.Length && json[index] == '\n')
+                                {
+                                    index++;
+                                }
+                            }
+                            else
+                            {
+                                AppendVerbatimEscape(sb, json, index);
+                            }
+
+                            break;
                         default: // 未知转义序列保持原样
-                            sb.Append('\\');
-                            sb.Append(json[index - 1]);
+                            AppendVerbatimEscape(sb, json, index);
                             break;
                     }
                 }
@@ -106,6 +182,59 @@ namespace DanKeJson.Json
 
             // 6. 未找到结束引号（字符串未闭合）
             return null;
+        }
+
+        /// <summary>把未知转义序列原样写回（反斜杠 + 转义字符）。</summary>
+        internal static void AppendVerbatimEscape(StringBuilder sb, string json, int index)
+        {
+            sb.Append('\\');
+            sb.Append(json[index - 1]);
+        }
+
+        /// <summary>读取若干位十六进制数字；失败时不移动索引。</summary>
+        internal static bool TryReadHexEscape(string json, ref int index, int digits, out char value)
+        {
+            value = default;
+            if (index + digits > json.Length)
+            {
+                return false;
+            }
+
+            int code = 0;
+            for (int i = 0; i < digits; i++)
+            {
+                int digit = HexValue(json[index + i]);
+                if (digit < 0)
+                {
+                    return false;
+                }
+
+                code = (code << 4) | digit;
+            }
+
+            index += digits;
+            value = (char)code;
+            return true;
+        }
+
+        private static int HexValue(char c)
+        {
+            if (c >= '0' && c <= '9')
+            {
+                return c - '0';
+            }
+
+            if (c >= 'a' && c <= 'f')
+            {
+                return c - 'a' + 10;
+            }
+
+            if (c >= 'A' && c <= 'F')
+            {
+                return c - 'A' + 10;
+            }
+
+            return -1;
         }
 
 

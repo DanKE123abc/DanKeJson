@@ -160,4 +160,32 @@ namespace DanKeJson.Tests
     {
         public string text { get; set; }
     }
+
+    /// <summary>带公共索引器的实体类：索引器不应参与序列化与反序列化。</summary>
+    public class IndexerModel
+    {
+        private readonly string[] _items = { "a", "b" };
+
+        public string Name = "n";
+
+        public string this[int index]
+        {
+            get { return _items[index]; }
+            set { _items[index] = value; }
+        }
+    }
+
+    /// <summary>JsonData 与普通实体的集合成员。</summary>
+    public class JsonDataListModel
+    {
+        public List<JsonData> items;
+        public List<ItemModel> typed;
+    }
+
+    /// <summary>深层链式结构，用于嵌套深度上限测试。</summary>
+    public class ChainModel
+    {
+        public int v;
+        public ChainModel next;
+    }
 }

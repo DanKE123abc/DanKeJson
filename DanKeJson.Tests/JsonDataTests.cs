@@ -291,5 +291,17 @@ namespace DanKeJson.Tests
 
             Assert.Equal("[\"x\"]", array.json);
         }
+
+        [Fact]
+        public void NullKey_IsIgnoredInsteadOfThrowing()
+        {
+            JsonData data = JSON.ToData("{\"a\":1}");
+
+            Assert.False(data.HasKey(null));
+            Assert.Null(data[null]);
+
+            data[null] = (JsonData)2;
+            Assert.Equal("{\"a\":1}", data.json);
+        }
     }
 }

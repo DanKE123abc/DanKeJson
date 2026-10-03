@@ -155,5 +155,65 @@ namespace DanKeJson.Tests
 
             Assert.Equal("1\\n2\n", File.ReadAllText(path).Replace("\r\n", "\n"));
         }
+
+        [Fact]
+        public void ListToJson_NullElement_WritesJsonNull()
+        {
+            var list = new List<JsonData> { JSON.ToData("{\"a\":1}"), null };
+            string path = _fixture.Workspace.PathOf("nulls.jsonl");
+
+            string text = JSONL.ListToJson(list, path);
+
+            Assert.Equal("{\"a\":1}\nnull", text);
+            Assert.Equal("{\"a\":1}\nnull\n", File.ReadAllText(path).Replace("\r\n", "\n"));
+        }
+
+        [Fact]
+        public void ListToJson_WritesUtf8WithoutBomAndUsesLf()
+        {
+            string path = _fixture.Workspace.PathOf("bom.jsonl");
+
+            JSONL.ListToJson(new List<JsonData> { JSON.ToData("{\"a\":1}") }, path);
+
+            byte[] bytes = File.ReadAllBytes(path);
+
+            Assert.NotEqual(0xEF, bytes[0]);
+            Assert.Equal((byte)'{', bytes[0]);
+            Assert.Equal("{\"a\":1}\n", File.ReadAllText(path).Replace("\r\n", "\n"));
+        }
+
+        [Fact]
+        public void ListToJson_EmptyList_WritesEmptyFile()
+        {
+            string path = _fixture.Workspace.PathOf("empty.jsonl");
+
+            string text = JSONL.ListToJson(new List<JsonData>(), path);
+
+            Assert.Equal("", text);
+            Assert.Equal(0, new FileInfo(path).Length);
+        }
+
+        [Fact]
+        public void AllLineToData_SkipsUnparsableLines()
+        {
+            string path = _fixture.Workspace.WriteFile("broken.jsonl", "{\n  \"a\": 1\n}\nnot-json\n{\"b\":2}\n");
+
+            List<JsonData> lines = JSONL.AllLineToData(path);
+
+            Assert.Single(lines);
+            Assert.Equal(2, (int)lines[0]["b"]);
+        }
+
+        [Fact]
+        public void AllLineToDataGeneric_SkipsUnparsableLines()
+        {
+            string path = _fixture.Workspace.WriteFile("broken2.jsonl", "{\"name\":\"a\"}\nnot-json\n{\"name\":\"b\"}\n");
+
+            List<ItemModel> items = JSONL.AllLineToData<ItemModel>(path);
+
+            Assert.Equal(2, items.Count);
+            Assert.Equal("a", items[0].name);
+            Assert.Equal("b", items[1].name);
+        }
     }
 }
