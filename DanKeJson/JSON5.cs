@@ -54,6 +54,7 @@ namespace DanKeJson
                 return null;
             }
 
+            text = TextUtility.StripLeadingBom(text);
             text = CommentParser.RemoveComments(text);
             int index = 0;
             JsonData json = Deserializer.ProcessJson(text, ref index);
@@ -80,6 +81,7 @@ namespace DanKeJson
                 return default(T);
             }
 
+            text = TextUtility.StripLeadingBom(text);
             text = CommentParser.RemoveComments(text);
             int index = 0;
             JsonData json = Deserializer.ProcessJson(text, ref index);

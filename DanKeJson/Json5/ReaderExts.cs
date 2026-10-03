@@ -1,6 +1,7 @@
 ﻿using System.Globalization;
 using System.Text;
 using DanKeJson.Json;
+using DanKeJson.Utils;
 using static DanKeJson.Json.Reader;
 
 #pragma warning disable CS8603
@@ -101,6 +102,74 @@ namespace DanKeJson.Json5
             return null;
         }
 
+        //json5 十六进制数字（0x / 0X，可带正负号），不是十六进制时把索引还原并返回 null
+        public static JsonData ToNumberHex(string json, ref int index)
+        {
+            if (index < 0 || index >= json.Length)
+            {
+                return null;
+            }
+
+            int start = index;
+            bool negative = false;
+            if (json[index] == '+' || json[index] == '-')
+            {
+                negative = json[index] == '-';
+                index++;
+            }
+
+            if (index + 1 >= json.Length || json[index] != '0' ||
+                (json[index + 1] != 'x' && json[index + 1] != 'X'))
+            {
+                index = start;
+                return null;
+            }
+
+            index += 2;
+            int digitsStart = index;
+            while (index < json.Length && IsHexDigit(json[index]))
+            {
+                index++;
+            }
+
+            if (index == digitsStart)
+            {
+                index = start;
+                return null;
+            }
+
+            string digits = json.Substring(digitsStart, index - digitsStart);
+            if (!ulong.TryParse(digits, NumberStyles.HexNumber, CultureInfo.InvariantCulture, out ulong value))
+            {
+                index = start;
+                return null;
+            }
+
+            if (negative)
+            {
+                if (value > long.MaxValue)
+                {
+                    index = start;
+                    return null;
+                }
+
+                return new JsonData(JsonData.Type.Number)
+                {
+                    json = (-(long)value).ToString(CultureInfo.InvariantCulture)
+                };
+            }
+
+            return new JsonData(JsonData.Type.Number)
+            {
+                json = value.ToString(CultureInfo.InvariantCulture)
+            };
+        }
+
+        private static bool IsHexDigit(char c)
+        {
+            return (c >= '0' && c <= '9') || (c >= 'a' && c <= 'f') || (c >= 'A' && c <= 'F');
+        }
+
         //json5键名
         public static string ReadKey(string json, ref int index)
         {
@@ -111,20 +180,12 @@ namespace DanKeJson.Json5
 
             if (json[index] == '"' || json[index] == '\'') //键名有引号
             {
-                char quote = json[index];
-                index++;
-                int start = index;
-                while (index < json.Length && json[index] != quote)
-                {
-                    index++;
-                }
+                // 复用字符串解析：带引号的键名同样需要处理 \" \\ \uXXXX 等转义
+                JsonData keyNode = json[index] == '"'
+                    ? ToString_Double(json, ref index)
+                    : ToString_Single(json, ref index);
 
-                if (index >= json.Length)
-                {
-                    return null;
-                }
-
-                return json.Substring(start, index++ - start);
+                return keyNode == null ? null : JsonString.Unquote(keyNode.json);
             }
             else //键名无引号
             {

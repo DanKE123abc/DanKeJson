@@ -57,8 +57,12 @@ namespace DanKeJson.Json5
             }
             else if (cur == '-' || cur == '+' || char.IsDigit(cur) || cur == 'N' || cur == 'I')
             {
-                //Number
-                jsonData = ToNumber(json, ref index);
+                //Number（JSON5 额外支持 0x / 0X 十六进制字面量）
+                jsonData = ToNumberHex(json, ref index);
+                if (jsonData == null)
+                {
+                    jsonData = ToNumber(json, ref index);
+                }
             }
             else if (cur == '{')
             {

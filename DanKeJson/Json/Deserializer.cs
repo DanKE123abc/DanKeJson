@@ -11,6 +11,7 @@ using static DanKeJson.Json.Reader;
 #pragma warning disable CS8603
 #pragma warning disable CS8602
 #pragma warning disable CS8600
+#pragma warning disable CS8625
 #pragma warning disable CS1591
 
 namespace DanKeJson
@@ -70,6 +71,8 @@ namespace DanKeJson.Json
                 }
 
                 Type memberType = GetMemberType(member);
+                Type valueType = Nullable.GetUnderlyingType(memberType) ?? memberType;
+                bool isNullable = valueType != memberType;
                 string memberName = member.Name;
 
                 // 获取自定义特性的名称
@@ -91,7 +94,24 @@ namespace DanKeJson.Json
                     continue;
                 }
 
-                switch (Type.GetTypeCode(memberType))
+                // JSON null：可空成员保持 null，不写入值类型的默认值
+                if (isNullable && propertyJson.type == JsonData.Type.None)
+                {
+                    continue;
+                }
+
+                // 枚举：既支持数字，也支持名称（含 Flags 的逗号写法）
+                if (valueType.IsEnum)
+                {
+                    if (TryParseEnum(propertyJson, valueType, out object enumValue))
+                    {
+                        SetMemberValue(member, dataclass, enumValue);
+                    }
+
+                    continue;
+                }
+
+                switch (Type.GetTypeCode(valueType))
                 {
                     case TypeCode.String:
                         string stringValue = propertyJson;
@@ -116,6 +136,13 @@ namespace DanKeJson.Json
                     case TypeCode.Double:
                         double.TryParse(propertyJson.json, NumberStyles.Float, CultureInfo.InvariantCulture, out double doubleValue);
                         SetMemberValue(member, dataclass, doubleValue);
+                        break;
+                    case TypeCode.Byte:
+                        byte.TryParse(propertyJson.json, NumberStyles.Integer, CultureInfo.InvariantCulture, out byte byteValue);
+                        SetMemberValue(member, dataclass, byteValue);
+                        break;
+                    case TypeCode.Char:
+                        SetMemberValue(member, dataclass, CharFromJson(propertyJson));
                         break;
                     case TypeCode.SByte:
                         sbyte.TryParse(propertyJson.json, NumberStyles.Integer, CultureInfo.InvariantCulture, out sbyte sbyteValue);
@@ -146,40 +173,47 @@ namespace DanKeJson.Json
                         SetMemberValue(member, dataclass, dateTimeValue);
                         break;
                     default:
-                        if (memberType == typeof(TimeSpan))
+                        if (valueType == typeof(TimeSpan))
                         {
                             TimeSpan.TryParse(JsonString.Unquote(propertyJson.json), CultureInfo.InvariantCulture, out TimeSpan timeSpanValue);
                             SetMemberValue(member, dataclass, timeSpanValue);
                         }
-                        else if (memberType == typeof(Guid))
+                        else if (valueType == typeof(Guid))
                         {
                             Guid.TryParse(JsonString.Unquote(propertyJson.json), out Guid guidValue);
                             SetMemberValue(member, dataclass, guidValue);
                         }
-                        else if (memberType == typeof(DateTimeOffset))
+                        else if (valueType == typeof(DateTimeOffset))
                         {
                             DateTimeOffset.TryParse(JsonString.Unquote(propertyJson.json), CultureInfo.InvariantCulture, DateTimeStyles.RoundtripKind, out DateTimeOffset dateTimeOffsetValue);
                             SetMemberValue(member, dataclass, dateTimeOffsetValue);
                         }
-                        else if (memberType.IsGenericType && memberType.GetGenericTypeDefinition() == typeof(List<>))
+                        else if (valueType.IsGenericType && valueType.GetGenericTypeDefinition() == typeof(List<>))
                         {
                             if (propertyJson.type == JsonData.Type.Array)
                             {
-                                IList list = ListFromArray(propertyJson, memberType.GetGenericArguments()[0]);
+                                IList list = ListFromArray(propertyJson, valueType.GetGenericArguments()[0]);
                                 SetMemberValue(member, dataclass, list);
                             }
                         }
-                        else if (memberType.IsArray)
+                        else if (valueType.IsArray)
                         {
                             if (propertyJson.type == JsonData.Type.Array)
                             {
-                                Array array = ArrayFromJson(propertyJson, memberType.GetElementType());
+                                Array array = ArrayFromJson(propertyJson, valueType.GetElementType());
                                 SetMemberValue(member, dataclass, array);
+                            }
+                        }
+                        else if (valueType.IsGenericType && valueType.GetGenericTypeDefinition() == typeof(Dictionary<,>))
+                        {
+                            if (propertyJson.type == JsonData.Type.Object)
+                            {
+                                SetMemberValue(member, dataclass, DictionaryFromJson(propertyJson, valueType));
                             }
                         }
                         else if (propertyJson.type == JsonData.Type.Object)
                         {
-                            SetMemberValue(member, dataclass, FromJson(propertyJson, memberType));
+                            SetMemberValue(member, dataclass, FromJson(propertyJson, valueType));
                         }
                         break;
                 }
@@ -229,6 +263,271 @@ namespace DanKeJson.Json
             else if (member is FieldInfo fieldInfo)
             {
                 fieldInfo.SetValue(instance, value);
+            }
+        }
+
+        /// <summary>
+        /// 解析枚举成员：JSON 数字（按基础类型转换）与 JSON 字符串（名称，含 Flags 的逗号写法）都支持。
+        /// </summary>
+        private static bool TryParseEnum(JsonData json, Type enumType, out object value)
+        {
+            value = null;
+            if (json == null)
+            {
+                return false;
+            }
+
+            if (json.type == JsonData.Type.String)
+            {
+                string text = JsonString.Unquote(json.json);
+                if (string.IsNullOrEmpty(text))
+                {
+                    return false;
+                }
+
+                try
+                {
+                    value = Enum.Parse(enumType, text, true);
+                    return true;
+                }
+                catch (ArgumentException)
+                {
+                    return false;
+                }
+                catch (OverflowException)
+                {
+                    return false;
+                }
+            }
+
+            if (json.type == JsonData.Type.Number)
+            {
+                try
+                {
+                    object numeric = Convert.ChangeType(json.json, Enum.GetUnderlyingType(enumType), CultureInfo.InvariantCulture);
+                    value = Enum.ToObject(enumType, numeric);
+                    return true;
+                }
+                catch (FormatException)
+                {
+                    return false;
+                }
+                catch (OverflowException)
+                {
+                    return false;
+                }
+                catch (InvalidCastException)
+                {
+                    return false;
+                }
+            }
+
+            return false;
+        }
+
+        private static char CharFromJson(JsonData json)
+        {
+            if (json == null)
+            {
+                return default;
+            }
+
+            if (json.type == JsonData.Type.Number)
+            {
+                return int.TryParse(json.json, NumberStyles.Integer, CultureInfo.InvariantCulture, out int code)
+                    ? (char)code
+                    : default;
+            }
+
+            string text = JsonString.Unquote(json.json);
+            return string.IsNullOrEmpty(text) ? default : text[0];
+        }
+
+        /// <summary>
+        /// 把单个 JsonData 值转换为指定类型，用于字典值等容器的元素转换。
+        /// </summary>
+        private static object ValueFromJson(JsonData json, Type type)
+        {
+            Type target = Nullable.GetUnderlyingType(type) ?? type;
+
+            if (json == null || json.type == JsonData.Type.None)
+            {
+                return type.IsValueType && Nullable.GetUnderlyingType(type) == null
+                    ? Activator.CreateInstance(type)
+                    : null;
+            }
+
+            if (target.IsEnum)
+            {
+                return TryParseEnum(json, target, out object enumValue)
+                    ? enumValue
+                    : Activator.CreateInstance(target);
+            }
+
+            switch (Type.GetTypeCode(target))
+            {
+                case TypeCode.String:
+                    return (string)json;
+                case TypeCode.Boolean:
+                    bool.TryParse(json.json, out bool boolValue);
+                    return boolValue;
+                case TypeCode.Char:
+                    return CharFromJson(json);
+                case TypeCode.Byte:
+                    byte.TryParse(json.json, NumberStyles.Integer, CultureInfo.InvariantCulture, out byte byteValue);
+                    return byteValue;
+                case TypeCode.SByte:
+                    sbyte.TryParse(json.json, NumberStyles.Integer, CultureInfo.InvariantCulture, out sbyte sbyteValue);
+                    return sbyteValue;
+                case TypeCode.Int16:
+                    short.TryParse(json.json, NumberStyles.Integer, CultureInfo.InvariantCulture, out short shortValue);
+                    return shortValue;
+                case TypeCode.UInt16:
+                    ushort.TryParse(json.json, NumberStyles.Integer, CultureInfo.InvariantCulture, out ushort ushortValue);
+                    return ushortValue;
+                case TypeCode.Int32:
+                    int.TryParse(json.json, NumberStyles.Integer, CultureInfo.InvariantCulture, out int intValue);
+                    return intValue;
+                case TypeCode.UInt32:
+                    uint.TryParse(json.json, NumberStyles.Integer, CultureInfo.InvariantCulture, out uint uintValue);
+                    return uintValue;
+                case TypeCode.Int64:
+                    long.TryParse(json.json, NumberStyles.Integer, CultureInfo.InvariantCulture, out long longValue);
+                    return longValue;
+                case TypeCode.UInt64:
+                    ulong.TryParse(json.json, NumberStyles.Integer, CultureInfo.InvariantCulture, out ulong ulongValue);
+                    return ulongValue;
+                case TypeCode.Single:
+                    float.TryParse(json.json, NumberStyles.Float, CultureInfo.InvariantCulture, out float floatValue);
+                    return floatValue;
+                case TypeCode.Double:
+                    double.TryParse(json.json, NumberStyles.Float, CultureInfo.InvariantCulture, out double doubleValue);
+                    return doubleValue;
+                case TypeCode.Decimal:
+                    decimal.TryParse(JsonString.Unquote(json.json), NumberStyles.Float, CultureInfo.InvariantCulture, out decimal decimalValue);
+                    return decimalValue;
+                case TypeCode.DateTime:
+                    DateTime.TryParse(JsonString.Unquote(json.json), CultureInfo.InvariantCulture, DateTimeStyles.RoundtripKind, out DateTime dateTimeValue);
+                    return dateTimeValue;
+                default:
+                    if (target == typeof(Guid))
+                    {
+                        Guid.TryParse(JsonString.Unquote(json.json), out Guid guidValue);
+                        return guidValue;
+                    }
+
+                    if (target == typeof(TimeSpan))
+                    {
+                        TimeSpan.TryParse(JsonString.Unquote(json.json), CultureInfo.InvariantCulture, out TimeSpan timeSpanValue);
+                        return timeSpanValue;
+                    }
+
+                    if (target == typeof(DateTimeOffset))
+                    {
+                        DateTimeOffset.TryParse(JsonString.Unquote(json.json), CultureInfo.InvariantCulture, DateTimeStyles.RoundtripKind, out DateTimeOffset offsetValue);
+                        return offsetValue;
+                    }
+
+                    if (json.type == JsonData.Type.Array)
+                    {
+                        if (target.IsArray)
+                        {
+                            return ArrayFromJson(json, target.GetElementType());
+                        }
+
+                        if (target.IsGenericType && target.GetGenericTypeDefinition() == typeof(List<>))
+                        {
+                            return ListFromArray(json, target.GetGenericArguments()[0]);
+                        }
+                    }
+
+                    if (json.type == JsonData.Type.Object)
+                    {
+                        if (target.IsGenericType && target.GetGenericTypeDefinition() == typeof(Dictionary<,>))
+                        {
+                            return DictionaryFromJson(json, target);
+                        }
+
+                        return FromJson(json, target);
+                    }
+
+                    return null;
+            }
+        }
+
+        private static IDictionary DictionaryFromJson(JsonData json, Type dictionaryType)
+        {
+            IDictionary dictionary = (IDictionary)Activator.CreateInstance(dictionaryType);
+            if (json == null || json.map == null)
+            {
+                return dictionary;
+            }
+
+            Type[] arguments = dictionaryType.GetGenericArguments();
+            Type keyType = arguments[0];
+            Type valueType = arguments[1];
+
+            foreach (KeyValuePair<string, JsonData> pair in json.map)
+            {
+                if (!TryConvertKey(pair.Key, keyType, out object key))
+                {
+                    continue;
+                }
+
+                dictionary[key] = ValueFromJson(pair.Value, valueType);
+            }
+
+            return dictionary;
+        }
+
+        private static bool TryConvertKey(string key, Type keyType, out object value)
+        {
+            value = null;
+            Type target = Nullable.GetUnderlyingType(keyType) ?? keyType;
+
+            if (target == typeof(string))
+            {
+                value = key;
+                return true;
+            }
+
+            if (key == null)
+            {
+                return false;
+            }
+
+            try
+            {
+                if (target.IsEnum)
+                {
+                    value = Enum.Parse(target, key, true);
+                    return true;
+                }
+
+                if (target == typeof(Guid))
+                {
+                    value = Guid.Parse(key);
+                    return true;
+                }
+
+                value = Convert.ChangeType(key, target, CultureInfo.InvariantCulture);
+                return true;
+            }
+            catch (FormatException)
+            {
+                return false;
+            }
+            catch (OverflowException)
+            {
+                return false;
+            }
+            catch (InvalidCastException)
+            {
+                return false;
+            }
+            catch (ArgumentException)
+            {
+                return false;
             }
         }
 

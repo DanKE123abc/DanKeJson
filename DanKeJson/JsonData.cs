@@ -155,6 +155,18 @@ namespace DanKeJson
             return jsonData.json[1..^1];
         }
 
+        /// <summary>
+        /// char 按字符串处理（与 System.Text.Json / Newtonsoft.Json 一致），
+        /// 否则会经由 int 隐式转换变成字符编码。
+        /// </summary>
+        public static implicit operator JsonData(char value)
+        {
+            return new JsonData(Type.String)
+            {
+                json = "\"" + value + "\""
+            };
+        }
+
         #endregion
 
         #region bool
@@ -191,7 +203,7 @@ namespace DanKeJson
 
         public static implicit operator int(JsonData jsonData)
         {
-            if (jsonData == null || jsonData.type != Type.Number || !int.TryParse(jsonData.json, out int value))
+            if (jsonData == null || jsonData.type != Type.Number || !int.TryParse(jsonData.json, NumberStyles.Integer, CultureInfo.InvariantCulture, out int value))
             {
                 return default;
             }
@@ -213,7 +225,7 @@ namespace DanKeJson
 
         public static implicit operator long(JsonData jsonData)
         {
-            if (jsonData == null || jsonData.type != Type.Number || !long.TryParse(jsonData.json, out long value))
+            if (jsonData == null || jsonData.type != Type.Number || !long.TryParse(jsonData.json, NumberStyles.Integer, CultureInfo.InvariantCulture, out long value))
             {
                 return default;
             }
@@ -272,7 +284,7 @@ namespace DanKeJson
             {
                 return float.NegativeInfinity;
             }
-            if (float.TryParse(jsonData.json, out float value))
+            if (float.TryParse(jsonData.json, NumberStyles.Float, CultureInfo.InvariantCulture, out float value))
             {
                 return value;
             }
@@ -330,7 +342,7 @@ namespace DanKeJson
             {
                 return double.NegativeInfinity;
             }
-            if (double.TryParse(jsonData.json, out double value))
+            if (double.TryParse(jsonData.json, NumberStyles.Float, CultureInfo.InvariantCulture, out double value))
             {
                 return value;
             }
@@ -351,7 +363,7 @@ namespace DanKeJson
 
         public static implicit operator sbyte(JsonData jsonData)
         {
-            if (jsonData == null || jsonData.type != Type.Number || !sbyte.TryParse(jsonData.json, out sbyte value))
+            if (jsonData == null || jsonData.type != Type.Number || !sbyte.TryParse(jsonData.json, NumberStyles.Integer, CultureInfo.InvariantCulture, out sbyte value))
             {
                 return default;
             }
@@ -373,7 +385,7 @@ namespace DanKeJson
 
         public static implicit operator short(JsonData jsonData)
         {
-            if (jsonData == null || jsonData.type != Type.Number || !short.TryParse(jsonData.json, out short value))
+            if (jsonData == null || jsonData.type != Type.Number || !short.TryParse(jsonData.json, NumberStyles.Integer, CultureInfo.InvariantCulture, out short value))
             {
                 return default;
             }
@@ -395,7 +407,7 @@ namespace DanKeJson
 
         public static implicit operator uint(JsonData jsonData)
         {
-            if (jsonData == null || jsonData.type != Type.Number || !uint.TryParse(jsonData.json, out uint value))
+            if (jsonData == null || jsonData.type != Type.Number || !uint.TryParse(jsonData.json, NumberStyles.Integer, CultureInfo.InvariantCulture, out uint value))
             {
                 return default;
             }
@@ -417,7 +429,7 @@ namespace DanKeJson
 
         public static implicit operator ulong(JsonData jsonData)
         {
-            if (jsonData == null || jsonData.type != Type.Number || !ulong.TryParse(jsonData.json, out ulong value))
+            if (jsonData == null || jsonData.type != Type.Number || !ulong.TryParse(jsonData.json, NumberStyles.Integer, CultureInfo.InvariantCulture, out ulong value))
             {
                 return default;
             }
@@ -439,7 +451,7 @@ namespace DanKeJson
 
         public static implicit operator ushort(JsonData jsonData)
         {
-            if (jsonData == null || jsonData.type != Type.Number || !ushort.TryParse(jsonData.json, out ushort value))
+            if (jsonData == null || jsonData.type != Type.Number || !ushort.TryParse(jsonData.json, NumberStyles.Integer, CultureInfo.InvariantCulture, out ushort value))
             {
                 return default;
             }

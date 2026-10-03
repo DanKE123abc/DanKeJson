@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using DanKeJson.Json;
+using DanKeJson.Utils;
 
 #pragma warning disable CS8603
 
@@ -28,6 +29,8 @@ namespace DanKeJson
                 return null;
             }
 
+            text = TextUtility.StripLeadingBom(text);
+
             int index = 0;
             JsonData json = Deserializer.ProcessJson(text, ref index);
             if (index == text.Length)
@@ -51,6 +54,8 @@ namespace DanKeJson
             {
                 return default(T);
             }
+
+            text = TextUtility.StripLeadingBom(text);
 
             int index = 0;
             JsonData json = Deserializer.ProcessJson(text, ref index);

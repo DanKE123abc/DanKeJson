@@ -11,6 +11,7 @@ using DanKeJson.Utils;
 #pragma warning disable CS8603
 #pragma warning disable CS8602
 #pragma warning disable CS8600
+#pragma warning disable CS8601
 #pragma warning disable CS1591
 
 namespace DanKeJson.Json
@@ -62,9 +63,19 @@ namespace DanKeJson.Json
                 return objectJson;
             }
 
+            // 枚举必须早于 Type.GetTypeCode 判断：枚举的 TypeCode 是其基础类型，
+            // 否则会落到整数分支并输出成员名（如 Blue），产生非法 JSON。
+            if (type.IsEnum)
+            {
+                object underlyingValue = Convert.ChangeType(jsonObject, Enum.GetUnderlyingType(type), CultureInfo.InvariantCulture);
+                return new JsonData(JsonData.Type.Number)
+                    { json = Convert.ToString(underlyingValue, CultureInfo.InvariantCulture) };
+            }
+
             switch (Type.GetTypeCode(type))
             {
                 case TypeCode.String:
+                case TypeCode.Char:
                     return new JsonData(JsonData.Type.String)
                         { json = "\"" + jsonObject + "\"" };
                 case TypeCode.Boolean:
@@ -114,12 +125,6 @@ namespace DanKeJson.Json
             if (type == typeof(JsonData))
             {
                 return (JsonData)jsonObject;
-            }
-
-            if (type.IsEnum)
-            {
-                object underlying = Convert.ChangeType(jsonObject, Enum.GetUnderlyingType(type), CultureInfo.InvariantCulture);
-                return new JsonData(JsonData.Type.Number) { json = underlying.ToString() };
             }
 
             // 循环引用检测（仅引用类型）

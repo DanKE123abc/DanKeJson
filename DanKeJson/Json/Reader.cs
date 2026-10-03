@@ -1,5 +1,6 @@
 ﻿using System.Globalization;
 using System.Text;
+using DanKeJson.Utils;
 
 #pragma warning disable CS8603
 
@@ -285,18 +286,14 @@ namespace DanKeJson.Json
                     return null;
                 }
 
-                int keyIndex = index++;
-                while (index < json.Length && json[index] != '"')
-                {
-                    index++;
-                }
-
-                if (index >= json.Length)
+                // 复用字符串解析：键名同样需要处理 \" \\ \uXXXX 等转义
+                JsonData keyNode = ToString_Double(json, ref index);
+                if (keyNode == null)
                 {
                     return null;
                 }
 
-                string key = json[(keyIndex + 1)..(index++)];
+                string key = JsonString.Unquote(keyNode.json);
                 if (obj.HasKey(key))
                 {
                     return null;
