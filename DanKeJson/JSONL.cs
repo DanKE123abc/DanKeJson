@@ -102,6 +102,10 @@ namespace DanKeJson
         /// <param name="jsonDataList">the JsonData list</param>
         /// <param name="filePath">the output file path</param>
         /// <returns></returns>
+        /// <remarks>
+        /// 指定 filePath 时按行写入：UTF-8 无 BOM、行分隔符为 \n（与返回值一致），
+        /// 列表中的 null 元素写成 JSON 的 null；目标目录必须已存在，否则抛出 DirectoryNotFoundException。
+        /// </remarks>
         public static string ListToJson(List<JsonData> jsonDataList, string filePath = null)
         {
             if (jsonDataList == null)
@@ -138,6 +142,10 @@ namespace DanKeJson
         /// <param name="filePath">the output file path</param>
         /// <typeparam name="T">Class</typeparam>
         /// <returns></returns>
+        /// <remarks>
+        /// 指定 filePath 时按行写入：UTF-8 无 BOM、行分隔符为 \n（与返回值一致），
+        /// 列表中的 null 元素写成 JSON 的 null；目标目录必须已存在，否则抛出 DirectoryNotFoundException。
+        /// </remarks>
         public static string ListToJson<T>(List<T> jsonDataList, string filePath = null) where T : class, new()
         {
             if (jsonDataList == null)

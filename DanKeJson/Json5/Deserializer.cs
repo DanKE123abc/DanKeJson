@@ -56,13 +56,13 @@ namespace DanKeJson.Json5
                 //Boolean
                 jsonData = ToBoolean(json, ref index);
             }
-            else if (cur == '-' || cur == '+' || char.IsDigit(cur) || cur == 'N' || cur == 'I')
+            else if (cur == '-' || cur == '+' || cur == '.' || char.IsDigit(cur) || cur == 'N' || cur == 'I')
             {
-                //Number（JSON5 额外支持 0x / 0X 十六进制字面量）
+                //Number（JSON5 额外支持 0x / 0X 十六进制、.5 / 5. 写法）
                 jsonData = ToNumberHex(json, ref index);
                 if (jsonData == null)
                 {
-                    jsonData = ToNumber(json, ref index);
+                    jsonData = ToNumber(json, ref index, true);
                 }
             }
             else if (cur == '{')

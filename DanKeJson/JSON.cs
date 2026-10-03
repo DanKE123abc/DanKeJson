@@ -48,6 +48,11 @@ namespace DanKeJson
         /// <param name="text">the JsonText</param>
         /// <typeparam name="T">Class</typeparam>
         /// <returns>T Class</returns>
+        /// <remarks>
+        /// 成员按名称精确匹配（区分大小写，不做忽略大小写的匹配），
+        /// 且不做类型强转：JSON 字符串不会自动转换成数字或布尔成员，类型不匹配时成员保持默认值。
+        /// 需要自定义键名时使用 <see cref="JsonProperty"/>。
+        /// </remarks>
         public static T ToData<T>(string text) where T : class, new()
         {
             if (text == null)
@@ -112,6 +117,10 @@ namespace DanKeJson
         /// </summary>
         /// <param name="jsonObject">object instantiated by the class</param>
         /// <returns>Json(String)</returns>
+        /// <remarks>
+        /// NaN / Infinity 无法用 JSON 表示，按 JSON.stringify 的做法输出为 null
+        /// （JSON5 支持这些字面量，JSON5.ToJson 会保留原样）。
+        /// </remarks>
         public static string ToJson(object jsonObject)
         {
             if (jsonObject == null)

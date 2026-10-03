@@ -261,6 +261,15 @@ namespace DanKeJson.Json
 
         public static JsonData ToNumber(string json, ref int index)
         {
+            return ToNumber(json, ref index, false);
+        }
+
+        /// <summary>
+        /// 解析数字。json5 为 true 时额外允许省略整数部分（.5）或小数部分（5.）的写法。
+        /// 无论哪种写法，最终保存的都是规范化后的合法 JSON 数字（如 0.5、5）。
+        /// </summary>
+        public static JsonData ToNumber(string json, ref int index, bool json5)
+        {
             if (index < 0 || index >= json.Length)
             {
                 return null;
@@ -302,65 +311,105 @@ namespace DanKeJson.Json
                 hasNumber = true;
             }
 
+            bool leadingPoint = false;
             if (!hasNumber)
             {
-                return null;
-            }
-
-            if (index >= json.Length || (json[index] != '.' &&
-                                         json[index] != 'e' &&
-                                         json[index] != 'E'))
-            {
-                return new JsonData(JsonData.Type.Number)
+                // JSON5 允许省略整数部分：.5
+                if (json5 && index < json.Length && json[index] == '.')
                 {
-                    json = json[start..index]
-                };
+                    leadingPoint = true;
+                }
+                else
+                {
+                    return null;
+                }
             }
 
-            if (json[index] == '.')
+            if (index < json.Length && json[index] == '.')
             {
-                int pointIndex = index++;
+                index++;
+                int fractionStart = index;
                 while (index < json.Length && char.IsDigit(json[index]))
                 {
                     index++;
                 }
 
-                if (index == pointIndex + 1)
+                bool hasFraction = index > fractionStart;
+
+                // 纯 JSON 必须写出小数位；JSON5 允许 "5."，但不允许只有小数点（如 ".e3"）
+                if ((!hasFraction && !json5) || (!hasFraction && leadingPoint))
                 {
                     return null;
                 }
+            }
 
-                if (index >= json.Length || (json[index] != 'e' && json[index] != 'E'))
+            if (index < json.Length && (json[index] == 'e' || json[index] == 'E'))
+            {
+                index++;
+                if (index < json.Length && (json[index] == '+' || json[index] == '-'))
                 {
-                    return new JsonData(JsonData.Type.Number)
-                    {
-                        json = json[start..index]
-                    };
+                    index++;
                 }
 
-            }
+                int exponentStart = index;
+                while (index < json.Length && char.IsDigit(json[index]))
+                {
+                    index++;
+                }
 
-            int eIndex = index++;
-            if (index < json.Length && (json[index] == '+' || json[index] == '-'))
-            {
-                index++;
-            }
-
-            while (index < json.Length && char.IsDigit(json[index]))
-            {
-                index++;
-            }
-
-            if (index == eIndex + 1)
-            {
-                return null;
+                if (index == exponentStart)
+                {
+                    return null;
+                }
             }
 
             return new JsonData(JsonData.Type.Number)
             {
-                json = json[start..index]
+                json = NormalizeNumber(json[start..index])
             };
+        }
 
+        /// <summary>
+        /// 把解析到的数字字面量规范化成合法 JSON 数字：
+        /// 去掉多余的前导零（007 → 7），把 .5 补成 0.5，把 5. / 5.e3 写成 5 / 5e3。
+        /// </summary>
+        internal static string NormalizeNumber(string literal)
+        {
+            if (string.IsNullOrEmpty(literal))
+            {
+                return literal;
+            }
+
+            string sign = string.Empty;
+            string body = literal;
+            if (body[0] == '-' || body[0] == '+')
+            {
+                sign = body[0] == '-' ? "-" : string.Empty;
+                body = body.Substring(1);
+            }
+
+            int firstMeaningful = 0;
+            while (firstMeaningful + 1 < body.Length &&
+                   body[firstMeaningful] == '0' &&
+                   char.IsDigit(body[firstMeaningful + 1]))
+            {
+                firstMeaningful++;
+            }
+
+            body = body.Substring(firstMeaningful);
+
+            if (body.StartsWith("."))
+            {
+                body = "0" + body;
+            }
+
+            body = body.Replace(".e", "e").Replace(".E", "E");
+            if (body.EndsWith("."))
+            {
+                body = body.Substring(0, body.Length - 1);
+            }
+
+            return sign + body;
         }
 
         public static JsonData ToObject(string json, ref int index)

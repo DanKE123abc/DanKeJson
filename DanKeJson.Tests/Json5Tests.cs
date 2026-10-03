@@ -257,6 +257,36 @@ namespace DanKeJson.Tests
         }
 
         [Fact]
+        public void ToJson_KeepsNaNAndInfinity()
+        {
+            // JSON5 支持这些字面量，因此不像 JSON 那样退化成 null
+            Assert.Equal("{\"d\":NaN,\"f\":0}", JSON5.ToJson(new DoubleModel { d = double.NaN }));
+            Assert.Equal("{\"d\":Infinity,\"f\":0}", JSON5.ToJson(new DoubleModel { d = double.PositiveInfinity }));
+            Assert.True(double.IsNaN(JSON5.ToData<DoubleModel>("{d:NaN}").d));
+        }
+
+        [Fact]
+        public void ToData_LeadingAndTrailingDecimalPoint()
+        {
+            Assert.Equal("0.5", JSON5.ToData("{a:.5}")["a"].json);
+            Assert.Equal("5", JSON5.ToData("{a:5.}")["a"].json);
+            Assert.Equal("-0.5", JSON5.ToData("{a:-.5}")["a"].json);
+            Assert.Equal("0.5e1", JSON5.ToData("{a:.5e1}")["a"].json);
+            Assert.Equal("5e3", JSON5.ToData("{a:5.e3}")["a"].json);
+
+            Assert.Null(JSON5.ToData("{a:.e3}"));
+            Assert.Null(JSON5.ToData("{a:.}"));
+        }
+
+        [Fact]
+        public void ToData_EscapedIdentifierInUnquotedKey()
+        {
+            Assert.Equal(1, (int)JSON5.ToData("{\\u0061bc:1}")["abc"]);
+            Assert.Equal(1, (int)JSON5.ToData("{$\\u0061:1}")["$a"]);
+            Assert.Null(JSON5.ToData("{\\u00zz:1}"));
+        }
+
+        [Fact]
         public void ToData_UnquotedKeyWithDollar()
         {
             var withoutQuotes = new Json5Options { KeyNameStyle = Json5Options.KeyNameType.WithoutQuotes };

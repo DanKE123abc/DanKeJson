@@ -25,12 +25,16 @@ namespace DanKeJson.Tests
         [InlineData("-12.5", "-12.5")]
         [InlineData("0", "0")]
         [InlineData("-0", "-0")]
-        [InlineData("01", "01")]
         [InlineData("1e3", "1e3")]
         [InlineData("1.5e-3", "1.5e-3")]
         [InlineData("1E+3", "1E+3")]
         [InlineData("+5", "5")]
-        public void ToData_Number_KeepsLiteral(string text, string expectedJson)
+        // 前导零会被规范化，保证再序列化时仍是合法 JSON
+        [InlineData("01", "1")]
+        [InlineData("-01", "-1")]
+        [InlineData("007", "7")]
+        [InlineData("00.5", "0.5")]
+        public void ToData_Number_NormalizesLiteral(string text, string expectedJson)
         {
             JsonData data = JSON.ToData(text);
 

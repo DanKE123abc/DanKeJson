@@ -193,6 +193,16 @@ namespace DanKeJson.Tests
             Assert.Equal(0, new FileInfo(path).Length);
         }
 
+        /// <summary>写文件要求目标目录已存在，否则按 .NET 惯例抛出异常。</summary>
+        [Fact]
+        public void ListToJson_MissingDirectory_Throws()
+        {
+            string path = Path.Combine(_fixture.Workspace.PathOf("no-such-dir"), "x.jsonl");
+
+            Assert.Throws<DirectoryNotFoundException>(
+                () => JSONL.ListToJson(new List<JsonData> { JSON.ToData("{\"a\":1}") }, path));
+        }
+
         [Fact]
         public void AllLineToData_SkipsUnparsableLines()
         {

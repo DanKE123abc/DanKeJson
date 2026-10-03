@@ -648,6 +648,19 @@ namespace DanKeJson.Json
         /// </summary>
         private static object ObjectFromJson(JsonData json)
         {
+            DepthGuard.Enter();
+            try
+            {
+                return ObjectFromJsonCore(json);
+            }
+            finally
+            {
+                DepthGuard.Exit();
+            }
+        }
+
+        private static object ObjectFromJsonCore(JsonData json)
+        {
             if (json == null || json.type == JsonData.Type.None)
             {
                 return null;

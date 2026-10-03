@@ -106,6 +106,25 @@ namespace DanKeJson.Tests
             Assert.Equal(1, (int)JSON.ToData("{\"a\":1}")["a"]);
         }
 
+        /// <summary>手工构造的深层 JsonData（绕过解析器）同样受深度上限保护。</summary>
+        [Fact]
+        public void Deserialize_DeepHandBuiltJsonData_Throws()
+        {
+            JsonData node = new JsonData(JsonData.Type.Number) { json = "1" };
+            for (int i = 0; i < 2000; i++)
+            {
+                JsonData wrapper = new JsonData(JsonData.Type.Object);
+                wrapper["a"] = node;
+                node = wrapper;
+            }
+
+            JsonData root = new JsonData(JsonData.Type.Object);
+            root["anything"] = node;
+
+            Assert.Throws<JsonDepthLimitException>(
+                () => DanKeJson.Json.Deserializer.FromJson(root, typeof(DynamicModel)));
+        }
+
         [Fact]
         public void MaxDepth_IsConfigurable()
         {

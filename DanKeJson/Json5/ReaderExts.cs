@@ -224,21 +224,41 @@ namespace DanKeJson.Json5
 
                 return keyNode == null ? null : JsonString.Unquote(keyNode.json);
             }
-            else //键名无引号：JSON5 的 IdentifierName（字母、数字、_、$）
+            else //键名无引号：JSON5 的 IdentifierName（字母、数字、_、$，支持 \uXXXX 转义）
             {
-                int start = index;
-                while (index < json.Length &&
-                       (char.IsLetterOrDigit(json[index]) || json[index] == '_' || json[index] == '$'))
+                StringBuilder builder = new StringBuilder();
+                while (index < json.Length)
                 {
-                    index++;
+                    char c = json[index];
+                    if (char.IsLetterOrDigit(c) || c == '_' || c == '$')
+                    {
+                        builder.Append(c);
+                        index++;
+                        continue;
+                    }
+
+                    if (c == '\\' && index + 1 < json.Length && json[index + 1] == 'u')
+                    {
+                        int escapeStart = index;
+                        index += 2;
+                        if (TryReadHexEscape(json, ref index, 4, out char escaped))
+                        {
+                            builder.Append(escaped);
+                            continue;
+                        }
+
+                        index = escapeStart;
+                    }
+
+                    break;
                 }
 
-                if (start == index)
+                if (builder.Length == 0)
                 {
                     return null; // Empty key
                 }
 
-                return json.Substring(start, index - start);
+                return builder.ToString();
             }
         }
         

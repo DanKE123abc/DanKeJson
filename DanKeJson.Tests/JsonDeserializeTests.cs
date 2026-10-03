@@ -431,6 +431,14 @@ namespace DanKeJson.Tests
         }
 
         [Fact]
+        public void ToData_DoesNotCoerceStringsToNumbers()
+        {
+            // 成员按名称精确匹配，且不做类型强转：字符串形式的数字不会写入数字成员
+            Assert.Equal(0, JSON.ToData<AllTypesModel>("{\"i\":\"5\"}").i);
+            Assert.Equal(5, JSON.ToData<AllTypesModel>("{\"i\":5}").i);
+        }
+
+        [Fact]
         public void ToData_SetterException_IsNotWrapped()
         {
             InvalidOperationException ex = Assert.Throws<InvalidOperationException>(

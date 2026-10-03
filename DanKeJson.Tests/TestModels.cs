@@ -233,6 +233,13 @@ namespace DanKeJson.Tests
         public object anything;
     }
 
+    /// <summary>double / float 成员，用于 NaN / Infinity 行为测试。</summary>
+    public class DoubleModel
+    {
+        public double d;
+        public float f;
+    }
+
     /// <summary>集合接口成员：应映射到 List&lt;T&gt; / Dictionary&lt;K,V&gt;。</summary>
     public class InterfaceCollectionsModel
     {

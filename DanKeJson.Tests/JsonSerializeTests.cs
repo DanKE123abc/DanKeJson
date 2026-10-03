@@ -289,5 +289,24 @@ namespace DanKeJson.Tests
         {
             Assert.Equal("\"System.String\"", JSON.ToJson(typeof(string)));
         }
+
+        [Fact]
+        public void ToJson_NonFiniteNumbers_BecomeNull()
+        {
+            // JSON 无法表示 NaN / Infinity，按 JSON.stringify 的做法输出 null
+            Assert.Equal("{\"d\":null,\"f\":0}", JSON.ToJson(new DoubleModel { d = double.NaN }));
+            Assert.Equal("{\"d\":null,\"f\":0}", JSON.ToJson(new DoubleModel { d = double.PositiveInfinity }));
+            Assert.Equal("{\"d\":null,\"f\":0}", JSON.ToJson(new DoubleModel { d = double.NegativeInfinity }));
+            Assert.Equal("null", JSON.ToJson(double.NaN));
+            Assert.Equal("{\"x\":null}", JSON.ToJson(new Dictionary<string, object> { { "x", double.NegativeInfinity } }));
+        }
+
+        [Fact]
+        public void ToJson_ReflectionObjects_AreStrings()
+        {
+            Assert.Equal("\"System.String ToString()\"",
+                JSON.ToJson(typeof(string).GetMethod("ToString", Type.EmptyTypes)));
+            Assert.Equal("{\"t\":\"System.Int32\"}", JSON.ToJson(new { t = typeof(int) }));
+        }
     }
 }

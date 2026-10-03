@@ -49,11 +49,11 @@ namespace DanKeJson.Json
 
             System.Type type = jsonObject.GetType();
 
-            // Type 自身：反射成员会抛异常，直接按类型名输出成字符串
-            // （必须早于下面的 IEnumerable 分支，RuntimeType 本身是可枚举的）
-            if (jsonObject is Type jsonType)
+            // 反射对象（Type / MemberInfo / Assembly / Module）的成员图又深又互相引用，
+            // 直接按文本输出，避免误报循环引用或抛出难以理解的反射异常
+            if (IsReflectionObject(jsonObject))
             {
-                return new JsonData(JsonData.Type.String) { json = "\"" + jsonType + "\"" };
+                return new JsonData(JsonData.Type.String) { json = "\"" + jsonObject + "\"" };
             }
 
             // 数组 / 列表（List<T>、int[]、ArrayList 等）
@@ -285,6 +285,18 @@ namespace DanKeJson.Json
             return json;
         }
 
+        /// <summary>NaN / Infinity 不是合法的 JSON 数字。</summary>
+        private static bool IsNonFiniteNumber(string literal)
+        {
+            return literal == "NaN" || literal == "Infinity" || literal == "-Infinity";
+        }
+
+        /// <summary>反射对象：成员图不适合直接序列化，改为输出文本。</summary>
+        private static bool IsReflectionObject(object value)
+        {
+            return value is Type || value is MemberInfo || value is Assembly || value is Module;
+        }
+
         private sealed class ReferenceComparer : IEqualityComparer<object>
         {
             public static readonly ReferenceComparer Instance = new ReferenceComparer();
@@ -310,7 +322,9 @@ namespace DanKeJson.Json
             switch (json.type)
             {
                 case JsonData.Type.Number:
-                    builder.Append(json.json);
+                    // JSON 无法表示 NaN / Infinity，按 JSON.stringify 的做法输出 null
+                    // （JSON5 支持这些字面量，Json5.Serializer 保留原样）
+                    builder.Append(IsNonFiniteNumber(json.json) ? "null" : json.json);
                     break;
                 case JsonData.Type.String:
                     builder.Append('"');
