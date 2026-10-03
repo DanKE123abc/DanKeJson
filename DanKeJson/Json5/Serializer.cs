@@ -124,7 +124,7 @@ namespace DanKeJson.Json5
         }
 
         /// <summary>
-        /// Returns true if the key can be emitted without quotes (letters, digits, underscore),
+        /// Returns true if the key can be emitted without quotes (letters, digits, underscore, dollar),
         /// matching the characters the JSON5 parser accepts for unquoted keys.
         /// </summary>
         private static bool IsIdentifier(string key)
@@ -136,7 +136,7 @@ namespace DanKeJson.Json5
 
             foreach (char c in key)
             {
-                if (!char.IsLetterOrDigit(c) && c != '_')
+                if (!char.IsLetterOrDigit(c) && c != '_' && c != '$')
                 {
                     return false;
                 }

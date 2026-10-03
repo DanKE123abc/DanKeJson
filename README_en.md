@@ -18,6 +18,8 @@ DanKeJson is a simple *.Net* library to handle conversions from and to JSON (Jav
 
 [Object to Json](./Docs/QuickStart/Object2Json.md)
 
+[Changelog](./CHANGELOG.md)
+
 ## Features
 
 DanKeJson has incorporated a variety of features to facilitate development, including but not limited to:
@@ -40,7 +42,7 @@ For more information on features, please refer to: [**Hello DanKeJson**](./Docs/
 Deserialization:
 
 - [ ] Parser support for single-line and multi-line comments
-- [ ] Support for date formats
+- [x] Support for date formats (DateTime / DateTimeOffset / TimeSpan / Guid)
 - [ ] Support more dotnet version
 - [x] Allow key names without quotes
 - [x] Support for single quotes in strings
@@ -70,46 +72,46 @@ dotnet cake .\build.cake
 
 ## Using DanKeJson from an application
 
-**[Download package](https://www.nuget.org/api/v2/package/DanKeJson/1.5.1)**
+**[Download package](https://www.nuget.org/api/v2/package/DanKeJson/1.6.0)**
 
 ### Package manager
 
 ```shell
-NuGet\Install-Package DanKeJson -Version 1.5.1
+NuGet\Install-Package DanKeJson -Version 1.6.0
 ```
 
 ### .NET CLI
 
 ```shell
-dotnet add package DanKeJson --version 1.5.1
+dotnet add package DanKeJson --version 1.6.0
 ```
 
 ### PackageReference
 
 ```xaml
-<PackageReference Include="DanKeJson" Version="1.5.1" />
+<PackageReference Include="DanKeJson" Version="1.6.0" />
 ```
 
 ### Paket CLI
 
 ```shell
-paket add DanKeJson --version 1.5.1
+paket add DanKeJson --version 1.6.0
 ```
 
 ### Script & Interactive
 
 ```c#
-#r "nuget: DanKeJson, 1.5.1"
+#r "nuget: DanKeJson, 1.6.0"
 ```
 
 ### Cake
 
 ```C#
 // Install DanKeJson as a Cake Addin
-#addin nuget:?package=DanKeJson&version=1.5.1
+#addin nuget:?package=DanKeJson&version=1.6.0
 
 // Install DanKeJson as a Cake Tool
-#tool nuget:?package=DanKeJson&version=1.5.1
+#tool nuget:?package=DanKeJson&version=1.6.0
 ```
 
 Alternatively, just copy the whole tree of files under `./publish/DanKeJson` to your own project's source tree and integrate it with your development environment.

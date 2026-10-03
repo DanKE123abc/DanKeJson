@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using DanKeJson.Json;
+using DanKeJson.Utils;
 using static DanKeJson.Json.Reader;
 using static DanKeJson.Json5.ReaderExts;
 
@@ -42,8 +43,8 @@ namespace DanKeJson.Json5
             JsonData jsonData = null;
             if (cur == '\"')
             {
-                //String (Double/Standard)
-                jsonData = ToString_Double(json, ref index);
+                //String (Double/Standard)，JSON5 额外支持 \x、\v、\0、续行
+                jsonData = ToString_Double(json, ref index, true);
             }
             else if (cur == '\'')
             {
@@ -55,20 +56,40 @@ namespace DanKeJson.Json5
                 //Boolean
                 jsonData = ToBoolean(json, ref index);
             }
-            else if (cur == '-' || cur == '+' || char.IsDigit(cur) || cur == 'N' || cur == 'I')
+            else if (cur == '-' || cur == '+' || cur == '.' || char.IsDigit(cur) || cur == 'N' || cur == 'I')
             {
-                //Number
-                jsonData = ToNumber(json, ref index);
+                //Number（JSON5 额外支持 0x / 0X 十六进制、.5 / 5. 写法）
+                jsonData = ToNumberHex(json, ref index);
+                if (jsonData == null)
+                {
+                    jsonData = ToNumber(json, ref index, true);
+                }
             }
             else if (cur == '{')
             {
-                //Object
-                jsonData = ReaderExts.ToObject(json, ref index);
+                //Object；每进入一层容器计数一次，使 MaxDepth 与文档嵌套层级一致
+                DepthGuard.Enter();
+                try
+                {
+                    jsonData = ReaderExts.ToObject(json, ref index);
+                }
+                finally
+                {
+                    DepthGuard.Exit();
+                }
             }
             else if (cur == '[')
             {
                 //Array
-                jsonData = ReaderExts.ToArray(json, ref index);
+                DepthGuard.Enter();
+                try
+                {
+                    jsonData = ReaderExts.ToArray(json, ref index);
+                }
+                finally
+                {
+                    DepthGuard.Exit();
+                }
             }
             else if (cur == 'n')
             {

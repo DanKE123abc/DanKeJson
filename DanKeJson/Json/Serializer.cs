@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.ExceptionServices;
 using System.Text;
 using DanKeJson.Utils;
 
@@ -11,6 +12,7 @@ using DanKeJson.Utils;
 #pragma warning disable CS8603
 #pragma warning disable CS8602
 #pragma warning disable CS8600
+#pragma warning disable CS8601
 #pragma warning disable CS1591
 
 namespace DanKeJson.Json
@@ -27,12 +29,32 @@ namespace DanKeJson.Json
 
         private static JsonData FromObject(object jsonObject, HashSet<object> stack)
         {
+            DepthGuard.Enter();
+            try
+            {
+                return FromObjectCore(jsonObject, stack);
+            }
+            finally
+            {
+                DepthGuard.Exit();
+            }
+        }
+
+        private static JsonData FromObjectCore(object jsonObject, HashSet<object> stack)
+        {
             if (jsonObject == null)
             {
                 return new JsonData(JsonData.Type.None);
             }
 
             System.Type type = jsonObject.GetType();
+
+            // 反射对象（Type / MemberInfo / Assembly / Module）的成员图又深又互相引用，
+            // 直接按文本输出，避免误报循环引用或抛出难以理解的反射异常
+            if (IsReflectionObject(jsonObject))
+            {
+                return new JsonData(JsonData.Type.String) { json = "\"" + jsonObject + "\"" };
+            }
 
             // 数组 / 列表（List<T>、int[]、ArrayList 等）
             if (jsonObject is IList list)
@@ -54,7 +76,9 @@ namespace DanKeJson.Json
                 JsonData objectJson = new JsonData(JsonData.Type.Object);
                 foreach (DictionaryEntry entry in dictionary)
                 {
-                    objectJson[entry.Key.ToString()] = entry.Value == null
+                    // JSON 的键必须是字符串；Hashtable 允许 null 键，这里统一写成空键
+                    string entryKey = entry.Key == null ? string.Empty : entry.Key.ToString();
+                    objectJson[entryKey] = entry.Value == null
                         ? new JsonData(JsonData.Type.None)
                         : FromObject(entry.Value, stack);
                 }
@@ -62,9 +86,35 @@ namespace DanKeJson.Json
                 return objectJson;
             }
 
+            // 其它可枚举类型（Stack / Queue / HashSet / LINQ 结果等）按数组序列化，
+            // 否则会退化成 {"Count":n,...} 这种错误结果。
+            // string 同样是 IEnumerable，但必须留给下面的字符串分支。
+            if (jsonObject is IEnumerable enumerable && !(jsonObject is string))
+            {
+                JsonData enumerableJson = new JsonData(JsonData.Type.Array);
+                foreach (object item in enumerable)
+                {
+                    enumerableJson.array.Add(item == null
+                        ? new JsonData(JsonData.Type.None)
+                        : FromObject(item, stack));
+                }
+
+                return enumerableJson;
+            }
+
+            // 枚举必须早于 Type.GetTypeCode 判断：枚举的 TypeCode 是其基础类型，
+            // 否则会落到整数分支并输出成员名（如 Blue），产生非法 JSON。
+            if (type.IsEnum)
+            {
+                object underlyingValue = Convert.ChangeType(jsonObject, Enum.GetUnderlyingType(type), CultureInfo.InvariantCulture);
+                return new JsonData(JsonData.Type.Number)
+                    { json = Convert.ToString(underlyingValue, CultureInfo.InvariantCulture) };
+            }
+
             switch (Type.GetTypeCode(type))
             {
                 case TypeCode.String:
+                case TypeCode.Char:
                     return new JsonData(JsonData.Type.String)
                         { json = "\"" + jsonObject + "\"" };
                 case TypeCode.Boolean:
@@ -116,12 +166,6 @@ namespace DanKeJson.Json
                 return (JsonData)jsonObject;
             }
 
-            if (type.IsEnum)
-            {
-                object underlying = Convert.ChangeType(jsonObject, Enum.GetUnderlyingType(type), CultureInfo.InvariantCulture);
-                return new JsonData(JsonData.Type.Number) { json = underlying.ToString() };
-            }
-
             // 循环引用检测（仅引用类型）
             bool referenceType = !type.IsValueType;
             if (referenceType)
@@ -143,7 +187,7 @@ namespace DanKeJson.Json
             const BindingFlags flags = BindingFlags.Public | BindingFlags.Instance;
             foreach (MemberInfo member in type.GetFields(flags)
                 .Select<FieldInfo, MemberInfo>(f => f)
-                .Concat(type.GetProperties(flags)))
+                .Concat(type.GetProperties(flags).Where(p => p.GetIndexParameters().Length == 0)))
             {
                 object memberValue;
                 Type memberType;
@@ -156,7 +200,17 @@ namespace DanKeJson.Json
                         continue;
                     }
 
-                    memberValue = propertyInfo.GetValue(jsonObject);
+                    try
+                    {
+                        memberValue = propertyInfo.GetValue(jsonObject);
+                    }
+                    catch (TargetInvocationException ex) when (ex.InnerException != null)
+                    {
+                        // 去掉反射包装，让调用方看到 getter 内部真正的异常
+                        ExceptionDispatchInfo.Capture(ex.InnerException).Throw();
+                        throw;
+                    }
+
                     memberType = propertyInfo.PropertyType;
                 }
                 else if (member is FieldInfo fieldInfo)
@@ -231,6 +285,18 @@ namespace DanKeJson.Json
             return json;
         }
 
+        /// <summary>NaN / Infinity 不是合法的 JSON 数字。</summary>
+        private static bool IsNonFiniteNumber(string literal)
+        {
+            return literal == "NaN" || literal == "Infinity" || literal == "-Infinity";
+        }
+
+        /// <summary>反射对象：成员图不适合直接序列化，改为输出文本。</summary>
+        private static bool IsReflectionObject(object value)
+        {
+            return value is Type || value is MemberInfo || value is Assembly || value is Module;
+        }
+
         private sealed class ReferenceComparer : IEqualityComparer<object>
         {
             public static readonly ReferenceComparer Instance = new ReferenceComparer();
@@ -256,7 +322,9 @@ namespace DanKeJson.Json
             switch (json.type)
             {
                 case JsonData.Type.Number:
-                    builder.Append(json.json);
+                    // JSON 无法表示 NaN / Infinity，按 JSON.stringify 的做法输出 null
+                    // （JSON5 支持这些字面量，Json5.Serializer 保留原样）
+                    builder.Append(IsNonFiniteNumber(json.json) ? "null" : json.json);
                     break;
                 case JsonData.Type.String:
                     builder.Append('"');

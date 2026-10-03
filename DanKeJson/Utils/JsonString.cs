@@ -18,8 +18,9 @@ namespace DanKeJson.Utils
             }
 
             StringBuilder sb = new StringBuilder(value.Length);
-            foreach (char c in value)
+            for (int i = 0; i < value.Length; i++)
             {
+                char c = value[i];
                 switch (c)
                 {
                     case '"':
@@ -48,6 +49,19 @@ namespace DanKeJson.Utils
                         {
                             sb.Append("\\u").Append(((int)c).ToString("x4"));
                         }
+                        else if (char.IsSurrogate(c))
+                        {
+                            // 合法代理对原样保留；孤立代理项转义，避免产出非法 JSON
+                            if (char.IsHighSurrogate(c) && i + 1 < value.Length && char.IsLowSurrogate(value[i + 1]))
+                            {
+                                sb.Append(c).Append(value[i + 1]);
+                                i++;
+                            }
+                            else
+                            {
+                                sb.Append("\\u").Append(((int)c).ToString("x4"));
+                            }
+                        }
                         else
                         {
                             sb.Append(c);
@@ -70,8 +84,9 @@ namespace DanKeJson.Utils
             }
 
             StringBuilder sb = new StringBuilder(value.Length);
-            foreach (char c in value)
+            for (int i = 0; i < value.Length; i++)
             {
+                char c = value[i];
                 switch (c)
                 {
                     case '\'':
@@ -99,6 +114,19 @@ namespace DanKeJson.Utils
                         if (c < 0x20)
                         {
                             sb.Append("\\u").Append(((int)c).ToString("x4"));
+                        }
+                        else if (char.IsSurrogate(c))
+                        {
+                            // 合法代理对原样保留；孤立代理项转义，避免产出非法 JSON5
+                            if (char.IsHighSurrogate(c) && i + 1 < value.Length && char.IsLowSurrogate(value[i + 1]))
+                            {
+                                sb.Append(c).Append(value[i + 1]);
+                                i++;
+                            }
+                            else
+                            {
+                                sb.Append("\\u").Append(((int)c).ToString("x4"));
+                            }
                         }
                         else
                         {

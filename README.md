@@ -18,6 +18,8 @@ DanKeJson 是一个.Net平台上的精简小巧的 JSON 类库，用于处理 JS
 
 [Object to Json](./Docs/QuickStart/Object2Json.md)
 
+[更新日志](./CHANGELOG.md)
+
 ## 特性
 
 DanKeJson 为了方便开发使用，添加了许多特性，包括但不限于：
@@ -41,7 +43,7 @@ DanKeJson 为了方便开发使用，添加了许多特性，包括但不限于�
 反序列化部分：
 
 - [ ] 解析器支持单行注释与多行注释
-- [ ] 支持日期格式
+- [x] 支持日期格式（DateTime / DateTimeOffset / TimeSpan / Guid）
 - [ ] 支持更多 .net 版本
 - [x] 键名无需引号
 - [x] 字符串支持单引号
@@ -76,46 +78,46 @@ dotnet cake .\build.cake
 
 ## 在你的应用中安装 DanKeJson
 
-**[点击下载](https://www.nuget.org/api/v2/package/DanKeJson/1.5.1)**
+**[点击下载](https://www.nuget.org/api/v2/package/DanKeJson/1.6.0)**
 
 ### Package manager
 
 ```shell
-NuGet\Install-Package DanKeJson -Version 1.5.1
+NuGet\Install-Package DanKeJson -Version 1.6.0
 ```
 
 ### .NET CLI
 
 ```shell
-dotnet add package DanKeJson --version 1.5.1
+dotnet add package DanKeJson --version 1.6.0
 ```
 
 ### PackageReference
 
 ```xaml
-<PackageReference Include="DanKeJson" Version="1.5.1" />
+<PackageReference Include="DanKeJson" Version="1.6.0" />
 ```
 
 ### Paket CLI
 
 ```shell
-paket add DanKeJson --version 1.5.1
+paket add DanKeJson --version 1.6.0
 ```
 
 ### Script & Interactive
 
 ```c#
-#r "nuget: DanKeJson, 1.5.1"
+#r "nuget: DanKeJson, 1.6.0"
 ```
 
 ### Cake
 
 ```C#
 // Install DanKeJson as a Cake Addin
-#addin nuget:?package=DanKeJson&version=1.5.1
+#addin nuget:?package=DanKeJson&version=1.6.0
 
 // Install DanKeJson as a Cake Tool
-#tool nuget:?package=DanKeJson&version=1.5.1
+#tool nuget:?package=DanKeJson&version=1.6.0
 ```
 
 或者，只需复制目录`./publish/DanKeJson`到您自己项目的源代码树中，并将其与您的开发环境集成。

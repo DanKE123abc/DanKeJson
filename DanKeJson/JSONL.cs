@@ -22,7 +22,10 @@ namespace DanKeJson
                 {
                     // 添加空行检查
                     if (string.IsNullOrWhiteSpace(l)) continue;
-                    dataLines.Add(JSON.ToData(l));
+                    // 跳过无法解析的行（例如被换行拆开的美化 JSON），避免插入 null 元素
+                    JsonData line = JSON.ToData(l);
+                    if (line == null) continue;
+                    dataLines.Add(line);
                 }
             }
             return dataLines;
@@ -44,7 +47,10 @@ namespace DanKeJson
                 {
                     // 添加空行检查
                     if (string.IsNullOrWhiteSpace(l)) continue;
-                    dataLines.Add(JSON.ToData<T>(l));
+                    // 解析失败的行（或该行就是 null）会被跳过，避免插入 null 元素
+                    T line = JSON.ToData<T>(l);
+                    if (line == null) continue;
+                    dataLines.Add(line);
                 }
             }
             return dataLines;
@@ -96,6 +102,10 @@ namespace DanKeJson
         /// <param name="jsonDataList">the JsonData list</param>
         /// <param name="filePath">the output file path</param>
         /// <returns></returns>
+        /// <remarks>
+        /// 指定 filePath 时按行写入：UTF-8 无 BOM、行分隔符为 \n（与返回值一致），
+        /// 列表中的 null 元素写成 JSON 的 null；目标目录必须已存在，否则抛出 DirectoryNotFoundException。
+        /// </remarks>
         public static string ListToJson(List<JsonData> jsonDataList, string filePath = null)
         {
             if (jsonDataList == null)
@@ -105,12 +115,15 @@ namespace DanKeJson
             var jsonLines = new List<string>();
             foreach (var l in jsonDataList)
             {
-                jsonLines.Add(JSON.ToJson(l));
+                // 列表中允许出现 null 元素，写成 JSON 的 null
+                jsonLines.Add(JSON.ToJson(l) ?? "null");
             }
             if (!string.IsNullOrEmpty(filePath))
             {
-                using (var writer = new StreamWriter(filePath, false, Encoding.UTF8))
+                // 不带 BOM 的 UTF-8，行分隔符统一为 \n（与返回值一致）
+                using (var writer = new StreamWriter(filePath, false, new UTF8Encoding(false)))
                 {
+                    writer.NewLine = "\n";
                     foreach (var line in jsonLines)
                     {
                         string escapedLine = line.Replace("\r\n", "\\n").Replace("\n", "\\n");
@@ -129,6 +142,10 @@ namespace DanKeJson
         /// <param name="filePath">the output file path</param>
         /// <typeparam name="T">Class</typeparam>
         /// <returns></returns>
+        /// <remarks>
+        /// 指定 filePath 时按行写入：UTF-8 无 BOM、行分隔符为 \n（与返回值一致），
+        /// 列表中的 null 元素写成 JSON 的 null；目标目录必须已存在，否则抛出 DirectoryNotFoundException。
+        /// </remarks>
         public static string ListToJson<T>(List<T> jsonDataList, string filePath = null) where T : class, new()
         {
             if (jsonDataList == null)
@@ -138,12 +155,15 @@ namespace DanKeJson
             var jsonLines = new List<string>();
             foreach (var l in jsonDataList)
             {
-                jsonLines.Add(JSON.ToJson(l));
+                // 列表中允许出现 null 元素，写成 JSON 的 null
+                jsonLines.Add(JSON.ToJson(l) ?? "null");
             }
             if (!string.IsNullOrEmpty(filePath))
             {
-                using (var writer = new StreamWriter(filePath, false, Encoding.UTF8))
+                // 不带 BOM 的 UTF-8，行分隔符统一为 \n（与返回值一致）
+                using (var writer = new StreamWriter(filePath, false, new UTF8Encoding(false)))
                 {
+                    writer.NewLine = "\n";
                     foreach (var line in jsonLines)
                     {
                         string escapedLine = line.Replace("\r\n", "\\n").Replace("\n", "\\n");

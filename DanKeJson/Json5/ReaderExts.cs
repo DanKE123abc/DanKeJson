@@ -1,6 +1,7 @@
 ﻿using System.Globalization;
 using System.Text;
 using DanKeJson.Json;
+using DanKeJson.Utils;
 using static DanKeJson.Json.Reader;
 
 #pragma warning disable CS8603
@@ -83,9 +84,46 @@ namespace DanKeJson.Json5
                             }
 
                             break;
+                        // JSON5 扩展转义
+                        case 'x':
+                            if (TryReadHexEscape(json, ref index, 2, out char hexValue))
+                            {
+                                sb.Append(hexValue);
+                            }
+                            else
+                            {
+                                AppendVerbatimEscape(sb, json, index);
+                            }
+
+                            break;
+                        case 'v':
+                            sb.Append('\v');
+                            break;
+                        case '0':
+                            if (index >= json.Length || !char.IsDigit(json[index]))
+                            {
+                                sb.Append('\0');
+                            }
+                            else
+                            {
+                                AppendVerbatimEscape(sb, json, index);
+                            }
+
+                            break;
+                        case '\n':
+                        case '\u2028':
+                        case '\u2029':
+                            // 字符串续行：反斜杠与行终止符都被移除
+                            break;
+                        case '\r':
+                            if (index < json.Length && json[index] == '\n')
+                            {
+                                index++;
+                            }
+
+                            break;
                         default: // 未知转义序列保持原样
-                            sb.Append('\\');
-                            sb.Append(json[index - 1]);
+                            AppendVerbatimEscape(sb, json, index);
                             break;
                     }
                 }
@@ -101,6 +139,74 @@ namespace DanKeJson.Json5
             return null;
         }
 
+        //json5 十六进制数字（0x / 0X，可带正负号），不是十六进制时把索引还原并返回 null
+        public static JsonData ToNumberHex(string json, ref int index)
+        {
+            if (index < 0 || index >= json.Length)
+            {
+                return null;
+            }
+
+            int start = index;
+            bool negative = false;
+            if (json[index] == '+' || json[index] == '-')
+            {
+                negative = json[index] == '-';
+                index++;
+            }
+
+            if (index + 1 >= json.Length || json[index] != '0' ||
+                (json[index + 1] != 'x' && json[index + 1] != 'X'))
+            {
+                index = start;
+                return null;
+            }
+
+            index += 2;
+            int digitsStart = index;
+            while (index < json.Length && IsHexDigit(json[index]))
+            {
+                index++;
+            }
+
+            if (index == digitsStart)
+            {
+                index = start;
+                return null;
+            }
+
+            string digits = json.Substring(digitsStart, index - digitsStart);
+            if (!ulong.TryParse(digits, NumberStyles.HexNumber, CultureInfo.InvariantCulture, out ulong value))
+            {
+                index = start;
+                return null;
+            }
+
+            if (negative)
+            {
+                if (value > long.MaxValue)
+                {
+                    index = start;
+                    return null;
+                }
+
+                return new JsonData(JsonData.Type.Number)
+                {
+                    json = (-(long)value).ToString(CultureInfo.InvariantCulture)
+                };
+            }
+
+            return new JsonData(JsonData.Type.Number)
+            {
+                json = value.ToString(CultureInfo.InvariantCulture)
+            };
+        }
+
+        private static bool IsHexDigit(char c)
+        {
+            return (c >= '0' && c <= '9') || (c >= 'a' && c <= 'f') || (c >= 'A' && c <= 'F');
+        }
+
         //json5键名
         public static string ReadKey(string json, ref int index)
         {
@@ -111,35 +217,48 @@ namespace DanKeJson.Json5
 
             if (json[index] == '"' || json[index] == '\'') //键名有引号
             {
-                char quote = json[index];
-                index++;
-                int start = index;
-                while (index < json.Length && json[index] != quote)
-                {
-                    index++;
-                }
+                // 复用字符串解析：带引号的键名同样需要处理 \" \\ \uXXXX 等转义
+                JsonData keyNode = json[index] == '"'
+                    ? ToString_Double(json, ref index, true)
+                    : ToString_Single(json, ref index);
 
-                if (index >= json.Length)
-                {
-                    return null;
-                }
-
-                return json.Substring(start, index++ - start);
+                return keyNode == null ? null : JsonString.Unquote(keyNode.json);
             }
-            else //键名无引号
+            else //键名无引号：JSON5 的 IdentifierName（字母、数字、_、$，支持 \uXXXX 转义）
             {
-                int start = index;
-                while (index < json.Length && (char.IsLetterOrDigit(json[index]) || json[index] == '_'))
+                StringBuilder builder = new StringBuilder();
+                while (index < json.Length)
                 {
-                    index++;
+                    char c = json[index];
+                    if (char.IsLetterOrDigit(c) || c == '_' || c == '$')
+                    {
+                        builder.Append(c);
+                        index++;
+                        continue;
+                    }
+
+                    if (c == '\\' && index + 1 < json.Length && json[index + 1] == 'u')
+                    {
+                        int escapeStart = index;
+                        index += 2;
+                        if (TryReadHexEscape(json, ref index, 4, out char escaped))
+                        {
+                            builder.Append(escaped);
+                            continue;
+                        }
+
+                        index = escapeStart;
+                    }
+
+                    break;
                 }
 
-                if (start == index)
+                if (builder.Length == 0)
                 {
                     return null; // Empty key
                 }
 
-                return json.Substring(start, index - start);
+                return builder.ToString();
             }
         }
         
