@@ -255,5 +255,15 @@ namespace DanKeJson.Tests
             Assert.Equal("a\\x41b", (string)JSON.ToData("\"a\\x41b\""));
             Assert.Equal("a\\\nb", (string)JSON.ToData("\"a\\\nb\""));
         }
+
+        [Fact]
+        public void ToData_UnquotedKeyWithDollar()
+        {
+            var withoutQuotes = new Json5Options { KeyNameStyle = Json5Options.KeyNameType.WithoutQuotes };
+
+            Assert.Equal(1, (int)JSON5.ToData("{$a:1}")["$a"]);
+            Assert.Equal("{$a:1}", JSON5.ToJson(JSON.ToData("{\"$a\":1}"), withoutQuotes));
+            Assert.Equal("{\"a-b\":1}", JSON5.ToJson(JSON.ToData("{\"a-b\":1}"), withoutQuotes));
+        }
     }
 }

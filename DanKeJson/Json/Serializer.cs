@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.ExceptionServices;
 using System.Text;
 using DanKeJson.Utils;
 
@@ -47,6 +48,13 @@ namespace DanKeJson.Json
             }
 
             System.Type type = jsonObject.GetType();
+
+            // Type 自身：反射成员会抛异常，直接按类型名输出成字符串
+            // （必须早于下面的 IEnumerable 分支，RuntimeType 本身是可枚举的）
+            if (jsonObject is Type jsonType)
+            {
+                return new JsonData(JsonData.Type.String) { json = "\"" + jsonType + "\"" };
+            }
 
             // 数组 / 列表（List<T>、int[]、ArrayList 等）
             if (jsonObject is IList list)
@@ -192,7 +200,17 @@ namespace DanKeJson.Json
                         continue;
                     }
 
-                    memberValue = propertyInfo.GetValue(jsonObject);
+                    try
+                    {
+                        memberValue = propertyInfo.GetValue(jsonObject);
+                    }
+                    catch (TargetInvocationException ex) when (ex.InnerException != null)
+                    {
+                        // 去掉反射包装，让调用方看到 getter 内部真正的异常
+                        ExceptionDispatchInfo.Capture(ex.InnerException).Throw();
+                        throw;
+                    }
+
                     memberType = propertyInfo.PropertyType;
                 }
                 else if (member is FieldInfo fieldInfo)

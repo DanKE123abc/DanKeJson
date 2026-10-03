@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.ExceptionServices;
 using DanKeJson.Utils;
 using static DanKeJson.Json.Reader;
 
@@ -56,6 +57,15 @@ namespace DanKeJson.Json
                 return json;
             }
 
+            // object 目标：按 JSON 的实际类型映射到对应的 CLR 类型
+            if (type == typeof(object))
+            {
+                return ObjectFromJson(json);
+            }
+
+            // 集合接口（IList<T> / IEnumerable<T> / IDictionary<K,V> 等）映射到具体实现
+            type = ResolveCollectionType(type);
+
             // 字典目标：顶层、成员、集合元素共用同一实现
             if (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(Dictionary<,>))
             {
@@ -74,6 +84,13 @@ namespace DanKeJson.Json
             }
 
             if (json == null || json.type == JsonData.Type.None)
+            {
+                return null;
+            }
+
+            // 抽象类、接口与没有公共无参构造的类型无法实例化：
+            // 直接跳过（成员保持默认值），而不是抛出 MissingMethodException
+            if (!CanInstantiate(type))
             {
                 return null;
             }
@@ -97,6 +114,7 @@ namespace DanKeJson.Json
 
                 Type memberType = GetMemberType(member);
                 Type valueType = Nullable.GetUnderlyingType(memberType) ?? memberType;
+                Type collectionType = ResolveCollectionType(valueType);
                 bool isNullable = valueType != memberType;
                 string memberName = member.Name;
 
@@ -133,6 +151,13 @@ namespace DanKeJson.Json
                         SetMemberValue(member, dataclass, enumValue);
                     }
 
+                    continue;
+                }
+
+                // object 成员：按 JSON 的实际类型映射（字符串/数字/布尔/数组/对象）
+                if (valueType == typeof(object))
+                {
+                    SetMemberValue(member, dataclass, ObjectFromJson(propertyJson));
                     continue;
                 }
 
@@ -213,32 +238,32 @@ namespace DanKeJson.Json
                             DateTimeOffset.TryParse(JsonString.Unquote(propertyJson.json), CultureInfo.InvariantCulture, DateTimeStyles.RoundtripKind, out DateTimeOffset dateTimeOffsetValue);
                             SetMemberValue(member, dataclass, dateTimeOffsetValue);
                         }
-                        else if (valueType.IsGenericType && valueType.GetGenericTypeDefinition() == typeof(List<>))
+                        else if (collectionType.IsGenericType && collectionType.GetGenericTypeDefinition() == typeof(List<>))
                         {
                             if (propertyJson.type == JsonData.Type.Array)
                             {
-                                IList list = ListFromArray(propertyJson, valueType.GetGenericArguments()[0]);
+                                IList list = ListFromArray(propertyJson, collectionType.GetGenericArguments()[0]);
                                 SetMemberValue(member, dataclass, list);
                             }
                         }
-                        else if (valueType.IsArray)
+                        else if (collectionType.IsArray)
                         {
                             if (propertyJson.type == JsonData.Type.Array)
                             {
-                                Array array = ArrayFromJson(propertyJson, valueType.GetElementType());
+                                Array array = ArrayFromJson(propertyJson, collectionType.GetElementType());
                                 SetMemberValue(member, dataclass, array);
                             }
                         }
-                        else if (valueType.IsGenericType && valueType.GetGenericTypeDefinition() == typeof(Dictionary<,>))
+                        else if (collectionType.IsGenericType && collectionType.GetGenericTypeDefinition() == typeof(Dictionary<,>))
                         {
                             if (propertyJson.type == JsonData.Type.Object)
                             {
-                                SetMemberValue(member, dataclass, DictionaryFromJson(propertyJson, valueType));
+                                SetMemberValue(member, dataclass, DictionaryFromJson(propertyJson, collectionType));
                             }
                         }
                         else if (propertyJson.type == JsonData.Type.Object)
                         {
-                            SetMemberValue(member, dataclass, FromJson(propertyJson, valueType));
+                            SetMemberValue(member, dataclass, FromJson(propertyJson, collectionType));
                         }
                         break;
                 }
@@ -282,13 +307,22 @@ namespace DanKeJson.Json
 
         private static void SetMemberValue(MemberInfo member, object instance, object value)
         {
-            if (member is PropertyInfo propertyInfo)
+            try
             {
-                propertyInfo.SetValue(instance, value);
+                if (member is PropertyInfo propertyInfo)
+                {
+                    propertyInfo.SetValue(instance, value);
+                }
+                else if (member is FieldInfo fieldInfo)
+                {
+                    fieldInfo.SetValue(instance, value);
+                }
             }
-            else if (member is FieldInfo fieldInfo)
+            catch (TargetInvocationException ex) when (ex.InnerException != null)
             {
-                fieldInfo.SetValue(instance, value);
+                // 去掉反射包装，让调用方看到 setter 内部真正的异常
+                ExceptionDispatchInfo.Capture(ex.InnerException).Throw();
+                throw;
             }
         }
 
@@ -374,13 +408,18 @@ namespace DanKeJson.Json
         /// </summary>
         private static object ValueFromJson(JsonData json, Type type)
         {
-            Type target = Nullable.GetUnderlyingType(type) ?? type;
+            Type target = ResolveCollectionType(Nullable.GetUnderlyingType(type) ?? type);
 
             if (json == null || json.type == JsonData.Type.None)
             {
                 return type.IsValueType && Nullable.GetUnderlyingType(type) == null
                     ? Activator.CreateInstance(type)
                     : null;
+            }
+
+            if (target == typeof(object))
+            {
+                return ObjectFromJson(json);
             }
 
             if (target.IsEnum)
@@ -557,6 +596,109 @@ namespace DanKeJson.Json
             }
         }
 
+        /// <summary>类型是否可以用 Activator.CreateInstance 创建。</summary>
+        private static bool CanInstantiate(Type type)
+        {
+            if (type.IsValueType)
+            {
+                // 结构体总是有默认构造（GetConstructor 对无显式构造的结构体返回 null）
+                return true;
+            }
+
+            if (type.IsAbstract || type.IsInterface)
+            {
+                return false;
+            }
+
+            return type.GetConstructor(Type.EmptyTypes) != null;
+        }
+
+        /// <summary>
+        /// 把集合接口映射到对应的具体实现（IList&lt;T&gt; / IEnumerable&lt;T&gt; → List&lt;T&gt;，
+        /// IDictionary&lt;K,V&gt; → Dictionary&lt;K,V&gt;），其它类型原样返回。
+        /// </summary>
+        private static Type ResolveCollectionType(Type type)
+        {
+            if (type == null || !type.IsInterface || !type.IsGenericType)
+            {
+                return type;
+            }
+
+            Type definition = type.GetGenericTypeDefinition();
+            if (definition == typeof(IList<>) ||
+                definition == typeof(ICollection<>) ||
+                definition == typeof(IEnumerable<>) ||
+                definition == typeof(IReadOnlyList<>) ||
+                definition == typeof(IReadOnlyCollection<>))
+            {
+                return typeof(List<>).MakeGenericType(type.GetGenericArguments());
+            }
+
+            if (definition == typeof(IDictionary<,>) || definition == typeof(IReadOnlyDictionary<,>))
+            {
+                return typeof(Dictionary<,>).MakeGenericType(type.GetGenericArguments());
+            }
+
+            return type;
+        }
+
+        /// <summary>
+        /// 把 JSON 节点映射成 object 成员的自然 CLR 类型：
+        /// 字符串 / 布尔 / 整数（long）/ 小数（double）/ List&lt;object&gt; / Dictionary&lt;string, object&gt;。
+        /// </summary>
+        private static object ObjectFromJson(JsonData json)
+        {
+            if (json == null || json.type == JsonData.Type.None)
+            {
+                return null;
+            }
+
+            switch (json.type)
+            {
+                case JsonData.Type.String:
+                    return (string)json;
+                case JsonData.Type.Boolean:
+                    bool.TryParse(json.json, out bool boolValue);
+                    return boolValue;
+                case JsonData.Type.Number:
+                    if (long.TryParse(json.json, NumberStyles.Integer, CultureInfo.InvariantCulture, out long longValue))
+                    {
+                        return longValue;
+                    }
+
+                    if (double.TryParse(json.json, NumberStyles.Float, CultureInfo.InvariantCulture, out double doubleValue))
+                    {
+                        return doubleValue;
+                    }
+
+                    return json.json;
+                case JsonData.Type.Array:
+                    List<object> list = new List<object>();
+                    if (json.array != null)
+                    {
+                        foreach (JsonData item in json.array)
+                        {
+                            list.Add(ObjectFromJson(item));
+                        }
+                    }
+
+                    return list;
+                case JsonData.Type.Object:
+                    Dictionary<string, object> map = new Dictionary<string, object>();
+                    if (json.map != null)
+                    {
+                        foreach (KeyValuePair<string, JsonData> pair in json.map)
+                        {
+                            map[pair.Key] = ObjectFromJson(pair.Value);
+                        }
+                    }
+
+                    return map;
+                default:
+                    return null;
+            }
+        }
+
         private static Array ArrayFromJson(JsonData json, Type elementType)
         {
             IList list = ListFromArray(json, elementType);
@@ -686,6 +828,12 @@ namespace DanKeJson.Json
                         {
                             // JsonData 元素直接保留原始节点（含 None 节点）
                             list.Add(item);
+                            continue;
+                        }
+
+                        if (elementType == typeof(object))
+                        {
+                            list.Add(ObjectFromJson(item));
                             continue;
                         }
 

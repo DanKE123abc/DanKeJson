@@ -188,4 +188,60 @@ namespace DanKeJson.Tests
         public int v;
         public ChainModel next;
     }
+
+    /// <summary>抽象基类成员：无法实例化，反序列化时应跳过而不是抛异常。</summary>
+    public abstract class AbstractThingModel
+    {
+        public string name;
+    }
+
+    /// <summary>同时包含「无法实例化成员」与普通成员的模型。</summary>
+    public class HostModel
+    {
+        public string name;
+        public Uri uri;
+        public AbstractThingModel thing;
+        public Version version;
+        public List<Version> versions;
+    }
+
+    /// <summary>getter 抛异常的模型（序列化时应抛出原始异常）。</summary>
+    public class ThrowingGetterModel
+    {
+        public string Good = "ok";
+
+        public string Bad
+        {
+            get { throw new InvalidOperationException("getter boom"); }
+        }
+    }
+
+    /// <summary>setter 抛异常的模型（反序列化时应抛出原始异常）。</summary>
+    public class ThrowingSetterModel
+    {
+        public string Ok;
+
+        public string V
+        {
+            set { throw new InvalidOperationException("setter boom"); }
+        }
+    }
+
+    /// <summary>object 成员：按 JSON 实际类型映射。</summary>
+    public class DynamicModel
+    {
+        public object anything;
+    }
+
+    /// <summary>集合接口成员：应映射到 List&lt;T&gt; / Dictionary&lt;K,V&gt;。</summary>
+    public class InterfaceCollectionsModel
+    {
+        public IEnumerable<int> numbers;
+        public IList<ItemModel> items;
+        public IReadOnlyList<int> readOnlyNumbers;
+        public IDictionary<string, int> map;
+        public IReadOnlyDictionary<string, int> readOnlyMap;
+        public List<object> rawList;
+        public Dictionary<string, object> rawMap;
+    }
 }

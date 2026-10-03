@@ -374,5 +374,69 @@ namespace DanKeJson.Tests
 
             Assert.Equal("a", m.typed[0].name);
         }
+
+        [Fact]
+        public void ToData_UninstantiableMembers_AreSkipped()
+        {
+            HostModel m = JSON.ToData<HostModel>(
+                "{\"uri\":{\"x\":1},\"thing\":{\"name\":\"a\"},\"version\":{\"major\":1}," +
+                "\"versions\":[{\"major\":1}],\"name\":\"ok\"}");
+
+            Assert.Null(m.uri);
+            Assert.Null(m.thing);
+            Assert.Equal("ok", m.name);
+            Assert.NotNull(m.version);
+            Assert.Single(m.versions);
+        }
+
+        [Fact]
+        public void ToData_ObjectMember_MapsJsonTypes()
+        {
+            Assert.Equal("s", JSON.ToData<DynamicModel>("{\"anything\":\"s\"}").anything);
+            Assert.Equal(5L, JSON.ToData<DynamicModel>("{\"anything\":5}").anything);
+            Assert.Equal(1.5d, JSON.ToData<DynamicModel>("{\"anything\":1.5}").anything);
+            Assert.Equal(true, JSON.ToData<DynamicModel>("{\"anything\":true}").anything);
+            Assert.Null(JSON.ToData<DynamicModel>("{\"anything\":null}").anything);
+
+            List<object> list = (List<object>)JSON.ToData<DynamicModel>("{\"anything\":[1,\"a\"]}").anything;
+            Assert.Equal(2, list.Count);
+            Assert.Equal(1L, list[0]);
+            Assert.Equal("a", list[1]);
+
+            Dictionary<string, object> map =
+                (Dictionary<string, object>)JSON.ToData<DynamicModel>("{\"anything\":{\"k\":1}}").anything;
+            Assert.Equal(1L, map["k"]);
+        }
+
+        [Fact]
+        public void ToData_InterfaceCollectionMembers()
+        {
+            InterfaceCollectionsModel m = JSON.ToData<InterfaceCollectionsModel>(
+                "{\"numbers\":[1,2],\"items\":[{\"name\":\"a\"}],\"readOnlyNumbers\":[1,2,3]," +
+                "\"map\":{\"a\":1},\"readOnlyMap\":{\"b\":2},\"rawList\":[1,\"a\"],\"rawMap\":{\"x\":[1]}}");
+
+            Assert.Equal(new[] { 1, 2 }, m.numbers);
+            Assert.Equal("a", m.items[0].name);
+            Assert.Equal(3, m.readOnlyNumbers.Count);
+            Assert.Equal(1, m.map["a"]);
+            Assert.Equal(2, m.readOnlyMap["b"]);
+            Assert.Equal(1L, m.rawList[0]);
+            Assert.Equal(1L, ((List<object>)m.rawMap["x"])[0]);
+        }
+
+        [Fact]
+        public void ToData_InterfaceMember_JsonNullStaysNull()
+        {
+            Assert.Null(JSON.ToData<InterfaceCollectionsModel>("{\"numbers\":null}").numbers);
+        }
+
+        [Fact]
+        public void ToData_SetterException_IsNotWrapped()
+        {
+            InvalidOperationException ex = Assert.Throws<InvalidOperationException>(
+                () => JSON.ToData<ThrowingSetterModel>("{\"V\":\"x\"}"));
+
+            Assert.Contains("setter boom", ex.Message);
+        }
     }
 }

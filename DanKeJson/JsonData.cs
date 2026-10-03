@@ -152,7 +152,9 @@ namespace DanKeJson
             {
                 return default;
             }
-            return jsonData.json[1..^1];
+
+            // 用 Unquote 而不是切片：手工构造的畸形节点（例如 json 只有一个引号）不再抛异常
+            return JsonString.Unquote(jsonData.json);
         }
 
         /// <summary>

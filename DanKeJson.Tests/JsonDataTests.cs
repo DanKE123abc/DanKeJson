@@ -303,5 +303,14 @@ namespace DanKeJson.Tests
             data[null] = (JsonData)2;
             Assert.Equal("{\"a\":1}", data.json);
         }
+
+        [Fact]
+        public void Implicit_String_MalformedNodeDoesNotThrow()
+        {
+            Assert.Equal("\"", (string)new JsonData(JsonData.Type.String) { json = "\"" });
+            Assert.Equal("", (string)new JsonData(JsonData.Type.String) { json = "" });
+            Assert.Equal("abc", (string)JSON.ToData("\"abc\""));
+            Assert.Null((string)(JsonData)5);
+        }
     }
 }

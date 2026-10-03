@@ -274,5 +274,20 @@ namespace DanKeJson.Tests
             Assert.Equal("\"😀\"", JSON.ToJson("😀"));
             Assert.Equal(0xD800, (int)((string)JSON.ToData(JSON.ToJson("\uD800")))[0]);
         }
+
+        [Fact]
+        public void ToJson_GetterException_IsNotWrapped()
+        {
+            InvalidOperationException ex = Assert.Throws<InvalidOperationException>(
+                () => JSON.ToJson(new ThrowingGetterModel()));
+
+            Assert.Contains("getter boom", ex.Message);
+        }
+
+        [Fact]
+        public void ToJson_Type_IsString()
+        {
+            Assert.Equal("\"System.String\"", JSON.ToJson(typeof(string)));
+        }
     }
 }
